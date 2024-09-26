@@ -1,34 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Nanum+Myeongjo:wght@400;700;800&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Sevillana&display=swap');
-$siderbar-color:   #d0d0d0;
+$siderbar-color:  #D0D5DD;
 $active-color: #fff9f9;
 $text-color: #2E3135;
 @import '../style.scss';
 
+
 .sidebar {
     width: $sidebar-width;
     background-color: $siderbar-color;
-    height: 100vh;
+    height: 90vh;
     overflow-x: hidden; 
     overflow-y: auto 2px; 
-    
-    .header{
-        height: 114px;
-        background-color: $siderbar-color;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    h3 {
-        font-family: "Roboto", sans-serif;
-        font-weight: 500;
-        font-style: normal;
-        line-height: 25.78px;
-        text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25); // Reduced shadow opacity
-        text-align: center;
-        color: $text-color;        
-        
-    }
 }
 
 // Custom scrollbar styling for WebKit browsers (Chrome, Safari)
@@ -56,17 +38,27 @@ $text-color: #2E3135;
     background-color: darken($siderbar-color, 20%); // Darker color on hover
 }
 
+.card{
+    background-color: $siderbar-color;
+    border: none;
+    margin: 10px 0;
+}
+
+.cardHeader{
+    background-color: $siderbar-color;
+}
+
 .activeLink {
     background-color: $text-color;
     color: $active-color;
-    border-radius: 8px;
+    border-radius: 15px;
     font-family: "Roboto Flex", system-ui;
     font-optical-sizing: auto;
     font-weight: 500;
     font-style: normal;
-    font-size: 15px;
+    font-size: 14px;
     box-shadow: 2px 2px 5px $text-color;
-    margin: 18px 0;
+    padding: 7px 10px;
 }
 
 .activeLink:hover{
@@ -81,7 +73,6 @@ $text-color: #2E3135;
 }
   
 .nonactiveLink{
-    margin: 13px 0;
     color: $text-color;
     font-family: "Roboto Flex", system-ui;
     font-optical-sizing: auto;
@@ -94,30 +85,6 @@ $text-color: #2E3135;
     color: $text-color;    
 }
 
-.accordion{
-    background-color: $siderbar-color !important; // Replace this with your desired sidebar background color
-    border: none;
-    border-radius: 0;
-    box-shadow: none !important;
-}
-
-.accordion_item {
-    background-color: $siderbar-color !important; // Replace this with your desired sidebar background color
-    border: none;
-    box-shadow: none !important;
-    border-radius: 0;
-    
-    .accordion_header {
-        background-color: $siderbar-color !important; // Ensures the header matches the item background
-        border: none;
-        box-shadow: none !important;
-    }
-
-    .accordion_header:active{
-        box-shadow: none !important;
-    }
-}
-
 .navs{
 
     .title{
@@ -126,22 +93,14 @@ $text-color: #2E3135;
         font-optical-sizing: auto;
         font-weight: 500;
         font-style: normal;
+        font-size: 15px;
+    }
+    .navigationLinks{
+        color: $text-color;
+        font-family: "Roboto Flex", system-ui;
+        font-optical-sizing: auto;
+        font-weight: 500;
+        font-style: normal;
         font-size: 14px;
     }
-}
-
-@media screen and (max-width: 768px) {
-    .sidebar {
-        width: 100%; // Adjust for smaller screens
-        background-color: #8C949B;
-    }
-}
-
-.md_title{
-    font-family: "Roboto", sans-serif;
-    font-weight: 500;
-    font-style: normal;
-    line-height: 25.78px;
-    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25); // Reduced shadow opacity    
-    color: $text-color;
 }

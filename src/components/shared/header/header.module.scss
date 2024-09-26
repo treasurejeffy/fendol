@@ -1,0 +1,32 @@
+$text-color: #2E3135;
+
+.brand{
+    width: 20%;
+}
+
+.header{
+    background-color: #FAFCFF;
+}
+
+h3 {
+    font-family: "Roboto", sans-serif;
+    font-weight: 550;
+    font-size: 24px;
+    font-style: normal;
+    line-height: 10.78px;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25); // Reduced shadow opacity
+    text-align: center;
+    color: $text-color;        
+}
+
+.search{
+    width: 50%;
+}
+
+.icon{
+    width: 30%;
+    span{
+        font-size: 15px;
+    font-weight: 500;
+    }
+}
