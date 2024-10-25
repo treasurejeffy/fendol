@@ -5,14 +5,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, Button } from 'react-bootstrap';
 import styles from '../product-stages.module.scss';
 import { toast, ToastContainer } from 'react-toastify';
-import axios from 'axios';
+import Api from "../../shared/api/apiLink";
 
 export default function CreateStages() {
     const [loader, setLoader] = useState(false);
 
     // Form fields state
     const [formData, setFormData] = useState({
-        name: "",
+        title: "",
         description: "",
     });
 
@@ -29,11 +29,16 @@ export default function CreateStages() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoader(true);
-        const loadingToast = toast.loading("Creating Stage...",{
-            className: 'dark-toast'});
+        
+        // Fetch the token from sessionStorage
+        const token = sessionStorage.getItem('authToken'); // Ensure the key matches what you have set
+
+        const loadingToast = toast.loading("Creating Stage...", {
+            className: 'dark-toast'
+        });
 
         try {
-            const response = await axios.post('YOUR_API_ENDPOINT', formData);
+            const response = await Api.post('/fish-stage', formData);
 
             // After a successful API call
             toast.update(loadingToast, {
@@ -43,14 +48,16 @@ export default function CreateStages() {
                 autoClose: 3000,
                 className: 'dark-toast'
             });
+
             // Reset form or handle success as needed
             setFormData({
-                name: "",
+                title: "",
                 description: "",
             });
+
         } catch (error) {
             toast.update(loadingToast, {
-                render: "Error creating stage. Please try again.",
+                render: error.response?.data?.message || "Error creating stage. Please try again.",
                 type: "error", // Use string for type
                 isLoading: false,
                 autoClose: 3000,
@@ -60,6 +67,7 @@ export default function CreateStages() {
             setLoader(false);
         }
     };
+
 
     return (
         <section className={`d-none d-lg-block ${styles.body}`}>
@@ -81,8 +89,8 @@ export default function CreateStages() {
                                 placeholder="Eg. Fingerlings, Small, Medium, Large, washing, smoking, drying..."
                                 className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                 type="text"
-                                name="name" // Change this to match the key in formData
-                                value={formData.name}
+                                name="title" // Change this to match the key in formData
+                                value={formData.title}
                                 onChange={handleInputChange}
                                 required
                             />

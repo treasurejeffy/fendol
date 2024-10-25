@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route} from 'react-router-dom';
 import CreateStages from './create-stages/create-stages';
+import AddSpecies from './create-fish-type/create-fish-type';
 import ViewAllStages from './view-all-stages/view-all-stages';
 import AddFish from './add-fish/add-fish';
 import MoveFish from './move-fish/move-fish';
@@ -12,7 +13,8 @@ const ProductStagesNavigations = () => {
   return (
     <Routes>
       <Route path='create-stages' element={<CreateStages/>}/>
-      <Route path='view-all-stages' element={<ViewAllStages/>}/>
+      <Route path='view-all-stages' element={<ViewAllStages/>}/>      
+      <Route path='create-fish-type' element={<AddSpecies/>}/>      
       <Route path='add-fish' element={<AddFish/>}/>
       <Route path='move-fish' element={<MoveFish/>}/>
       <Route path='view-add-fish-history' element={<ViewAddFishHistory/>}/>

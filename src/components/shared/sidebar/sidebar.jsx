@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Nav, Card, Collapse} from 'react-bootstrap';
+import { Nav, Card, Collapse, Tooltip, OverlayTrigger} from 'react-bootstrap';
 import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import { IoGridOutline } from "react-icons/io5";
 import { LuClipboardCheck } from "react-icons/lu";
 import { FaRegCircle } from "react-icons/fa6";
 import styles from './siderbar.module.scss';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate,Link } from 'react-router-dom';
 
 export default function SideBar() {
     const location = useLocation();
@@ -27,14 +27,8 @@ export default function SideBar() {
             setOpen(prev => ({ ...prev, feed: true }));
         }  else if (path.includes('/store')) {
             setOpen(prev => ({ ...prev, store: true }));
-        } else if (path.includes('/process-control')) {
-            setOpen(prev => ({ ...prev, process_control: true }));
-        } else if (path.includes('/damage-loss')) {
-            setOpen(prev => ({ ...prev, damage_loss: true }));
-        } else if (path.includes('/sales')) {
-            setOpen(prev => ({ ...prev, sales: true }));
-        } else if (path.includes('/expenses')) {
-            setOpen(prev => ({ ...prev, expenses: true }));
+        }else if (path.includes('/finance')) {
+            setOpen(prev => ({ ...prev, finance: true }));
         } else if (path.includes('/report')) {
             setOpen(prev => ({ ...prev, report: true }));
         } else if (path.includes('/notification')) {
@@ -57,6 +51,7 @@ export default function SideBar() {
                         >
                             <IoGridOutline size={25} className="me-1 text-dark" /> <span className={styles.title}>Dashboard</span>
                         </Nav.Link>
+                        <Link to={''}></Link>
                     </Nav.Item>
                     <div className={`mb-4 ${styles.navigationDropdown}`}>
 
@@ -80,32 +75,33 @@ export default function SideBar() {
                                 <div id="admin-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
-                                            <div
-                                                onClick={() => navigate('/admin/add-new-admin')}
-                                                className={`${location.pathname === "/admin/add-new-admin" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
+                                            <OverlayTrigger
+                                                placement="right"
+                                                overlay={<Tooltip id="tooltip-add-new">Add a new admin</Tooltip>}
                                             >
-                                                <FaRegCircle size={20} className="me-1" /> Add New
-                                            </div>
+                                                <div
+                                                    onClick={() => navigate('/admin/add-new-admin')}
+                                                    className={`${location.pathname === "/admin/add-new-admin" ? styles.activeLink : styles.nonactiveLink}`}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
+                                                    <FaRegCircle size={20} className="me-1" /> Add New
+                                                </div>
+                                            </OverlayTrigger>
                                         </Nav.Item>
                                         <Nav.Item className="my-3">
-                                            <div
-                                                onClick={() => navigate('/admin/view-all')}
-                                                className={`${location.pathname === "/admin/view-all" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
+                                            <OverlayTrigger
+                                                placement="right"
+                                                overlay={<Tooltip id="tooltip-view-all">View all admins</Tooltip>}
                                             >
-                                                <FaRegCircle size={20} className="me-1" /> View All
-                                            </div>
-                                        </Nav.Item>
-                                        <Nav.Item className="my-3">
-                                            <div
-                                                onClick={() => navigate('/admin/deactivated-admin')}
-                                                className={`${location.pathname === "/admin/deactivated-admin" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> Deactivated ad..
-                                            </div>
-                                        </Nav.Item>
+                                                <div
+                                                    onClick={() => navigate('/admin/view-all')}
+                                                    className={`${location.pathname === "/admin/view-all" ? styles.activeLink : styles.nonactiveLink}`}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
+                                                    <FaRegCircle size={20} className="me-1" /> View All
+                                                </div>
+                                            </OverlayTrigger>
+                                        </Nav.Item>                                    
                                     </Card.Body>
                                 </div>
                             </Collapse>
@@ -137,6 +133,15 @@ export default function SideBar() {
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> Create Stages
+                                            </div>
+                                        </Nav.Item>
+                                        <Nav.Item className="mb-3">
+                                            <div
+                                                onClick={() => navigate('/product-stages/create-fish-type')}
+                                                className={`${location.pathname === '/product-stages/create-fish-type' ? styles.activeLink : styles.nonactiveLink}`}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <FaRegCircle size={20} className="me-1" /> Create Fish Type
                                             </div>
                                         </Nav.Item>
                                         <Nav.Item className="my-3">
@@ -211,7 +216,7 @@ export default function SideBar() {
                                         <Nav.Item className="mb-3">
                                             <div
                                                 onClick={() => navigate('/products/create-products')}
-                                                className={`${location.pathname === "products/create-products" ? styles.activeLink : styles.nonactiveLink}`}
+                                                className={`${location.pathname === "/products/create-products" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> Create Products
@@ -219,8 +224,8 @@ export default function SideBar() {
                                         </Nav.Item>
                                         <Nav.Item className="my-3">
                                             <div
-                                                onClick={() => navigate('#view-products')}
-                                                className={`${location.pathname === "#view-products" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/products/view-all')}
+                                                className={`${location.pathname === "/products/view-all" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> View All
@@ -252,26 +257,8 @@ export default function SideBar() {
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
                                             <div 
-                                                onClick={() => navigate('/showcase/create-showcase')} 
-                                                className={`${location.pathname === "showcase/create-showcase"? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> Create 
-                                            </div>
-                                        </Nav.Item>
-                                        <Nav.Item className="mb-3">
-                                            <div 
-                                                onClick={() => navigate('/showcase/add-new')} 
-                                                className={`${location.pathname === "showcase/add-new"? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> Add New
-                                            </div>
-                                        </Nav.Item>
-                                        <Nav.Item className="mb-3">
-                                            <div 
                                                 onClick={() => navigate('/showcase/broken-showcase')} 
-                                                className={`${location.pathname === "showcase/broken-showcase"? styles.activeLink : styles.nonactiveLink}`}
+                                                className={`${location.pathname === "/showcase/broken-showcase"? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> Broken Showcase
@@ -280,7 +267,7 @@ export default function SideBar() {
                                         <Nav.Item className="mb-3">
                                             <div 
                                                 onClick={() => navigate('/showcase/whole-showcase')} 
-                                                className={`${location.pathname === "showcase/whole-showcase"? styles.activeLink : styles.nonactiveLink}`}
+                                                className={`${location.pathname === "/showcase/whole-showcase"? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> Whole Showcase
@@ -289,10 +276,10 @@ export default function SideBar() {
                                         <Nav.Item className="mb-3">
                                             <div 
                                                 onClick={() => navigate('/showcase/place-order')} 
-                                                className={`${location.pathname === "showcase/place-order"? styles.activeLink : styles.nonactiveLink}`}
+                                                className={`${location.pathname === "/sshowcase/place-order"? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={20} className="me-1" /> Place Order
+                                                <FaRegCircle size={20} className="me-1" /> Package History
                                             </div>
                                         </Nav.Item>
                                     </Card.Body>
@@ -322,7 +309,7 @@ export default function SideBar() {
                                         <Nav.Item className="mb-3">
                                             <div 
                                                 onClick={() => navigate('/feed/add-new')} 
-                                                className={`${location.pathname === "feed/add-new" ? styles.activeLink : styles.nonactiveLink}`}
+                                                className={`${location.pathname === "/feed/add-new" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> Add New
@@ -330,17 +317,17 @@ export default function SideBar() {
                                         </Nav.Item>
                                         <Nav.Item className="mb-3">
                                             <div 
-                                                onClick={() => navigate('/feed/update-inventory')} 
-                                                className={`${location.pathname === "feed/update-inventory" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/feed/view-all')} 
+                                                className={`${location.pathname === "/feed/view-all" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={20} className="me-1" /> Update Inventory
+                                                <FaRegCircle size={20} className="me-1" /> View All
                                             </div>
                                         </Nav.Item>
                                         <Nav.Item className="mb-3">
                                             <div 
                                                 onClick={() => navigate('/feed/inventory-history')} 
-                                                className={`${location.pathname === "feed/inventory-history" ? styles.activeLink : styles.nonactiveLink}`}
+                                                className={`${location.pathname === "/feed/inventory-history" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> Inventory History
@@ -373,7 +360,7 @@ export default function SideBar() {
                                         <Nav.Item className="mb-3">
                                             <div 
                                                 onClick={() => navigate('/store/add-new')} 
-                                                className={`${location.pathname === "store/add-new" ? styles.activeLink : styles.nonactiveLink}`}
+                                                className={`${location.pathname === "/store/add-new" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> Add New
@@ -381,17 +368,17 @@ export default function SideBar() {
                                         </Nav.Item>
                                         <Nav.Item className="mb-3">
                                             <div 
-                                                onClick={() => navigate('/store/update-inventory')} 
-                                                className={`${location.pathname === "store/update-inventory" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/store/view-all')} 
+                                                className={`${location.pathname === "/store/view-all" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={20} className="me-1" /> Update Inventory
+                                                <FaRegCircle size={20} className="me-1" /> View All
                                             </div>
                                         </Nav.Item>
                                         <Nav.Item className="mb-3">
                                             <div 
                                                 onClick={() => navigate('/store/inventory-history')} 
-                                                className={`${location.pathname === "store/inventory-history" ? styles.activeLink : styles.nonactiveLink}`}
+                                                className={`${location.pathname === "/store/inventory-history" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> Inventory History
@@ -402,167 +389,50 @@ export default function SideBar() {
                             </Collapse>
                         </Card>
 
-                        {/* process control navigation */}
+                        {/* finance navigation */}
                         <Card className={styles.card}>
                             <Card.Header 
-                                onClick={() => handleToggle('process_control')} 
-                                aria-controls="process_control-collapse-text" 
-                                aria-expanded={open.process_control}
+                                onClick={() => handleToggle('finance')} 
+                                aria-controls="finance-collapse-text" 
+                                aria-expanded={open.finance}
                                 className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
                             >
                                 <span className={`${styles.title}`}>
-                                    <LuClipboardCheck size={25} className="me-1" /> Process Control
-                                </span>
+                                    <LuClipboardCheck size={25} className="me-1" /> Finance
+                                </span> 
                                 <span>
-                                    {open.process_control ? <FaCaretUp/> : <FaCaretDown/>}
+                                    {open.finance ? <FaCaretUp/> : <FaCaretDown/>}
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.process_control}>
-                                <div id="feed-collapse-text">
+                            <Collapse in={open.finance}>
+                                <div id="finance-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
                                             <div 
-                                                onClick={() => navigate('#control-batch')} 
-                                                className={`${location.pathname === "#control-batch" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/finance/add-sales')} 
+                                                className={`${location.pathname === "/finance/add-sales" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={20} className="me-1" /> Control Batch
+                                                <FaRegCircle size={20} className="me-1" /> Add Sales
                                             </div>
                                         </Nav.Item>
                                         <Nav.Item className="mb-3">
                                             <div 
-                                                onClick={() => navigate('#view-summary')} 
-                                                className={`${location.pathname === "#view-summary" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/finance/add-expenses')} 
+                                                className={`${location.pathname === "/finance/add-expenses" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={20} className="me-1" /> View Summary
-                                            </div>
-                                        </Nav.Item>
-                                    </Card.Body>
-                                </div>
-                            </Collapse>
-                        </Card>
-
-                        {/* Damage/Loss navigation */}
-                        <Card className={styles.card}>
-                            <Card.Header 
-                                onClick={() => handleToggle('damage_loss')} 
-                                aria-controls="damage_loss-collapse-text" 
-                                aria-expanded={open.damage_loss}
-                                className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
-                            >
-                                <span className={`${styles.title}`}>
-                                    <LuClipboardCheck size={25} className="me-1" /> Damage/Loss
-                                </span>
-                                <span>
-                                    {open.damage_loss ? <FaCaretUp/> : <FaCaretDown/>}
-                                </span>
-                            </Card.Header>
-
-                            <Collapse in={open.damage_loss}>
-                                <div id="damage_loss-collapse-text">
-                                    <Card.Body className={styles.navigationLinks}>
-                                        <Nav.Item className="mb-3">
-                                            <div 
-                                                onClick={() => navigate('#create-damage')} 
-                                                className={`${location.pathname === "#create-damage" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> Create
+                                                <FaRegCircle size={20} className="me-1" /> Add Expenses
                                             </div>
                                         </Nav.Item>
                                         <Nav.Item className="mb-3">
                                             <div 
-                                                onClick={() => navigate('#view-damage')} 
-                                                className={`${location.pathname === "#view-damage" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/finance/ledger')} 
+                                                className={`${location.pathname === "/finance/ledger" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={20} className="me-1" /> View
-                                            </div>
-                                        </Nav.Item>
-                                    </Card.Body>
-                                </div>
-                            </Collapse>
-                        </Card>
-
-                        {/* Sales navigation*/}
-                        <Card className={styles.card}>
-                            <Card.Header 
-                                onClick={() => handleToggle('sales')} 
-                                aria-controls="sales-collapse-text" 
-                                aria-expanded={open.sales}
-                                className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
-                            >
-                                <span className={`${styles.title}`}>
-                                    <LuClipboardCheck size={25} className="me-1" /> Sales
-                                </span>
-                                <span>
-                                    {open.sales ? <FaCaretUp/> : <FaCaretDown/>}
-                                </span>
-                            </Card.Header>
-
-                            <Collapse in={open.sales}>
-                                <div id="sales-collapse-text">
-                                    <Card.Body className={styles.navigationLinks}>
-                                        <Nav.Item className="mb-3">
-                                            <div 
-                                                onClick={() => navigate('#create-sales')} 
-                                                className={`${location.pathname === "#create-sales" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> Create
-                                            </div>
-                                        </Nav.Item>
-                                        <Nav.Item className="mb-3">
-                                            <div 
-                                                onClick={() => navigate('#view-sales')} 
-                                                className={`${location.pathname === "#view-sales" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> View
-                                            </div>
-                                        </Nav.Item>
-                                    </Card.Body>
-                                </div>
-                            </Collapse>
-                        </Card>
-
-                        {/* Expenses navigation*/}
-                        <Card className={styles.card}>
-                            <Card.Header 
-                                onClick={() => handleToggle('expenses')} 
-                                aria-controls="expenses-collapse-text" 
-                                aria-expanded={open.expenses}
-                                className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
-                            >
-                                <span className={`${styles.title}`}>
-                                    <LuClipboardCheck size={25} className="me-1" /> Expenses
-                                </span>
-                                <span>
-                                    {open.expenses ? <FaCaretUp/> : <FaCaretDown/>}
-                                </span>
-                            </Card.Header>
-
-                            <Collapse in={open.expenses}>
-                                <div id="expenses-collapse-text">
-                                    <Card.Body className={styles.navigationLinks}>
-                                        <Nav.Item className="mb-3">
-                                            <div 
-                                                onClick={() => navigate('#create-expenses')} 
-                                                className={`${location.pathname === "#create-expenses" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> Create
-                                            </div>
-                                        </Nav.Item>
-                                        <Nav.Item className="mb-3">
-                                            <div 
-                                                onClick={() => navigate('#view-expenses')} 
-                                                className={`${location.pathname === "#view-expenses" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> View
+                                                <FaRegCircle size={20} className="me-1" />Finance Ledger
                                             </div>
                                         </Nav.Item>
                                     </Card.Body>

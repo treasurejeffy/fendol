@@ -1,25 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
 import styles from '../product-stages.module.scss'; // Adjust the import as needed
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header';
-import axios from 'axios';
+import Api from '../../shared/api/apiLink'
 
 const AddFish = () => {
+  const [stages, setStages] = useState([]);
+  const [fishType, setfishType] = useState([]);
+
+    useEffect(() => {
+        const fetchStages = async () => {
+          try {
+            const response = await Api.get('/fish-stages'); // Replace with your API URL
+            console.log(response.data);
+            if (Array.isArray(response.data.data)) {
+              setStages(response.data.data);
+            } else {
+              throw new Error('Expected an array of stages');
+            }
+          } catch (err) {
+            console.log(err.response?.data?.message || 'Failed to fetch data. Please try again.');
+          } finally {
+            console.log('get success')
+          }
+        };
+    
+        fetchStages();
+    }, []);
+
+    useEffect(() => {
+        const fetchFishType = async () => {
+          try {
+            const response = await Api.get('/species'); // Replace with your API URL
+            console.log(response.data);
+            if (Array.isArray(response.data.data)) {
+              setfishType(response.data.data);
+            } else {
+              throw new Error('Expected an array of stages');
+            }
+          } catch (err) {
+            console.log(err.response?.data?.message || 'Failed to fetch data. Please try again.');
+          } finally {
+            console.log('get success')
+          }
+        };
+    
+        fetchFishType();
+    }, []);
+
     const [formData, setFormData] = useState({
-        stage: '',
+        stageId: '',
         quantity: 0,
-        fishName: '',
-        specie: '',
+        speciesId: ''        
     });
     const [loader, setLoader] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        
+        // Check if the input is for quantity and convert the value to a number
+        setFormData({
+            ...formData,
+            [name]: name === 'quantity' ? parseInt(value, 10) : value, // or use parseFloat if you need decimal values
+        });
     };
+
 
     const handleAddFish = async (e) => {
         e.preventDefault();
@@ -28,7 +76,7 @@ const AddFish = () => {
             className: 'dark-toast'});
 
         try {
-            const response = await axios.post('YOUR_API_ENDPOINT', formData);
+            const response = await Api.post('/fish', formData);
 
             // After a successful API call
             toast.update(loadingToast, {
@@ -40,14 +88,13 @@ const AddFish = () => {
             });
             // Reset form or handle success as needed
             setFormData({
-                stage: '',
-                quantity: 0,
-                specie: '',
-                fishName: '',
+                stageId: '',
+                quantity: 0,        
+                speciesId: ''
             });
         } catch (error) {
             toast.update(loadingToast, {
-                render: "Error adding fish. Please try again.",
+                render: error.response?.data?.message ||  "Error adding fish. Please try again.",
                 type: "error", // Use string for type
                 isLoading: false,
                 autoClose: 3000,
@@ -76,16 +123,22 @@ const AddFish = () => {
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Stage</Form.Label>
                                     <Form.Select
-                                        name="stage"
-                                        value={formData.stage}
+                                        name="stageId"
+                                        value={formData.stageId}
                                         onChange={handleInputChange}
                                         required
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                     >
-                                        <option value="">Select Stage</option>
-                                        <option value="stage1">Stage 1</option>
-                                        <option value="stage2">Stage 2</option>
-                                        <option value="stage3">Stage 3</option>
+                                        <option value="" disabled>Choose Stage</option>
+                                        {!stages ? (
+                                            <option>Please wait...</option>
+                                        ) : stages.length < 1 ? (
+                                            <option>No data available</option>
+                                        ) : (
+                                            stages.map((stage, index) => (
+                                                <option value={stage.id} key={index}>{stage.title}</option>
+                                            ))
+                                        )}
                                     </Form.Select>
                                 </Col>
                                 <Col className="mb-4">
@@ -102,29 +155,26 @@ const AddFish = () => {
                                     />
                                 </Col>
                                 <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Fish Name</Form.Label>
-                                    <Form.Control
-                                        placeholder="Enter fish name"
-                                        type="text"
-                                        name="fishName"
+                                    <Form.Label className="fw-semibold">Fish Type</Form.Label>
+                                    <Form.Select
+                                        name="speciesId"
+                                        value={formData.speciesId}
+                                        onChange={handleInputChange}
                                         required
-                                        value={formData.fishName}
-                                        onChange={handleInputChange}
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                    />
-                                </Col>
-                                <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Specie</Form.Label>
-                                    <Form.Control
-                                        placeholder="Enter specie"
-                                        type="text"
-                                        name="specie"
-                                        required                                    
-                                        value={formData.specie}
-                                        onChange={handleInputChange}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                    />
-                                </Col>
+                                    >
+                                        <option value="" disabled>Choose fishType</option>
+                                        {!fishType ? (
+                                            <option>Please wait...</option>
+                                        ) : fishType.length < 1 ? (
+                                            <option>No data available</option>
+                                        ) : (
+                                            fishType.map((stage, index) => (
+                                                <option value={stage.id} key={index}>{stage.speciesName}</option>
+                                            ))
+                                        )}
+                                    </Form.Select>
+                                </Col>         
                             </Row>
                             <div className="d-flex justify-content-end my-4">
                                 <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">

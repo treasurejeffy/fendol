@@ -5,10 +5,13 @@ import { FaSearch } from "react-icons/fa";
 import { GoQuestion } from "react-icons/go";
 import { IoMdNotifications } from "react-icons/io";
 import { FaRegUserCircle } from 'react-icons/fa';
+import {useNavigate} from 'react-router-dom';
+
 import styles from './header.module.scss'
 
 
 export default function Header() {
+    const navigate = useNavigate();
     return(
         <header>
             <div className={`shadow-sm sticky-top d-flex pe-5 ps-3 aligns-items-center ${styles.header}`} style={{height:'70px'}} >
@@ -34,7 +37,7 @@ export default function Header() {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="border border-secondary bg-light-subtle">
-                            <Dropdown.Item href="#logout" className="fw-semibold">Logout</Dropdown.Item>
+                            <Dropdown.Item className="fw-semibold" onClick={()=>{sessionStorage.clear(); navigate('/') }}>Logout</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>

@@ -1,52 +1,76 @@
 import React, { useState } from 'react';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import styles from '../store.module.scss'; // Adjust the import as needed
+import styles from '../finance.module.scss'; // Adjust the import as needed
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header';
 import Api from '../../shared/api/apiLink';
 
-const AddStock = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        unit: '',
-        threshold: 0,
-    });
-    const [loader, setLoader] = useState(false);
+// Utility function to format numbers with commas
+const formatNumberWithCommas = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 
+const AddExpense = () => {
+    const [formData, setFormData] = useState({
+        price: '',
+        description: '',
+    });
+    const [unformattedPrice, setUnformattedPrice] = useState(0);
+       const [loader, setLoader] = useState(false);
+
+    // Handle input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+
+        // Handle price input separately to format it with commas
+        if (name === 'price') {
+            // Remove commas to get the pure number
+            const numberValue = value.replace(/,/g, '');
+            setFormData({
+                ...formData,
+                price: formatNumberWithCommas(numberValue), // Format the price with commas for display
+            });
+            setUnformattedPrice(parseFloat(numberValue) || 0); // Store the unformatted number
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
-    const handleAddStock = async (e) => {
+    // Handle form submission
+    const handleAddExpense = async (e) => {
         e.preventDefault();
         setLoader(true);
-        const loadingToast = toast.loading("Adding stock...", {
+        const loadingToast = toast.loading("Adding expense...", {
             className: 'dark-toast'
         });
 
         try {
-            // Replace 'YOUR_API_ENDPOINT' with your actual endpoint URL
-            const response = await Api.post('/create-store', formData);
+            // Post the unformatted number to the API (not the formatted one)
+            const response = await Api.post('/expense', { 
+                ...formData, 
+                price: unformattedPrice // Send unformatted price
+            });
 
+            // After a successful API call
             toast.update(loadingToast, {
-                render: "Stock added successfully!",
+                render: "Expense added successfully!",
                 type: "success",
                 isLoading: false,
                 autoClose: 3000,
                 className: 'dark-toast'
             });
 
+            // Reset form after successful submission
             setFormData({
-                name: '',
-                unit: '',
-                threshold: 0,
+                price: '',
+                description: '',
             });
+            setUnformattedPrice(0);
         } catch (error) {
             toast.update(loadingToast, {
-                render: error.response?.data?.message ||  "Error adding stock. Please try again.",
+                render: error.response?.data?.message || "Error adding expense. Please try again.",
                 type: "error",
                 isLoading: false,
                 autoClose: 3000,
@@ -69,45 +93,29 @@ const AddStock = () => {
                 <section className={`${styles.content}`}>
                     <main>
                         <ToastContainer />
-                        <Form className={styles.create_form} onSubmit={handleAddStock}>
-                            <h4 className="mt-4 mb-5">Add New </h4>
+                        <Form className={styles.create_form} onSubmit={handleAddExpense}>
+                            <h4 className="mt-4 mb-5">Add New Expense</h4>
                             <Row xxl={2} xl={2} lg={2}>
                                 <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Name</Form.Label>
+                                    <Form.Label className="fw-semibold">Total Price</Form.Label>
                                     <Form.Control
-                                        placeholder="Enter stock name"
-                                        type="text"
-                                        name="name"                                        
-                                        value={formData.name}
-                                        onChange={handleInputChange}
+                                        placeholder="Enter total price"
+                                        type="text" // Change input type to text to handle commas
+                                        name="price"
+                                        value={formData.price} // Display the formatted price
                                         required
+                                        onChange={handleInputChange}
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                     />
                                 </Col>
                                 <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Unit</Form.Label>
-                                    <Form.Select
-                                        name="unit"
-                                        required
-                                        value={formData.unit}
-                                        onChange={handleInputChange}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                    >
-                                        <option value="" disabled>Select Unit</option>
-                                        <option value="kg">Kg</option>
-                                        <option value="liters">Liters</option>
-                                        <option value="pieces">Pieces</option>
-                                    </Form.Select>
-                                </Col>
-                                <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Threshold Value</Form.Label>
+                                    <Form.Label className="fw-semibold">Description</Form.Label>
                                     <Form.Control
-                                        placeholder="Enter threshold value"
-                                        type="number"
-                                        name="threshold"
-                                        value={formData.threshold}
+                                        placeholder="Enter description"
+                                        as="textarea"
+                                        name="description"
                                         required
-                                        min="0"
+                                        value={formData.description}
                                         onChange={handleInputChange}
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                     />
@@ -115,7 +123,7 @@ const AddStock = () => {
                             </Row>
                             <div className="d-flex justify-content-end my-4">
                                 <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
-                                    {loader ? ' Adding...' : 'Add'}
+                                    {loader ? ' Adding...' : 'Add Expense'}
                                 </Button>
                             </div>
                         </Form>
@@ -126,4 +134,4 @@ const AddStock = () => {
     );
 };
 
-export default AddStock;
+export default AddExpense;

@@ -9,8 +9,8 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { LOGIN_USER } from "../reduxForProtectingRoute/actions/types";
 import 'react-toastify/dist/ReactToastify.css';
-import {loginSuccess} from '../redux-routing/actions/types'
 
 export default function LogIn() {
     const [showPassword, setShowPassword] = useState(false);
@@ -31,54 +31,56 @@ export default function LogIn() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoader(true);
+    
+        // Show loading toast
         const loadingToast = toast.loading("Logging in...", { className: 'dark-toast' });
     
         try {
-            const response = await axios.post('https://dev-api.fendolgroup.com/api/v1/login', loginData);
-            const token = response.data.token; // Adjust according to the API response structure
-            const success = response.data.success; // Assuming your API sends a 'success' field
-            
-            dispatch(loginSuccess(token));
-
-            if (success) { // Check if the login was successful
-                console.log('Login successful');
+          const response = await axios.post('https://dev-api.fendolgroup.com/api/v1/login', loginData);
+          const token = response.data.token; // Adjust according to API response structure
+          const success = response.data.success; // Assuming your API sends a 'success' field
     
-                // Set token in session storage
-                sessionStorage.setItem('authToken', token);
+          if (success) {
+            console.log('Login successful');
     
-                // Update success toast
-                toast.update(loadingToast, {
-                    render: "Logged in successfully!",
-                    type: "success",
-                    isLoading: false,
-                    autoClose: 3000,
-                    className: 'dark-toast',
-                });
+            // Store token in local storage
+            sessionStorage.setItem('authToken',(token));
     
-                // Clear form data
-                setLoginData({ email: '', password: '' });
+            // Dispatch token to Redux
+            dispatch({ type: LOGIN_USER, payload: token });
     
-                // Navigate to the new page
-                navigate('admin/add-new-admin');
-            } else {
-                // Handle login failure
-                throw new Error("Login failed");
-            }
-        } catch (error) {
-            // Update error toast
+            // Update success toast
             toast.update(loadingToast, {
-                render: error.response?.data?.message || "Error logging in. Please try again.",
-                type: "error",
-                isLoading: false,
-                autoClose: 7000,
-                className: 'dark-toast',
+              render: "Logged in successfully!",
+              type: "success",
+              isLoading: false,
+              autoClose: 3000,
+              className: 'dark-toast',
             });
+    
+            // Clear form data
+            setLoginData({ email: '', password: '' });
+    
+            // Navigate to the desired page after success
+            navigate('/admin/add-new-admin');
+          } else {
+            // Handle failure
+            throw new Error("Login failed");
+          }
+        } catch (error) {
+          // Show error toast
+          toast.update(loadingToast, {
+            render: error.response?.data?.message || "Error logging in. Please try again.",
+            type: "error",
+            isLoading: false,
+            autoClose: 7000,
+            className: 'dark-toast',
+          });
         } finally {
-            setLoader(false);
+          setLoader(false); // Reset loader state
         }
     };
     
-
     return (
         <section className="login_section">
             <div className="text-end">
@@ -88,8 +90,7 @@ export default function LogIn() {
                 <div className="d-flex justify-content-center align-items-center vh-100">
                     <div className="form-box rounded-5">
                         <Form className="form" onSubmit={handleSubmit}>
-                            <h2 className="fw-bold text-center">FENDOL</h2>
-                            <h5 className="py-3 login fw-semibold">Log in</h5>
+                            <h2 className="fw-bold text-center py-4">FENDOL</h2>                           
 
                             <Form.Label className="fw-semibold">Email</Form.Label>
                             <Form.Control
@@ -123,7 +124,6 @@ export default function LogIn() {
                             </InputGroup>
 
                             <a href="" className="text-white border-0 fw-semibold">Forgot Password?</a>
-
                             <Button type="submit" className="w-100 btn shadow btn-dark py-2 fs-5 mt-5 fw-semibold" disabled={loader}>
                                 {loader ? 'Logging In' : "Log in"}
                             </Button>

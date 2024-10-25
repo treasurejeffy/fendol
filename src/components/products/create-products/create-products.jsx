@@ -3,59 +3,87 @@ import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Col, Form, Row, Button } from 'react-bootstrap';
-import styles from '../product.module.scss'
+import styles from '../product.module.scss';
 import { toast, ToastContainer } from 'react-toastify';
-import axios from 'axios';
+import Api from "../../shared/api/apiLink";
+
+// Function to format numbers with commas
+const formatNumberWithCommas = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+// Function to remove commas from the formatted number
+const removeCommas = (number) => {
+    return number.toString().replace(/,/g, "");
+};
 
 export default function CreateProducts() {
     const [loader, setLoader] = useState(false);
 
     // Form fields state
     const [formData, setFormData] = useState({
-        productname: "",
-        productweight: "",
-        productunit: "",
-        baseprice: ""
+        productName: "",
+        productWeight: "",
+        unit: "",
+        basePrice: ""
     });
 
     // Handle form input change
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+
+        // If changing basePrice, format with commas for display
+        if (name === "basePrice") {
+            const formattedValue = value ? formatNumberWithCommas(removeCommas(value)) : "";
+            setFormData({
+                ...formData,
+                [name]: formattedValue
+            });
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value
+            });
+        }
     };
 
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoader(true);
-        const loadingToast = toast.loading("Creating Product...",{
-            className: 'dark-toast'});
+        const loadingToast = toast.loading("Creating Product...", {
+            className: 'dark-toast'
+        });
 
         try {
-            const response = await axios.post('YOUR_API_ENDPOINT', formData);
+            // Before submitting, remove commas from basePrice
+            const formDataToSubmit = {
+                ...formData,
+                basePrice: removeCommas(formData.basePrice)
+            };
+
+            const response = await Api.post('/product', formDataToSubmit);
 
             // After a successful API call
             toast.update(loadingToast, {
                 render: "Created Product successfully!",
-                type: "success", // Use string for type
+                type: "success",
                 isLoading: false,
                 autoClose: 3000,
                 className: 'dark-toast'
             });
+
             // Reset form or handle success as needed
             setFormData({
-                productname: "",
-                productweight: "",
-                productunit: "",
-                baseprice: ""
+                productName: "",
+                productWeight: "",
+                unit: "",
+                basePrice: ""
             });
         } catch (error) {
             toast.update(loadingToast, {
-                render: "Error creating product. Please try again.",
-                type: "error", // Use string for type
+                render: error.response?.data?.message || "Error creating product. Please try again.",
+                type: "error",
                 isLoading: false,
                 autoClose: 3000,
                 className: 'dark-toast'
@@ -64,7 +92,6 @@ export default function CreateProducts() {
             setLoader(false);
         }
     };
-
 
     return (
         <section className={`d-none d-lg-block ${styles.body}`}>
@@ -78,7 +105,7 @@ export default function CreateProducts() {
 
                 <section className={`${styles.content}`}>
                     <main>
-                        <ToastContainer/>
+                        <ToastContainer />
                         <Form className={styles.create_form} onSubmit={handleSubmit}>
                             <h4 className="mt-3 mb-5">Create Product</h4>
                             <Row xxl={2} xl={2} lg={2} md={1}>
@@ -88,8 +115,8 @@ export default function CreateProducts() {
                                         placeholder="Enter product name"
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                         type="text"
-                                        name="productname"
-                                        value={formData.productname}
+                                        name="productName"
+                                        value={formData.productName}
                                         required
                                         onChange={handleInputChange}
                                     />
@@ -100,8 +127,8 @@ export default function CreateProducts() {
                                         placeholder="Enter product weight"
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                         type="text"
-                                        name="productweight"
-                                        value={formData.productweight}
+                                        name="productWeight"
+                                        value={formData.productWeight}
                                         onChange={handleInputChange}
                                         required
                                     />
@@ -109,8 +136,8 @@ export default function CreateProducts() {
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Product Unit</Form.Label>
                                     <Form.Select
-                                        name="productunit"
-                                        value={formData.productunit}
+                                        name="unit"
+                                        value={formData.unit}
                                         required
                                         onChange={handleInputChange}
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
@@ -126,8 +153,8 @@ export default function CreateProducts() {
                                         placeholder="Enter base price"
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                         type="text"
-                                        name="baseprice"
-                                        value={formData.baseprice}
+                                        name="basePrice"
+                                        value={formData.basePrice}
                                         required
                                         onChange={handleInputChange}
                                     />
@@ -136,13 +163,7 @@ export default function CreateProducts() {
 
                             <div className="d-flex justify-content-end mt-5">
                                 <Button className="btn shadow btn-dark py-2 px-5 mt-4 fs-6 fw-semibold" disabled={loader} type="submit">
-                                    {loader ? (
-                                        <div className="spinner-border text-success" role="status">
-                                            <span className="visually-hidden">Loading...</span>
-                                        </div>
-                                    ) : (
-                                        "Create"
-                                    )}
+                                    {loader ? 'Creating...' : 'Create'}
                                 </Button>
                             </div>
                         </Form>

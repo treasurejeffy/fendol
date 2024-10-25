@@ -3,22 +3,23 @@ import axios from "axios";
 import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import styles from '../product-stages.module.scss';
-import { Spinner, Alert, Row, Col } from 'react-bootstrap'; // Import Spinner and Alert from Bootstrap
+import styles from '../showcase.module.scss';
+import { Spinner, Alert, Button } from 'react-bootstrap'; // Import Spinner and Alert from Bootstrap
 import { FaExclamationTriangle } from "react-icons/fa";
 import Api from "../../shared/api/apiLink";
 
 // Fish stage number boxes
-const FishStageBox = ({ stageName, quantity }) => {
+const FishStageBox = ({quantity }) => {
   return (
     <div className={`${styles.stageBox} shadow py-3`}>
-      <h6>{stageName}</h6>
+      <h6>Broken</h6>
       <p>{quantity}<span> Fishes</span></p>
+      <div className="text-end"><Button className='btn btn-dark px-5 py-2'>Package</Button></div>
     </div>
   );
 };
 
-export default function ViewAddFishHistory() {
+export default function ViewBorkenHistory() {
   const [fishStages, setFishStages] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [loadingStages, setLoadingStages] = useState(true); // Loading state for fish stages
@@ -26,27 +27,13 @@ export default function ViewAddFishHistory() {
   const [errorStages, setErrorStages] = useState(''); // Error state for fish stages
   const [errorTable, setErrorTable] = useState(''); // Error state for table data
 
-  // Fetch fish stage numbers
-  useEffect(() => {
-    const fetchFishStages = async () => {
-      try {
-        const response = await Api.get('/fishes'); // Replace with your API endpoint
-        setFishStages(response.data.data); // Assuming the response is an array of fish stages
-      } catch (error) {
-        setErrorStages("Error fetching fishes in their stage."); // Set error message
-      } finally {
-        setLoadingStages(false); // Stop loading indicator
-      }
-    };
-    fetchFishStages();
-  }, []);
 
   // Fetch table data
   useEffect(() => {
     const fetchTableData = async () => {
       try {
-        const response = await Api.get('fishes'); // Replace with your API endpoint
-        setTableData(response.data.data); // Assuming the response is an array of fish history data
+        const response = await Api.get('/fish/broken'); // Replace with your API endpoint
+        setTableData(response.data); // Assuming the response is an array of fish history data
       } catch (error) {
         setErrorTable("Error fetching add fish history data."); // Set error message
       } finally {
@@ -55,16 +42,6 @@ export default function ViewAddFishHistory() {
     };
     fetchTableData();
   }, []);
-
-  // Format date function
-  const formatDate = (isoDate) => {
-    const date = new Date(isoDate);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-  
 
   return (
     <section className={`d-none d-lg-block ${styles.body}`}>
@@ -83,7 +60,7 @@ export default function ViewAddFishHistory() {
             <h4 className="mt-3 mb-5">View Add Fish History</h4>
             
             {/* Fish Stage Numbers */}
-            <div>
+            <div className={`d-flex mb-5 ${fishStages ? 'justify-content-between' : 'justify-content-center'}`}>
               {loadingStages && (
                 <div className="text-center w-100">
                   <Spinner animation="border" role="status">
@@ -98,16 +75,13 @@ export default function ViewAddFishHistory() {
                     </Alert>
                   </div>
               )}
-              <Row lg={4}>
-                {!loadingStages && !errorStages && fishStages.map((stage, index) => (
-                  <Col key={index}>
-                    <FishStageBox
-                      stageName={stage.speciesName}
-                      quantity={stage.quantity}                    
-                    />
-                  </Col>
-                ))}
-              </Row>
+              {!loadingStages && !errorStages && fishStages.map((stage, index) => (
+                <FishStageBox
+                  key={index}
+                  stageName={stage.name}
+                  quantity={stage.quantity}
+                />
+              ))}
             </div>
 
             {/* Table */}
@@ -126,27 +100,27 @@ export default function ViewAddFishHistory() {
               </div>              
             )}
             {!loadingTable && !errorTable && (
-              <table className={`mt-5 ${styles.styled_table}`}>
+              <table className={styles.styled_table}>
                 <thead className={`rounded-2 ${styles.theader}`}>
                   <tr>
                     <th>DATE CREATED</th>
                     <th>STAGE</th>
                     <th>QUANTITY ADDED</th>
-                    <th>FISH TYPE</th>
+                    <th>FISH NAME</th>
+                    <th>SPECIE</th>
                   </tr>
                 </thead>
                 <tbody>
                   {tableData.length > 0 ? (
-                    tableData.map((data, index) => {
-                      const formattedDate = formatDate(data.createdAt);
-                      return(
+                    tableData.map((data, index) => (
                       <tr key={index}>
-                        <td>{formattedDate}</td>
+                        <td>{data.dateCreated}</td>
                         <td>{data.stage}</td>
-                        <td>{data.quantity}</td>
-                        <td>{data.speciesName}</td>
-                      </tr>)
-                  })
+                        <td>{data.quantityAdded}</td>
+                        <td>{data.fishName}</td>
+                        <td>{data.specie}</td>
+                      </tr>
+                    ))
                   ) : (
                     <tr>
                       <td colSpan="5" className="text-center">No data available</td>

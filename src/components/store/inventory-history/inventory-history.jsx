@@ -4,30 +4,39 @@ import Header from "../../shared/header/header";
 import { Spinner, Alert, Table } from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../store.module.scss';
-import axios from 'axios';
+import Api from '../../shared/api/apiLink';
 import { FaExclamationTriangle } from "react-icons/fa";
 
 export default function InventoryHistory() {
-  const [storeInventoryHistory, setStoreInventoryHistory] = useState([]);
+  const [inventoryHistory, setInventoryHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchStoreInventoryHistory = async () => {
+    const fetchInventoryHistory = async () => {
       try {
-        // Replace 'YOUR_API_ENDPOINT' with your actual API endpoint
-        const response = await axios.get('YOUR_API_ENDPOINT'); 
-        setStoreInventoryHistory(response.data); // Assuming the response contains an array of history data
+        const response = await Api.get('/stores-histories'); 
+        setInventoryHistory(response.data.data); // Assuming the response contains an array of history data
       } catch (error) {
-        setError("Error fetching store inventory history. Please try again.");
+        setError("Error fetching inventory history. Please try again.");
       } finally {
         setLoading(false);
       }
     };
-    fetchStoreInventoryHistory();
+    fetchInventoryHistory();
   }, []);
 
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = date.getFullYear();
+  
+    return `${day}/${month}/${year}`;
+  };
+
   return (
+
     <section className={`d-none d-lg-block ${styles.body}`} >
       <div className="sticky-top">
         <Header />
@@ -51,32 +60,52 @@ export default function InventoryHistory() {
             ) : error ? (
               <div className="d-flex justify-content-center">
                 <Alert variant="danger" className="text-center w-50 py-5 my-5">
-                  <FaExclamationTriangle size={40}/><span className="fw-semibold">{error}</span>
+                   <FaExclamationTriangle size={30}/> <span>{error}</span>
                 </Alert>
               </div>
             ) : (
-              <Table responsive className={styles.styled_table}> 
+              <table responsive className={styles.styled_table}> 
                 <thead>
-                  <tr>
-                    <th>DATE CREATED</th>
-                    <th>QUANTITY USED<br /> (KG)</th>
+                  <tr className="fw-semibold">
+                    <th>DATE CREATED</th>                    
                     <th>NAME</th>
-                    <th>QUANTITY REMAINING <br />(KG)</th>
+                    <th>PRODUCT <br /> STAGE</th>
+                    <th>QUANTITY <br /> ADDED (KG)</th>
+                    <th>QUANTITY <br /> USED (KG)</th>
+                    <th>QUANTITY <br /> REMAINING(KG)</th>
                     <th>STATUS</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {storeInventoryHistory.map((history, index) => (
-                    <tr key={index}>
-                      <td>{history.dateCreated}</td>
-                      <td>{history.quantityUsed}</td>
-                      <td>{history.name}</td>
-                      <td>{history.quantityRemaining}</td>
-                      <td>{history.status}</td>
-                    </tr>
-                  ))}
+                  {inventoryHistory.map((history, index) => {
+                     const formattedCreatedAt = formatDate(history.createdAt);
+                     return(
+                      <tr key={index}>
+                        <td>{formattedCreatedAt}</td>
+                        <td>{history.name}</td>
+                        <td>{history.quantityUsed}</td>
+                        <td>{history.storeDetails.quantity}</td>
+                        <td>{history.quantityUsed}</td>
+                        <td>{history.remainingStock}</td>
+                        <td className="text-uppercase fw-semibold d-flex">
+                          <span className={
+                            history.status === 'in stock' 
+                              ? 'text-success' 
+                              : history.status === 'out of stock' 
+                              ? 'text-danger' 
+                              : history.status === 'low stock' 
+                              ? 'text-warning' 
+                              : ''
+                          }>
+                            {history.status}
+                          </span>
+                        </td>
+
+                      </tr>
+                     )                    
+                  })}
                 </tbody>
-              </Table>
+              </table>
             )}
           </main>        
         </section>

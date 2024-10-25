@@ -22,6 +22,35 @@
     }
 }
 
+.stageBox {
+  background-color: #FAFCFF;
+  border-radius: 8px;
+  text-align: center;
+  width: 24%;
+  margin-bottom: 59px;
+  
+  h6 {
+    color: #8C949B;
+  }
+  
+  p {
+    color: #2E3135;
+    font-size: 30px;
+    font-weight: 600;
+
+    span {
+    color: #8C949B;
+      font-size: small;
+      font-weight: 400;
+    }
+  }
+  &:hover {
+    box-shadow: 2px 4px 8px #2E3135; // Increase shadow
+    transform: scale(1.05); // Slightly increase size on hover
+  }
+}
+
+
 .styled_table {
   width: 100%;
   position: relative; // Ensure that child elements with absolute positioning are relative to this table
@@ -34,12 +63,28 @@
 
 .styled_table th {
   color: #8C949B;
-  padding-bottom: 20px;
+  padding: 20px 9px;
   text-align: left; // Optional: align text to the left
 }
 
+.theader{
+  background-color: #D0D5DD;
+  th {
+    color: #2E3135;
+    &:first-of-type {
+      border-top-left-radius: 8px; // Adjust to desired radius
+      border-bottom-left-radius: 8px;
+    }
+    &:last-of-type {
+      border-top-right-radius: 8px; // Adjust to desired radius
+      border-bottom-right-radius: 8px;
+    }
+  }
+
+}
+
 .styled_table td {
-  padding: 18px 0px;
+  padding: 19px 8px;
   border-bottom:  0.2px solid #d0d6db;
   font-family: Roboto Flex;
   font-size: 16px;
@@ -77,6 +122,12 @@
     background-color: #FAFCFF; // Hover background color
     color: #2E3135; // Hover text color
   }
+}
+
+.border_dot {
+  border-bottom: 2px dotted #616468; /* Adjust thickness and color */
+  width: 100px; /* Adjust this value to control the width */
+  margin: 8px 10px;
 }
 
 @media (max-width: 992) {

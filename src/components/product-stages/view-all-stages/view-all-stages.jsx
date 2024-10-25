@@ -3,37 +3,33 @@ import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../product-stages.module.scss';
-import { BsThreeDotsVertical,BsExclamationTriangleFill } from "react-icons/bs";
+import { BsThreeDotsVertical, BsExclamationTriangleFill } from "react-icons/bs";
 import axios from "axios";
-import { Spinner, Alert } from 'react-bootstrap';
+import { Spinner, Alert, Button, Form, Modal } from 'react-bootstrap';
+import Api from "../../shared/api/apiLink";
+import ReactPaginate from 'react-paginate';
 
-const DropdownMenu = ({ show, onClickOutside, onEdit, onDelete }) => {
-  if (!show) return null;
-
-  return (
-    <div className={styles.dropdownMenu} onClick={onClickOutside}>
-      <ul className={styles.menuList}>
-        <li className={styles.menuItem} onClick={onEdit}>Edit Stage</li>
-        <li className={styles.menuItem} onClick={onDelete}>Delete Stage</li>
-      </ul>
-    </div>
-  );
-};
-
-export default function ViewAllStages() {
+const ViewAllStages = () => {
   const [stages, setStages] = useState([]);
-  const [dropdownVisible, setDropdownVisible] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5; // Adjust this number as needed
+  const [selectedStage, setSelectedStage] = useState(null); // For the modal
+  const [showModal, setShowModal] = useState(false); // Modal visibility
 
   useEffect(() => {
-    // Fetch all stages from the API
     const fetchStages = async () => {
       try {
-        const response = await axios.get('YOUR_API_URL'); // Replace with your API URL
-        setStages(response.data); // Assuming response.data is an array of stages
+        const response = await Api.get('/fish-stages'); // Replace with your API URL
+        console.log(response.data);
+        if (Array.isArray(response.data.data)) {
+          setStages(response.data.data);
+        } else {
+          throw new Error('Expected an array of stages');
+        }
       } catch (err) {
-        setError('Failed to fetch data. Please try again.');
+        setError(err.response?.data?.message || 'Failed to fetch data. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -42,28 +38,49 @@ export default function ViewAllStages() {
     fetchStages();
   }, []);
 
-  const handleDropdownToggle = (index) => {
-    setDropdownVisible((prev) => (prev === index ? null : index));
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = date.getFullYear();
+  
+    return `${day}/${month}/${year}`;
   };
 
-  const handleClickOutside = () => {
-    setDropdownVisible(null);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSelectedStage({
+      ...selectedStage,
+      [name]: value,
+    });
   };
 
-  const handleEditStage = (stage) => {
-    console.log('Editing stage:', stage);
-    // Implement your edit stage logic here
+  // edit stage
+  const handleEdit = (stage) => {
+    setSelectedStage(stage); // Set the selected admin data
+    setShowModal(true); // Show the modal
   };
 
-  const handleDeleteStage = async (stage) => {
+  // save edited stage
+  const handleSave = async () => {
     try {
-      await axios.delete(`YOUR_API_URL/${stage.id}`); // Replace with your delete API endpoint
-      setStages((prev) => prev.filter((item) => item.id !== stage.id));
-      console.log('Stage deleted successfully');
-    } catch (err) {
-      console.error('Failed to delete stage:', err);
+      // You can call your API to save the changes here
+      await Api.put(`/admins/${selectedStage.id}`, selectedStage);
+      setShowModal(false); // Close the modal after saving
+    } catch (error) {
+      console.error("Failed to save admin:", error);
     }
   };
+
+
+  // Pagination logic
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const displayedStages = stages.slice(startIndex, endIndex);
 
   return (
     <section className={`d-none d-lg-block ${styles.body}`}>
@@ -96,49 +113,117 @@ export default function ViewAllStages() {
                 <Alert variant="danger" className="text-center w-50 py-5">
                   <BsExclamationTriangleFill size={40} /> <span className="fw-semibold">{error}</span>
                 </Alert>
-              </div> 
+              </div>
+            )}
+
+            {/* No Data Message */}
+            {!loading && !error && displayedStages.length === 0 && (
+              <div className="d-flex justify-content-center">
+                <Alert variant="info" className="text-center w-50 py-5">
+                  No available data
+                </Alert>
+              </div>
             )}
 
             {/* Stages Table */}
-            {!loading && !error && (
-              <table className={styles.styled_table}>
-                <thead>
-                  <tr>
-                    <th>DATE CREATED</th>
-                    <th>ID</th>
-                    <th>NAME</th>
-                    <th>DESCRIPTION</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stages.map((stage, index) => (
-                    <tr key={index}>
-                      <td>{stage.dateCreated}</td>
-                      <td>{stage.id}</td>
-                      <td>{stage.name}</td>
-                      <td className="d-flex justify-content-between align-items-center">
-                        <span>{stage.description}</span>
-                        <div className="position-relative">
-                          <BsThreeDotsVertical
-                            className="me-3 cursor-pointer"
-                            onClick={() => handleDropdownToggle(index)} // Pass index to toggle
-                          />
-                          <DropdownMenu
-                            show={dropdownVisible === index} // Show menu only for active index
-                            onClickOutside={handleClickOutside}
-                            onEdit={() => handleEditStage(stage)} // Pass the stage object
-                            onDelete={() => handleDeleteStage(stage)} // Pass the stage object
-                          />
-                        </div>
-                      </td>
+            {!loading && !error && displayedStages.length > 0 && (
+              <>
+                <table className={styles.styled_table}>
+                  <thead>
+                    <tr>
+                      <th>DATE CREATED</th>
+                      <th>NAME</th>
+                      <th>DESCRIPTION</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {displayedStages.map((stage) => {
+                      // Format the createdAt date
+                      const formattedCreatedAt = formatDate(stage.createdAt);
+
+                      return (
+                        <tr key={stage.id} onClick={()=>handleEdit(stage)}>
+                          <td>{formattedCreatedAt}</td>
+                          <td>{stage.title}</td>
+                          <td>
+                            {stage.description} 
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                {/* Pagination */}
+                <div className="d-flex justify-content-center mt-4">
+                  <ReactPaginate
+                    previousLabel={"< "}
+                    nextLabel={" >"}
+                    breakLabel={"..."}
+                    pageCount={Math.ceil(stages.length / itemsPerPage)}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={3}
+                    onPageChange={handlePageChange}
+                    containerClassName={"pagination"}
+                    pageClassName={"page-item"}
+                    pageLinkClassName={"page-link"}
+                    previousClassName={"page-item"}
+                    previousLinkClassName={"page-link"}
+                    nextClassName={"page-item"}
+                    nextLinkClassName={"page-link"}
+                    breakClassName={"page-item"}
+                    breakLinkClassName={"page-link"}
+                    activeClassName={"dark"}
+                  />
+                </div>
+
+                {/* Modal for Editing Admin */}
+                <Modal show={showModal} onHide={() => setShowModal(false)}>
+                  <Modal.Header closeButton className="border-0">
+                    <Modal.Title className="fw-semibold">Edit Stage</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body className="border-0 pt-5">
+                    {selectedStage && (
+                      <Form>                  
+                        <Form.Group className="mb-3">
+                          <Form.Label>Product Name</Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="title"
+                            value={selectedStage.title || ''}
+                            placeholder="*****" // Default placeholder for password
+                            onChange={handleInputChange}
+                            required
+                          />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Description</Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            name="role"
+                            style={{ height: '200px' }}
+                            required
+                            value={selectedStage.description}
+                            onChange={handleInputChange}
+                          />
+                        </Form.Group>
+                      </Form>
+                    )}
+                  </Modal.Body>
+                  <Modal.Footer className="border-0 mt-5">
+                    <Button variant="dark" className="px-5" onClick={handleSave}>
+                      Save
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
+
+              </>
             )}
           </main>
         </section>
       </div>
     </section>
   );
-}
+};
+
+export default ViewAllStages;

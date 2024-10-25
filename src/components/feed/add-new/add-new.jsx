@@ -5,16 +5,13 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header';
-import axios from 'axios';
-
+import Api from '../../shared/api/apiLink';
 const AddFeed = () => {
     const [formData, setFormData] = useState({
         feedName: '',
-        quantity: 0,
-        unit: '',
         feedType: '',
-        price: 0,
-        thresholdValue: 0,
+        unit:'',
+        threshold: 0
     });
     const [loader, setLoader] = useState(false);
 
@@ -32,7 +29,7 @@ const AddFeed = () => {
 
         try {
             // Make the actual API call
-            const response = await axios.post('YOUR_API_ENDPOINT', formData);
+            const response = await Api.post('/create-feed', formData);
 
             // After a successful API call
             toast.update(loadingToast, {
@@ -45,15 +42,13 @@ const AddFeed = () => {
             // Reset form or handle success as needed
             setFormData({
                 feedName: '',
-                quantity: 0,
                 unit: '',
                 feedType: '',
-                price: 0,
-                thresholdValue: 0,
+                threshold: 0,
             });
         } catch (error) {
             toast.update(loadingToast, {
-                render: "Error adding feed. Please try again.",
+                render:error.response?.data?.message || "Error adding feed. Please try again.",
                 type: "error",
                 isLoading: false,
                 autoClose: 3000,
@@ -92,19 +87,6 @@ const AddFeed = () => {
                                     />
                                 </Col>
                                 <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Quantity</Form.Label>
-                                    <Form.Control
-                                        placeholder="Enter quantity"
-                                        type="number"
-                                        name="quantity"
-                                        value={formData.quantity}
-                                        min="1"
-                                        required
-                                        onChange={handleInputChange}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                    />
-                                </Col>
-                                <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Unit</Form.Label>
                                     <Form.Select
                                         name="unit"
@@ -128,27 +110,14 @@ const AddFeed = () => {
                                         onChange={handleInputChange}
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                     />
-                                </Col>
-                                <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Price</Form.Label>
-                                    <Form.Control
-                                        placeholder="Enter price"
-                                        type="number"
-                                        name="price"
-                                        value={formData.price}
-                                        required
-                                        min="1"
-                                        onChange={handleInputChange}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                    />
-                                </Col>
+                                </Col>                         
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Threshold Value</Form.Label>
                                     <Form.Control
                                         placeholder="Enter threshold value"
                                         type="number"
-                                        name="thresholdValue"
-                                        value={formData.thresholdValue}
+                                        name="threshold"
+                                        value={formData.threshold}
                                         required
                                         min="1"
                                         onChange={handleInputChange}

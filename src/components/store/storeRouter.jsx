@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route} from 'react-router-dom';
 import AddStock from './add-new/add-new';
-import UpdateInventory from './update-inventory/update-inventory';
+import UpdateStoreInventory from './view-all/view-all';
 import InventoryHistory from './inventory-history/inventory-history';
 
 const StoreNavigations = () => {
@@ -9,7 +9,7 @@ const StoreNavigations = () => {
   return (
     <Routes>
       <Route path='add-new' element={<AddStock/>}/>
-      <Route path='update-inventory' element={<UpdateInventory/>}/>
+      <Route path='view-all' element={<UpdateStoreInventory/>}/>
       <Route path='inventory-history' element={<InventoryHistory/>}/>
     </Routes>
   );

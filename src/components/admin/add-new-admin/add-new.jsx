@@ -75,8 +75,7 @@ const AddNew = () => {
         } finally {
             setLoader(false);
         }
-    };
-    
+    }; 
     
 
     return (
@@ -92,7 +91,7 @@ const AddNew = () => {
                     <main>
                         <ToastContainer />
                         <Form className={styles.create_form} onSubmit={handleSubmit}>
-                            <h4 className="mt-3 mb-5">Create Admin</h4>
+                            <h4 className="mt-5 mb-5">Create Admin</h4>
                             <Row xxl={2} xl={2} lg={2} md={1} sm={1} xs={1}>
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Full Name</Form.Label>
@@ -154,7 +153,7 @@ const AddNew = () => {
                                     />
                                 </Col>
                             </Row>
-                            <div className="d-flex justify-content-end my-4">
+                            <div className="d-flex justify-content-end my-5">
                                 <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
                                     {loader ? (
                                       ' Creating...'
@@ -162,7 +161,7 @@ const AddNew = () => {
                                     ) : (
                                         "Create"
                                     )}
-                                </Button>
+                            </Button>                                
                             </div>
                         </Form>
                     </main>

@@ -26,9 +26,7 @@
   background-color: #FAFCFF;
   border-radius: 8px;
   text-align: center;
-  width: 24%;
-  margin-bottom: 59px;
-  
+  margin-bottom: 15px;
   h6 {
     color: #8C949B;
   }
@@ -53,7 +51,6 @@
 
 .styled_table {
   width: 100%;
-  table-layout: fixed; // Ensures equal column widths
   position: relative; // Ensure that child elements with absolute positioning are relative to this table
 }
 
@@ -86,7 +83,7 @@
 
 .styled_table td {
   padding: 19px 8px;
-  border-bottom:  0.5px solid #8a9199;
+  border-bottom:  0.2px solid #d0d6db;
   font-family: Roboto Flex;
   font-size: 16px;
   font-weight: 500;
@@ -94,6 +91,9 @@
   letter-spacing: 0.04em;
   color: #2E3135;
   position: relative; // Ensure td can contain absolute positioned elements like the dropdown
+  :hover{
+    cursor: pointer;
+  }
 }
 
 .dropdownMenu {
@@ -125,6 +125,11 @@
   }
 }
 
+.border_dot {
+  border-bottom: 2px dotted #616468; /* Adjust thickness and color */
+  width: 100px; /* Adjust this value to control the width */
+  margin: 8px 10px;
+}
 
 @media (max-width: 992) {
   .body{
