@@ -4,11 +4,11 @@ import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../product-stages.module.scss';
-import { Spinner, Alert, Row, Col } from 'react-bootstrap'; // Import Spinner and Alert from Bootstrap
+import { Spinner, Alert, Row, Col } from 'react-bootstrap';
 import { FaExclamationTriangle } from "react-icons/fa";
 import Api from "../../shared/api/apiLink";
+import ReactPaginate from 'react-paginate'; // Import ReactPaginate
 
-// Fish stage number boxes
 const FishStageBox = ({ stageName, quantity }) => {
   return (
     <div className={`${styles.stageBox} shadow py-3`}>
@@ -21,50 +21,57 @@ const FishStageBox = ({ stageName, quantity }) => {
 export default function ViewAddFishHistory() {
   const [fishStages, setFishStages] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [loadingStages, setLoadingStages] = useState(true); // Loading state for fish stages
-  const [loadingTable, setLoadingTable] = useState(true); // Loading state for table data
-  const [errorStages, setErrorStages] = useState(''); // Error state for fish stages
-  const [errorTable, setErrorTable] = useState(''); // Error state for table data
+  const [loadingStages, setLoadingStages] = useState(true);
+  const [loadingTable, setLoadingTable] = useState(true);
+  const [errorStages, setErrorStages] = useState('');
+  const [errorTable, setErrorTable] = useState('');
+  const [currentPage, setCurrentPage] = useState(0); // Current page state
+  const itemsPerPage = 10; // Number of items per page
 
-  // Fetch fish stage numbers
   useEffect(() => {
     const fetchFishStages = async () => {
       try {
-        const response = await Api.get('/fishes'); // Replace with your API endpoint
-        setFishStages(response.data.data); // Assuming the response is an array of fish stages
+        const response = await Api.get('/fishes');
+        setFishStages(response.data.data);
       } catch (error) {
-        setErrorStages("Error fetching fishes in their stage."); // Set error message
+        setErrorStages("Error fetching fishes in their stage.");
       } finally {
-        setLoadingStages(false); // Stop loading indicator
+        setLoadingStages(false);
       }
     };
     fetchFishStages();
   }, []);
 
-  // Fetch table data
   useEffect(() => {
     const fetchTableData = async () => {
       try {
-        const response = await Api.get('fishes'); // Replace with your API endpoint
-        setTableData(response.data.data); // Assuming the response is an array of fish history data
+        const response = await Api.get('fishes');
+        setTableData(response.data.data);
       } catch (error) {
-        setErrorTable("Error fetching add fish history data."); // Set error message
+        setErrorTable("Error fetching add fish history data.");
       } finally {
-        setLoadingTable(false); // Stop loading indicator
+        setLoadingTable(false);
       }
     };
     fetchTableData();
   }, []);
 
-  // Format date function
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
-  
+
+  // Handle page change
+  const handlePageChange = (selected) => {
+    setCurrentPage(selected.selected);
+  };
+
+  // Calculate current items
+  const currentItems = tableData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+  const pageCount = Math.ceil(tableData.length / itemsPerPage); // Total number of pages
 
   return (
     <section className={`d-none d-lg-block ${styles.body}`}>
@@ -72,17 +79,14 @@ export default function ViewAddFishHistory() {
         <Header />
       </div>
       <div className="d-flex gap-2">
-        {/* Sidebar */}
         <div className={styles.sidebar}>
           <SideBar className={styles.sidebarItem} />
         </div>
 
-        {/* Content */}
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
             <h4 className="mt-3 mb-5">View Add Fish History</h4>
             
-            {/* Fish Stage Numbers */}
             <div>
               {loadingStages && (
                 <div className="text-center w-100">
@@ -92,25 +96,24 @@ export default function ViewAddFishHistory() {
                 </div>
               )}
               {errorStages && (
-                 <div className=" w-100">
-                    <Alert variant="danger" className="text-center py-5">
-                      <FaExclamationTriangle size={40}/><span className="fw-semibold">{errorStages}</span>
-                    </Alert>
-                  </div>
+                <div className=" w-100">
+                  <Alert variant="danger" className="text-center py-5">
+                    <FaExclamationTriangle size={40} /><span className="fw-semibold">{errorStages}</span>
+                  </Alert>
+                </div>
               )}
               <Row lg={4}>
                 {!loadingStages && !errorStages && fishStages.map((stage, index) => (
                   <Col key={index}>
                     <FishStageBox
-                      stageName={stage.speciesName}
-                      quantity={stage.quantity}                    
+                      stageName={stage.stageTitle}
+                      quantity={stage.quantity}
                     />
                   </Col>
                 ))}
               </Row>
             </div>
 
-            {/* Table */}
             {loadingTable && (
               <div className="text-center">
                 <Spinner animation="border" role="status">
@@ -121,39 +124,65 @@ export default function ViewAddFishHistory() {
             {errorTable && (
               <div className="d-flex justify-content-center">
                 <Alert variant="danger" className="text-center w-50 py-5">
-                  <FaExclamationTriangle size={40}/><span className="fw-semibold">{errorTable}</span>
+                  <FaExclamationTriangle size={40} /><span className="fw-semibold">{errorTable}</span>
                 </Alert>
-              </div>              
+              </div>
             )}
             {!loadingTable && !errorTable && (
-              <table className={`mt-5 ${styles.styled_table}`}>
-                <thead className={`rounded-2 ${styles.theader}`}>
-                  <tr>
-                    <th>DATE CREATED</th>
-                    <th>STAGE</th>
-                    <th>QUANTITY ADDED</th>
-                    <th>FISH TYPE</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableData.length > 0 ? (
-                    tableData.map((data, index) => {
-                      const formattedDate = formatDate(data.createdAt);
-                      return(
-                      <tr key={index}>
-                        <td>{formattedDate}</td>
-                        <td>{data.stage}</td>
-                        <td>{data.quantity}</td>
-                        <td>{data.speciesName}</td>
-                      </tr>)
-                  })
-                  ) : (
+              <>
+                <table className={`mt-5 ${styles.styled_table}`}>
+                  <thead className={`rounded-2 ${styles.theader}`}>
                     <tr>
-                      <td colSpan="5" className="text-center">No data available</td>
+                      <th>DATE CREATED</th>
+                      <th>STAGE</th>
+                      <th>QUANTITY ADDED</th>
+                      <th>FISH TYPE</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {currentItems.length > 0 ? (
+                      currentItems.map((data, index) => {
+                        const formattedDate = formatDate(data.createdAt);
+                        return (
+                          <tr key={index}>
+                            <td>{formattedDate}</td>
+                            <td>{data.stageTitle}</td>
+                            <td>{data.quantity}</td>
+                            <td>{data.speciesName}</td>
+                          </tr>
+                        )
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="text-center">No data available</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+                
+                {/* Pagination */}
+                <div className="d-flex justify-content-center mt-4">
+                  <ReactPaginate
+                    previousLabel={"<"}
+                    nextLabel={">"}
+                    breakLabel={"..."}
+                    pageCount={pageCount}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={5}
+                    onPageChange={handlePageChange}
+                    containerClassName={"pagination"}
+                    pageClassName={"page-item"}
+                    pageLinkClassName={"page-link"}
+                    previousClassName={"page-item"}
+                    previousLinkClassName={"page-link"}
+                    nextClassName={"page-item"}
+                    nextLinkClassName={"page-link"}
+                    breakClassName={"page-item"}
+                    breakLinkClassName={"page-link"}
+                    activeClassName={"active"}
+                  />
+                </div>
+              </>
             )}
           </main>
         </section>

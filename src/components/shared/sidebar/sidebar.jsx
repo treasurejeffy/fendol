@@ -71,7 +71,7 @@ export default function SideBar() {
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.admin}>
+                            <Collapse in={open.admin} style={{ transitionDuration: "0s" }}>
                                 <div id="admin-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
@@ -123,7 +123,7 @@ export default function SideBar() {
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.product_stages}>
+                            <Collapse in={open.product_stages} style={{ transitionDuration: "0s" }}>
                                 <div id="product_stages-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
@@ -210,7 +210,7 @@ export default function SideBar() {
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.products}>
+                            <Collapse in={open.products} style={{ transitionDuration: "0s" }}>
                                 <div id="products-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
@@ -252,7 +252,7 @@ export default function SideBar() {
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.showcase}>
+                            <Collapse in={open.showcase} style={{ transitionDuration: "0s" }}>
                                 <div id="showcase-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
@@ -303,7 +303,7 @@ export default function SideBar() {
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.feed}>
+                            <Collapse in={open.feed} style={{ transitionDuration: "0s" }}>
                                 <div id="feed-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
@@ -354,7 +354,7 @@ export default function SideBar() {
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.store}>
+                            <Collapse in={open.store} style={{ transitionDuration: "0s" }}>
                                 <div id="feed-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
@@ -405,7 +405,7 @@ export default function SideBar() {
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.finance}>
+                            <Collapse in={open.finance} style={{ transitionDuration: "0s" }}>
                                 <div id="finance-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
@@ -456,7 +456,7 @@ export default function SideBar() {
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.report}>
+                            <Collapse in={open.report} style={{ transitionDuration: "0s" }}>
                                 <div id="report-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
@@ -534,7 +534,7 @@ export default function SideBar() {
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.notification}>
+                            <Collapse in={open.notification} style={{ transitionDuration: "0s" }}>
                                 <div id="notification-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">

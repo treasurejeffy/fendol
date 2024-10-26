@@ -48,15 +48,24 @@
   }
 }
 
+.inputs{
+  &::placeholder {
+    opacity: 0.5;
+  }
+}
 
 .styled_table {
   width: 100%;
-  position: relative; // Ensure that child elements with absolute positioning are relative to this table
-}
+  border-collapse: collapse;
+  table-layout: fixed; // Fixed layout for equal column widths
 
-.styled_table th,
-.styled_table td {
-  white-space: nowrap; // Prevent text wrapping
+  th, td {
+    padding: 8px;
+    text-align: left;
+    overflow: hidden; // Prevent overflow
+    text-overflow: ellipsis; // Add ellipsis for overflowed text
+    white-space: nowrap; // Prevent text wrapping
+  }
 }
 
 .styled_table th {
@@ -79,6 +88,12 @@
     }
   }
 
+}
+
+.trow{
+  &:hover{
+    cursor: pointer;
+  }
 }
 
 .styled_table td {

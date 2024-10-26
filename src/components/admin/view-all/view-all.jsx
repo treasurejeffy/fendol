@@ -7,23 +7,24 @@ import { BsThreeDotsVertical, BsExclamationTriangleFill } from "react-icons/bs";
 import Api from '../../shared/api/apiLink';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Spinner, Alert, Modal, Button, Form } from 'react-bootstrap';
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { Spinner, Alert, Modal, Button, Form, InputGroup } from 'react-bootstrap';
+import { FaArrowLeft, FaArrowRight, FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function ViewAll() {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [adminsPerPage] = useState(5); // Change as needed
-  const [selectedAdmin, setSelectedAdmin] = useState(null); // For the modal
-  const [showModal, setShowModal] = useState(false); // Modal visibility
+  const [adminsPerPage] = useState(5);
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await Api.get('/admins');
-        console.log('API Response:', response); // Log the response for debugging
+        console.log('API Response:', response);
 
         if (Array.isArray(response.data.data)) {
           setAdmins(response.data.data);
@@ -39,11 +40,11 @@ export default function ViewAll() {
     };
 
     fetchData();
-  }, []); // Ensuring it only runs once
+  }, []);
 
   const handleEdit = (admin) => {
-    setSelectedAdmin(admin); // Set the selected admin data
-    setShowModal(true); // Show the modal
+    setSelectedAdmin(admin);
+    setShowModal(true);
   };
 
   const handleInputChange = (e) => {
@@ -60,33 +61,33 @@ export default function ViewAll() {
     });
   
     try {
-      // API call to save the admin details
       await Api.put(`/admins/${selectedAdmin.id}`, selectedAdmin);
   
-      // On successful API call
       toast.update(loadingToast, {
         render: "Admin saved successfully!",
-        type: "success", // Use string for type
+        type: "success",
         isLoading: false,
-        autoClose: 3000, // Close after 3 seconds
+        autoClose: 3000,
         className: 'dark-toast'
       });
   
-      setShowModal(false); // Close the modal after saving
+      setShowModal(false);
     } catch (error) {
       console.error("Failed to save admin:", error);
   
-      // Display error toast
       toast.update(loadingToast, {
         render: "Failed to save admin. Please try again.",
-        type: "error", // Use string for type
+        type: "error",
         isLoading: false,
-        autoClose: 6000, // Close after 6 seconds
+        autoClose: 6000,
         className: 'dark-toast'
       });
     }
   };
-  
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const indexOfLastAdmin = currentPage * adminsPerPage;
   const indexOfFirstAdmin = indexOfLastAdmin - adminsPerPage;
@@ -152,7 +153,6 @@ export default function ViewAll() {
                   </tbody>
                 </table>
 
-                {/* Pagination Controls */}
                 <div className="d-flex justify-content-center mt-3 align-items-center">
                   <button 
                     onClick={() => setCurrentPage(currentPage - 1)} 
@@ -174,7 +174,6 @@ export default function ViewAll() {
             )}
           </main>
 
-          {/* Modal for Editing Admin */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton className="border-0">
               <Modal.Title className="fw-semibold">Edit Admin</Modal.Title>
@@ -182,7 +181,6 @@ export default function ViewAll() {
             <Modal.Body className="border-0 pt-5">
               {selectedAdmin && (
                 <Form>
-                  {/* Full Name */}
                   <Form.Group className="mb-3 row">
                     <Form.Label className="col-4 fw-semibold">Full Name</Form.Label>
                     <div className="col-8">
@@ -196,7 +194,6 @@ export default function ViewAll() {
                     </div>
                   </Form.Group>
 
-                  {/* Email */}
                   <Form.Group className="mb-3 row">
                     <Form.Label className="col-4 fw-semibold">Email</Form.Label>
                     <div className="col-8">
@@ -210,33 +207,52 @@ export default function ViewAll() {
                     </div>
                   </Form.Group>
 
-                  {/* Password */}
                   <Form.Group className="mb-3 row">
                     <Form.Label className="col-4 fw-semibold">Password</Form.Label>
                     <div className="col-8">
-                      <Form.Control
-                        type="password"
-                        name="password"
-                        value={selectedAdmin.password || ''}
-                        onChange={handleInputChange}
-                        className="py-2 shadow-none border-secondary-subtle border-1"
-                      />
+                      <InputGroup>
+                        <Form.Control
+                          type={showPassword ? "text" : "password"}
+                          name="password"
+                          placeholder="Enter new password"
+                          onChange={handleInputChange}
+                          className={`py-2 shadow-none border-secondary-subtle border-1 border-end-0 ${styles.fadedPlaceholder}`}
+                        />
+                        <InputGroup.Text
+                          onClick={togglePasswordVisibility}
+                          className="bg-light-subtle shadow-none border-secondary-subtle border-1 border-start-0"
+                          style={{ cursor: "pointer" }}
+                        >
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </InputGroup.Text>
+                      </InputGroup>
                     </div>
                   </Form.Group>
 
-                  {/* Role */}
                   <Form.Group className="mb-3 row">
                     <Form.Label className="col-4 fw-semibold">Role</Form.Label>
                     <div className="col-8">
-                      <Form.Control
-                        type="text"
+                      <Form.Select
                         name="role"
-                        value={selectedAdmin.role}
+                        value={
+                          ["Product Manager", "Inventory Manager", "Sales Manager"].includes(selectedAdmin.role)
+                            ? selectedAdmin.role
+                            : ""
+                        }
                         onChange={handleInputChange}
                         className="py-2 shadow-none border-secondary-subtle border-1"
-                      />
+                      >
+                        <option value="" disabled>
+                          Select Role
+                        </option>
+                        <option value="Product Manager">Product Manager</option>
+                        <option value="Inventory Manager">Inventory Manager</option>
+                        <option value="Sales Manager">Sales Manager</option>
+                      </Form.Select>
                     </div>
                   </Form.Group>
+
+
                 </Form>
               )}
             </Modal.Body>

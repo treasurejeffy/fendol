@@ -72,7 +72,7 @@ const AddSpecies = () => {
                             <h4 className="mt-4 mb-5">Add Fish Type</h4>                               
                             <Form.Label className="fw-semibold">Name</Form.Label>
                             <Form.Control
-                                placeholder="Enter fish name | type"
+                                placeholder="Enter fish type"
                                 type="text"
                                 name="speciesName"
                                 value={formData.speciesName}

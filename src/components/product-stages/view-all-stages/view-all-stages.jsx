@@ -3,77 +3,92 @@ import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../product-stages.module.scss';
-import { BsThreeDotsVertical, BsExclamationTriangleFill } from "react-icons/bs";
+import { BsExclamationTriangleFill } from "react-icons/bs";
 import axios from "axios";
 import { Spinner, Alert, Button, Form, Modal } from 'react-bootstrap';
 import Api from "../../shared/api/apiLink";
 import ReactPaginate from 'react-paginate';
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ViewAllStages = () => {
   const [stages, setStages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 5; // Adjust this number as needed
-  const [selectedStage, setSelectedStage] = useState(null); // For the modal
-  const [showModal, setShowModal] = useState(false); // Modal visibility
+  const itemsPerPage = 10;
+  const [selectedStage, setSelectedStage] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const fetchStages = async () => {
+    try {
+      const response = await Api.get('/fish-stages');
+      if (Array.isArray(response.data.data)) {
+        setStages(response.data.data);
+      } else {
+        throw new Error('Expected an array of stages');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStages = async () => {
-      try {
-        const response = await Api.get('/fish-stages'); // Replace with your API URL
-        console.log(response.data);
-        if (Array.isArray(response.data.data)) {
-          setStages(response.data.data);
-        } else {
-          throw new Error('Expected an array of stages');
-        }
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch data. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStages();
   }, []);
 
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-  
     return `${day}/${month}/${year}`;
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setSelectedStage({
-      ...selectedStage,
+    setSelectedStage(prevStage => ({
+      ...prevStage,
       [name]: value,
-    });
+    }));
   };
 
-  // edit stage
   const handleEdit = (stage) => {
-    setSelectedStage(stage); // Set the selected admin data
-    setShowModal(true); // Show the modal
+    setSelectedStage(stage);
+    setShowModal(true);
   };
 
   // save edited stage
   const handleSave = async () => {
+    if (!selectedStage || !selectedStage.title || !selectedStage.description) {
+      toast.error("Please fill in all fields."); // Ensure all fields are filled
+      return;
+    }
+
+    let loadingToast; // Declare loadingToast here
+
     try {
-      // You can call your API to save the changes here
-      await Api.put(`/admins/${selectedStage.id}`, selectedStage);
+      // Show loading toast
+      loadingToast = toast.loading("Saving stage..."); // Show loading toast
+
+      // Call your API to save the changes using the correct URL with ID
+      const response = await Api.put(`/fish-stage/${selectedStage.id}`, selectedStage);
+
+      // Show success toast
+      toast.update(loadingToast, { render: "Stage updated successfully!", type: "success", isLoading: false, autoClose: 3000 });
+      fetchStages();
       setShowModal(false); // Close the modal after saving
     } catch (error) {
-      console.error("Failed to save admin:", error);
+      console.error("Failed to save stage:", error);
+      // Show error toast
+      toast.update(loadingToast, { render: "Failed to save stage. Please try again.", type: "error", isLoading: false, autoClose: 3000 }); // Update error toast
     }
   };
 
 
-  // Pagination logic
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
@@ -88,17 +103,13 @@ const ViewAllStages = () => {
         <Header />
       </div>
       <div className="d-flex gap-2">
-        {/* Sidebar */}
         <div className={styles.sidebar}>
           <SideBar className={styles.sidebarItem} />
         </div>
-
-        {/* Content */}
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
             <h4 className="mt-3 mb-5">View Stages</h4>
 
-            {/* Loader */}
             {loading && (
               <div className="text-center">
                 <Spinner animation="border" role="status">
@@ -107,7 +118,6 @@ const ViewAllStages = () => {
               </div>
             )}
 
-            {/* Error Message */}
             {error && (
               <div className="d-flex justify-content-center">
                 <Alert variant="danger" className="text-center w-50 py-5">
@@ -116,7 +126,6 @@ const ViewAllStages = () => {
               </div>
             )}
 
-            {/* No Data Message */}
             {!loading && !error && displayedStages.length === 0 && (
               <div className="d-flex justify-content-center">
                 <Alert variant="info" className="text-center w-50 py-5">
@@ -125,7 +134,6 @@ const ViewAllStages = () => {
               </div>
             )}
 
-            {/* Stages Table */}
             {!loading && !error && displayedStages.length > 0 && (
               <>
                 <table className={styles.styled_table}>
@@ -138,15 +146,15 @@ const ViewAllStages = () => {
                   </thead>
                   <tbody>
                     {displayedStages.map((stage) => {
-                      // Format the createdAt date
                       const formattedCreatedAt = formatDate(stage.createdAt);
-
                       return (
-                        <tr key={stage.id} onClick={()=>handleEdit(stage)}>
+                        <tr key={stage.id} onClick={() => handleEdit(stage)} className={styles.trow}>
                           <td>{formattedCreatedAt}</td>
                           <td>{stage.title}</td>
                           <td>
-                            {stage.description} 
+                            {stage.description.length > 40 
+                              ? `${stage.description.slice(0, 40)}...` 
+                              : stage.description}
                           </td>
                         </tr>
                       );
@@ -154,7 +162,6 @@ const ViewAllStages = () => {
                   </tbody>
                 </table>
 
-                {/* Pagination */}
                 <div className="d-flex justify-content-center mt-4">
                   <ReactPaginate
                     previousLabel={"< "}
@@ -176,22 +183,22 @@ const ViewAllStages = () => {
                     activeClassName={"dark"}
                   />
                 </div>
+                <ToastContainer />
 
-                {/* Modal for Editing Admin */}
                 <Modal show={showModal} onHide={() => setShowModal(false)}>
                   <Modal.Header closeButton className="border-0">
                     <Modal.Title className="fw-semibold">Edit Stage</Modal.Title>
                   </Modal.Header>
                   <Modal.Body className="border-0 pt-5">
                     {selectedStage && (
-                      <Form>                  
+                      <Form>
                         <Form.Group className="mb-3">
                           <Form.Label>Product Name</Form.Label>
                           <Form.Control
                             type="text"
                             name="title"
                             value={selectedStage.title || ''}
-                            placeholder="*****" // Default placeholder for password
+                            placeholder="*****"
                             onChange={handleInputChange}
                             required
                           />
@@ -200,10 +207,10 @@ const ViewAllStages = () => {
                           <Form.Label>Description</Form.Label>
                           <Form.Control
                             as="textarea"
-                            name="role"
+                            name="description"
                             style={{ height: '200px' }}
                             required
-                            value={selectedStage.description}
+                            value={selectedStage.description || ''}
                             onChange={handleInputChange}
                           />
                         </Form.Group>
@@ -216,7 +223,6 @@ const ViewAllStages = () => {
                     </Button>
                   </Modal.Footer>
                 </Modal>
-
               </>
             )}
           </main>

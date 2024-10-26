@@ -96,8 +96,8 @@ const AddNew = () => {
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Full Name</Form.Label>
                                     <Form.Control
-                                        placeholder="John Doe"
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        placeholder="Enter Full Name"
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
                                         type="text"
                                         name="fullName"
                                         required
@@ -108,8 +108,8 @@ const AddNew = () => {
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">E-Mail</Form.Label>
                                     <Form.Control
-                                        placeholder="johndoe@gmail.com"
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        placeholder="Enter E-Mail"
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
                                         type="email"
                                         name="email"
                                         value={formData.email}
@@ -122,8 +122,8 @@ const AddNew = () => {
                                     <InputGroup className="mb-4">
                                         <Form.Control
                                             type={showPassword ? "text" : "password"}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 border-end-0 ${styles.inputs}`}
-                                            placeholder="**********"
+                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 border-end-0 ${styles.inputs} ${styles.fadedPlaceholder}`}
+                                            placeholder="Enter Password"
                                             name="password"
                                             value={formData.password}
                                             onChange={handleInputChange}
@@ -142,15 +142,19 @@ const AddNew = () => {
                                 </Col>
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold fs-6">Role</Form.Label>
-                                    <Form.Control
-                                        placeholder="Worker"
-                                        type="text"
+                                    <Form.Select
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                         name="role"
                                         value={formData.role}
-                                        required
                                         onChange={handleInputChange}
-                                    />
+                                        required
+                                    >
+                                        <option value="" disabled>Select Role</option>
+                                        <option value="Product Manager">Product Manager</option>                                        
+                                        <option value="Inventory Manager">Inventory Manager</option>
+                                        <option value="Sale Manager">Sale Manager</option>
+                                        <option value="Admin">Admin</option>
+                                    </Form.Select>
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-end my-5">

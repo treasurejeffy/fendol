@@ -36,8 +36,17 @@
   padding-bottom: 20px;
 }
 
+.fadedPlaceholder::placeholder {
+  opacity: 0.5;
+}
+
+
 .styled_table tbody tr{
   border-bottom:  0.2px solid #d0d6db;
+
+  &:hover{
+    cursor: pointer;
+  }
 
   td{
     padding: 18px 0px;
