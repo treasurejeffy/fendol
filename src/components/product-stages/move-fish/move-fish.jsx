@@ -17,7 +17,7 @@ export default function MoveFish() {
         stageId_from: '',
         stageId_to: '',
         speciesId: '',
-        actual_quantity: '',
+        actual_quantity: Number,
         remarks: '',
     });
     const [showSecondForm, setShowSecondForm] = useState(false);
