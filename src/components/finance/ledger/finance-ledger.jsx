@@ -105,27 +105,25 @@ const FinanceLedger = () => {
 
             {/* Ledger Table */}
             {!loading && !error && displayedLedgerData.length > 0 && (
-              <>
-                <div className="d-flex justify-content-end"><p className="text-muted fw-semibold w-25 shadow-sm p-4">Total Balance: ₦{balance}</p></div>
+              <>              
                 <table className={styles.styled_table}>
-                  <thead>
+                  <thead  className={`rounded-2 ${styles.theader}`}>
                     <tr>
                       <th>DATE</th>
-                      <th>PRODUCT</th>
-                      <th>DESCRIPTION</th>
-                      <th>QUANTITY</th>
-                      <th>CREDIT</th>
-                      <th>DEBIT</th>
+                      <th className="pt-3">PRODUCT</th>
+                      <th className="pt-3">DESCRIPTION</th>
+                      <th className="pt-3">QUANTITY</th>
+                      <th style={{ color: 'green' }} className="pt-3">CREDIT()</th>
+                      <th  style={{ color: 'red' }} className="pt-3">DEBIT()</th>
+                      <th >BALANCE()</th>
+                      
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedLedgerData.map((entry) => {
-                      const formattedDate = formatDate(entry.date);                    
+                    {displayedLedgerData.map((record,index) => {
+                      const formattedDate = formatDate(record.date);                    
                       return (
-                        <React.Fragment key={entry.date}> 
-                          
-                          {/* Render individual records */}
-                          {entry.records.map((record, index) => (
+                        <React.Fragment key={record.date}> 
                             <tr key={index}>
                               <td>{formatDate(record.date)}</td>
                               <td>{record.productName}</td>
@@ -133,8 +131,8 @@ const FinanceLedger = () => {
                               <td>{record.quantity}</td>
                               <td style={{ color: 'green' }}>{record.credit ? `₦${record.credit}` : '-'}</td>
                               <td style={{ color: 'red' }}>{record.debit ? `₦${record.debit}` : '-'}</td>
-                            </tr>
-                          ))}
+                              <td>{record.balance}</td>
+                            </tr>                          
                         </React.Fragment>
                       );
                     })}

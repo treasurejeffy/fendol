@@ -10,14 +10,14 @@ import Api from '../../shared/api/apiLink';
 const AddSales = () => {
     const [dryData, setDryData] = useState({
         productName: "",
-        quantity: 0,
+        quantity: Number,
         description: ""
     });
 
     const [freshData, setFreshData] = useState({        
         productName:"",
-        productWeight: 0,
-        quantity: 0,
+        productWeight: Number,
+        quantity: Number,
         description: "",
         stageId_from: ""        
     })
@@ -25,7 +25,7 @@ const AddSales = () => {
     const [fingerlingsData, setFingerlingsData] = useState(
         {
             productName:"",
-            quantity: 0,
+            quantity: Number,
             description:"",
             stageId_from : ""
         }
@@ -35,6 +35,8 @@ const AddSales = () => {
     const [productDetails, setProductDetails] = useState(null);
     const [salesType, setSalesType] = useState('Type'); 
     const [stages, setStages] = useState([]);
+
+
 
     // Fetch stages
     const fetchStages = async () => {
@@ -64,33 +66,35 @@ const AddSales = () => {
         fetchStages();
     }, []);
 
-        // Handle input changes for dryData
-        const handleInputChange = (e) => {
-            const { name, value } = e.target;
-            setDryData({
-                ...dryData,
-                [name]: value ? value : parseFloat(value)
-            });
-        };
+    // Handle quantity change and update total price for dry fish
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setDryData(prevData => ({
+            ...prevData,
+            [name]: value,
+            totalPrice: name === 'quantity' ? (prevData.basePrice || 0) * (parseFloat(value) || 0) : prevData.totalPrice
+        }));
+    };
 
-        // freshData input changes
-        const handleInputChangeFresh = (e) => {
-            const { name, value } = e.target;
-            setFreshData({
-                ...freshData,
-                [name]: value ? value : parseFloat(value)
-            });
-        };
+    // freshData input changes
+    const handleInputChangeFresh = (e) => {
+        const { name, value } = e.target;
+        setFreshData(prevData => ({
+            ...prevData,
+            [name]: value,
+            totalPrice: name === 'productWeight' ? (prevData.basePrice || 0) * (parseFloat(value) || 0) : prevData.totalPrice
+        }));
+    };
 
-        // fingerlingsData control input
-        const handleInputChangeFingerlings = (e) => {
-            const { name, value } = e.target;
-            setFingerlingsData({
-                ...fingerlingsData,
-                [name]: value ? value : parseFloat(value)
-            });
-        };
-
+    // fingerlingsData input changes, similar to dry fish calculation
+    const handleInputChangeFingerlings = (e) => {
+        const { name, value } = e.target;
+        setFingerlingsData(prevData => ({
+            ...prevData,
+            [name]: value,
+            totalPrice: name === 'quantity' ? (prevData.basePrice || 0) * (parseFloat(value) || 0) : prevData.totalPrice
+        }));
+    };
 
     // Fetch product details when a product is selected
     const handleProductSelect = async (e) => {
@@ -98,19 +102,22 @@ const AddSales = () => {
         const selectedProductName = e.target.value;
         const selectedProductId = selectedOption.getAttribute('data-id');
 
-        setDryData({ ...dryData, productName: selectedProductName });
+        // Update product name for all data objects
+        setDryData(prevData => ({ ...prevData, productName: selectedProductName }));
+
 
         if (selectedProductId) {
             try {
                 const response = await Api.get(`/product/${selectedProductId}`);
                 const productData = response.data.data;
 
-                setDryData({
-                    ...dryData,
-                    productName: selectedProductName,
+                // Update dry fish data
+                setDryData(prevData => ({
+                    ...prevData,
                     productWeight: productData.productWeight || '',
-                    totalPrice: productData.totalPrice || '',
-                });
+                    basePrice: productData.basePrice || 0,
+                    totalPrice: (productData.basePrice || 0) * (prevData.quantity || 0)
+                }));
 
                 setProductDetails(productData);
             } catch (error) {
@@ -118,7 +125,61 @@ const AddSales = () => {
                 toast.error('Error fetching product details.');
             }
         }
-    };  
+    };
+
+    const handleProductSelectFinger = async (e) =>{
+        const selectedOption = e.target.selectedOptions[0];
+        const selectedProductName = e.target.value;
+        const selectedProductId = selectedOption.getAttribute('data-id-finger');
+
+        // Update product name for all data
+        setFingerlingsData(prevData => ({ ...prevData, productName: selectedProductName }));
+
+        if (selectedProductId) {
+            try {
+                const response = await Api.get(`/product/${selectedProductId}`);
+                const productData = response.data.data;
+              // Update fingerlings data
+              setFingerlingsData(prevData => ({
+                ...prevData,
+                basePrice: productData.basePrice || 0,
+                totalPrice: (productData.basePrice || 0) * (prevData.quantity || 0)
+            }));
+
+                setProductDetails(productData);
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+                toast.error('Error fetching product details.');
+            }
+        }
+    }
+
+    const handleProductSelectFresh = async (e) =>{
+        const selectedOption = e.target.selectedOptions[0];
+        const selectedProductName = e.target.value;
+        const selectedProductId = selectedOption.getAttribute('data-id-fresh');
+
+        // Update product name for all data
+        setFreshData(prevData => ({ ...prevData, productName: selectedProductName }));
+
+        if (selectedProductId) {
+            try {
+                const response = await Api.get(`/product/${selectedProductId}`);
+                const productData = response.data.data;
+                // Update fresh fish data using productWeight for total price calculation
+                setFreshData(prevData => ({
+                    ...prevData,
+                    basePrice: productData.basePrice || 0,
+                    totalPrice: (productData.basePrice || 0) * (productData.productWeight || 0)
+                }));
+                setProductDetails(productData);
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+                toast.error('Error fetching product details.');
+            }
+        }
+    }
+
 
     // Handle form submission
     const handleAddSales = async (e) => {
@@ -159,20 +220,20 @@ const AddSales = () => {
             // Reset the form data for Dry Fish as an example
             setDryData({
                 productName: '',
-                quantity: 0,
+                quantity: Number,
                 description: ''
             });
         
             // Reset form data for other types as needed
             setFingerlingsData({
                 productName: '',
-                quantity: 0,
+                quantity: Number,
                 description: ''
             });
         
             setFreshData({
                 productName: '',
-                quantity: 0,
+                quantity: Number,
                 description: ''
             });
         
@@ -204,402 +265,373 @@ const AddSales = () => {
                         <ToastContainer />
                         <div className='d-flex justify-content-between'>
                             <h4 className="mt-4 mb-5">Add New Sale</h4>
-                            <Dropdown className='mt-4'>
-                                <Dropdown.Toggle className='bg-light' variant="light" id="dropdown-variants-light">
-                                    <span className='pe-4'>{salesType}</span>
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu>
-                                    <Dropdown.Item onClick={()=>{setSalesType('Dry Fish')}}>Dry Fish</Dropdown.Item>
-                                    <Dropdown.Item onClick={()=>{setSalesType('Fresh Fish')}}>Fresh Fish</Dropdown.Item>
-                                    <Dropdown.Item onClick={()=>{setSalesType('Fingerlings Fish')}}>Fingerlings Fish</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                            {(salesType === 'Dry Fish' || salesType === 'Fresh Fish' || salesType === 'Fingerlings Fish') && (
+                                <div style={{ width: '18%' }}>
+                                    <Form.Select
+                                        value={salesType}
+                                        onChange={(e) => setSalesType(e.target.value)}
+                                        className="bg-light shadow-none border-secondary-subtle border-1"
+                                    >
+                                        <option value="" disabled>Select Sales Type</option>
+                                        <option value="Dry Fish">Dry Fish</option>
+                                        <option value="Fresh Fish">Fresh Fish</option>
+                                        <option value="Fingerlings Fish">Fingerlings Fish</option>
+                                    </Form.Select>
+                                </div>
+                            )}
                         </div>
                         
                         {salesType === 'Type' ? (
-                            <p style={{height: '10vh'}} className='text-muted fs-5 d-flex align-items-center justify-content-center fw-semibold'>
+                            <div style={{height: '15vh'}} className='text-muted fs-5 d-flex gap-3 align-items-center justify-content-center fw-semibold'>
+                            <p className='text-muted fs-5 fw-semibold'>
                                 Please select sales type
                             </p>
+                            <div  style={{width:'18%'}}>
+                                <Form.Select
+                                    value={salesType}
+                                    onChange={(e) => setSalesType(e.target.value)}
+                                    className="bg-light shadow-none border-secondary-subtle border-1 p-3"
+                                >
+                                    <option value="" >Select Sales Type</option>
+                                    <option value="Dry Fish">Dry Fish</option>
+                                    <option value="Fresh Fish">Fresh Fish</option>
+                                    <option value="Fingerlings Fish">Fingerlings Fish</option>
+                                </Form.Select>                    
+                            </div>
+                            </div>
                         ) : null}                          
 
-                            {salesType === 'Dry Fish' && <Form onSubmit={handleAddSales}>
-                                <Row xxl={2} xl={2} lg={2}>
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Product Name</Form.Label>
-                                        <Form.Select
-                                            name="productName"
-                                            required
-                                            value={dryData.productName}
-                                            onChange={handleProductSelect}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        >
-                                            <option value="" disabled>Select Product</option>
-                                            {products.map((product, index) => (
-                                                <option key={index} value={product.productName} data-id={product.id}>
-                                                    {product.productName || 'No Data Yet'}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Col>
+                        {salesType === 'Dry Fish' && <Form onSubmit={handleAddSales}>
+                            <Row xxl={2} xl={2} lg={2}>
+                            <Col className="mb-4">
+                                <Form.Label className="fw-semibold">Product Name</Form.Label>
+                                <Form.Select
+                                    name="productName"
+                                    required
+                                    value={dryData.productName || ''}
+                                    onChange={handleProductSelect}
+                                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                >
+                                    <option value="" disabled>Select Product</option>
+                                    {products
+                                        .filter(product => 
+                                            product.productName && 
+                                            !product.productName.toLowerCase().includes('fresh fish') && 
+                                            !product.productName.toLowerCase().includes('fingerlings fish')
+                                        )
+                                        .map(product => (
+                                            <option key={product.id} value={product.productName} data-id={product.id}>
+                                                {`${product.productName} - (${product.basePrice})`}
+                                            </option>
+                                        ))
+                                    }
+                                </Form.Select>
+                            </Col>
 
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Quantity</Form.Label>
-                                        <Form.Control
-                                            placeholder="Enter quantity"
-                                            type="number"
-                                            name="quantity"
-                                            value={dryData.quantity}
-                                            min="0"
-                                            required
-                                            onChange={handleInputChange}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
 
-                                    {/* Quantity Used to Pack */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Quantity Used to Pack</Form.Label>
-                                        <Form.Control
-                                            placeholder="Enter quantity used to pack"
-                                            type="number"
-                                            name="quantity_pack"
-                                            value={dryData.quantity_pack}
-                                            min="0"                                    
-                                            onChange={handleInputChange}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Quantity</Form.Label>
+                                    <Form.Control
+                                        placeholder="Enter quantity"
+                                        type="number"
+                                        name="quantity"
+                                        value={dryData.quantity || ''}                                        
+                                        required
+                                        onChange={handleInputChange}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
 
-                                    {/* Product Weight (Readonly) */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Product Weight</Form.Label>
-                                        <Form.Control
-                                            placeholder="Product weight"
-                                            type="text"
-                                            name="productWeight"
-                                            value={dryData.productWeight} // Assuming this value is fetched when product is selected
-                                            readOnly
-                                            className={`py-2 bg-light-subtle text-secondary shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
+                                {/* Quantity Used to Pack */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Quantity Used to Pack</Form.Label>
+                                    <Form.Control
+                                        placeholder="Enter quantity used to pack"
+                                        type="number"
+                                        name="quantity_pack"
+                                        value={dryData.quantity_pack || ''}
+                                        min="0"                                    
+                                        onChange={handleInputChange}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
 
-                                    {/* Description */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Description</Form.Label>
-                                        <Form.Control
-                                            placeholder="Enter description"
-                                            as="textarea"
-                                            name="description"
-                                            value={dryData.description}
-                                            onChange={handleInputChange}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
+                                {/* Product Weight (Readonly) */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Product Weight</Form.Label>
+                                    <Form.Control
+                                        placeholder="Product weight"
+                                        type="text"
+                                        name="productWeight"
+                                        value={dryData.productWeight || ''} // Assuming this value is fetched when product is selected
+                                        readOnly
+                                        className={`py-2 bg-light-subtle text-secondary shadow-none border-secondary-subtle border-1 ${styles.inputs} ${styles.Pweight}`}
+                                    />
+                                </Col>
 
-                                    {/* Total Price (Readonly) */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Total Price</Form.Label>
-                                        <Form.Control
-                                            placeholder="Total price"
-                                            type="text"
-                                            name="totalPrice"
-                                            value={dryData.totalPrice} // Assuming this value is calculated or fetched
-                                            readOnly
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>                             
-                                </Row>
-                                <div className='text-end'>
-                                    <Button
-                                        variant='dark'
-                                        disabled={loader}
-                                        className='fw-semibold py-2 px-5 mb-3'
-                                        type='submit'
-                                    >
-                                        {loader ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                Adding Sale...
-                                            </>
-                                        ) : (
-                                            'Add Sale'
-                                        )}
-                                    </Button>
-                                </div>
-                            </Form>}
-                            {salesType === 'Fresh Fish' && <Form onSubmit={handleAddSales}>
-                                <Row xxl={2} xl={2} lg={2}>  
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Product Name</Form.Label>
-                                        <Form.Select
-                                            name="productName"
-                                            required
-                                            value={freshData.productName}
-                                            onChange={handleInputChangeFresh}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        >
-                                            <option value="" disabled>Select Product</option>
-                                            {products.map((product, index) => (
-                                                <option key={index} value={product.productName} data-id={product.id}>
-                                                    {product.productName || 'No Data Yet'}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Col>
+                                {/* Description */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Description</Form.Label>
+                                    <Form.Control
+                                        placeholder="Enter description"
+                                        as="textarea"
+                                        name="description"
+                                        value={dryData.description || ''}
+                                        onChange={handleInputChange}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
 
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Stage From</Form.Label>
-                                        <Form.Select
-                                            name="stageId_from"
-                                            required
-                                            value={freshData.stageId_from}
-                                            onChange={handleInputChangeFresh}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        >
-                                            <option value="" disabled>Select Stage</option>
-                                            {stages.map((stage, index) => (
-                                                <option key={index} value={stage.id}>
-                                                    {stage.title || 'No Data Yet'}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Col>
-
-                                    {/* Total Product Weight (Not Readonly) */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Total Product Weight</Form.Label>
-                                        <Form.Control
-                                            placeholder="Enter product weight"
-                                            type="number"
-                                            name="productWeight"
-                                            value={freshData.productWeight}
-                                            required
-                                            onChange={handleInputChangeFresh}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
-
-                                    {/* Quantity */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Quantity</Form.Label>
-                                        <Form.Control
-                                            placeholder="Enter quantity"
-                                            type="number"
-                                            name="quantity"
-                                            value={freshData.quantity}                                            
-                                            required
-                                            onChange={handleInputChangeFresh}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
-
-                                    {/* Description */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Description</Form.Label>
-                                        <Form.Control
-                                            placeholder="Enter description"
-                                            as="textarea"
-                                            name="description"
-                                            value={freshData.description}
-                                            onChange={handleInputChangeFresh}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
-
-                                    {/* Total Price (Readonly) */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Total Price</Form.Label>
-                                        <Form.Control
-                                            placeholder="Total price"
-                                            type="text"
-                                            name="totalPrice"
-                                            value={freshData.totalPrice}
-                                            readOnly
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
-                                    {salesType === 'Fingerlings Fish' && (
+                                {/* Total Price (Readonly) */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Total Price</Form.Label>
+                                    <Form.Control
+                                        placeholder="Total price"
+                                        type="text"
+                                        name="totalPrice"
+                                        value={dryData.totalPrice ? `₦${new Intl.NumberFormat().format(dryData.totalPrice)}` : ''}
+                                        readOnly
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>       
+                                                        
+                            </Row>
+                            <div className='text-end'>
+                                <Button
+                                    variant='dark'
+                                    disabled={loader}
+                                    className='fw-semibold py-2 px-5 mb-3'
+                                    type='submit'
+                                >
+                                    {loader ? (
                                         <>
-                                            {/* Product Name Select */}
-                                            <Col className="mb-4">
-                                                <Form.Label className="fw-semibold">Stage From</Form.Label>
-                                                <Form.Select
-                                                    name="stageId_from"
-                                                    required
-                                                    value={dryData.stageId_from}
-                                                    onChange={handleInputChange}
-                                                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                                >
-                                                    <option value="" disabled>Select Stage</option>
-                                                    {stages.map((stage, index) => (
-                                                        <option key={index} value={stage.id}>
-                                                            {stage.title || 'No Data Yet'}
-                                                        </option>
-                                                    ))}
-                                                </Form.Select>
-                                            </Col>
-
-                                            {/* Quantity */}
-                                            <Col className="mb-4">
-                                                <Form.Label className="fw-semibold">Quantity</Form.Label>
-                                                <Form.Control
-                                                    placeholder="Enter quantity"
-                                                    type="number"
-                                                    name="quantity"
-                                                    value={dryData.quantity}
-                                                    min="0"
-                                                    required
-                                                    onChange={handleInputChange}
-                                                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                                />
-                                            </Col>
-
-                                            {/* Description */}
-                                            <Col className="mb-4">
-                                                <Form.Label className="fw-semibold">Description</Form.Label>
-                                                <Form.Control
-                                                    placeholder="Enter description"
-                                                    as="textarea"
-                                                    name="description"
-                                                    value={dryData.description}
-                                                    onChange={handleInputChange}
-                                                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                                />
-                                            </Col>
-
-                                            {/* Total Price (Readonly) */}
-                                            <Col className="mb-4">
-                                                <Form.Label className="fw-semibold">Total Price</Form.Label>
-                                                <Form.Control
-                                                    placeholder="Total price"
-                                                    type="text"
-                                                    name="totalPrice"
-                                                    value={dryData.totalPrice}
-                                                    readOnly
-                                                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                                />
-                                            </Col>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Adding Sale...
                                         </>
+                                    ) : (
+                                        'Add Sale'
                                     )}
-                                </Row>
-                                <div className='text-end'>
-                                    <Button
-                                        variant='dark'
-                                        disabled={loader}
-                                        className='fw-semibold py-2 px-5 mb-3'
-                                        type='submit'
+                                </Button>
+                            </div>
+                        </Form>}
+                        {salesType === 'Fresh Fish' && <Form onSubmit={handleAddSales}>
+                            <Row xxl={2} xl={2} lg={2}>  
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Product Name</Form.Label>                                        
+                                    <Form.Select
+                                        name="productName"
+                                        required
+                                        value={freshData.productName || ''}
+                                        onChange={handleProductSelectFresh}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                     >
-                                        {loader ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                Adding Sale...
-                                            </>
-                                        ) : (
-                                            'Add Sale'
-                                        )}
-                                    </Button>
-                                </div>
-                            </Form>}
-                            {salesType === 'Fingerlings Fish' && <Form onSubmit={handleAddSales}>
-                                <Row xxl={2} xl={2} lg={2}>  
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Product Name</Form.Label>
-                                        <Form.Select
-                                            name="productName"
-                                            required
-                                            value={fingerlingsData.productName}
-                                            onChange={handleInputChangeFingerlings}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        >
-                                            <option value="" disabled>Select Product</option>
-                                            {products.map((product, index) => (
-                                                <option key={index} value={product.productName} data-id={product.id}>
-                                                    {product.productName || 'No Data Yet'}
+                                        <option value="" disabled>Select Fresh Fish Product</option>
+                                        {products
+                                            .filter(product => product.productName && product.productName.toLowerCase().includes('fresh'))
+                                            .map((product, index) => (
+                                                <option key={index} value={product.productName} data-id-fresh={product.id}>
+                                                    {product.productName ? `${product.productName} - (${product.basePrice})` : 'No Data Yet'}
                                                 </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Col>
-                                                                                                      
-                                    {/* Product Name Select */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Stage From</Form.Label>
-                                        <Form.Select
-                                            name="stageId_from"
-                                            required
-                                            value={fingerlingsData.stageId_from}
-                                            onChange={handleInputChangeFingerlings}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        >
-                                            <option value="" disabled>Select Stage</option>
-                                            {stages.map((stage, index) => (
+                                            ))
+                                        }
+                                    </Form.Select>
+                                </Col>
+
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Stage From</Form.Label>
+                                    <Form.Select
+                                        name="stageId_from"
+                                        required
+                                        value={freshData.stageId_from}
+                                        onChange={handleInputChangeFresh}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    >
+                                        <option value="" disabled>Select Stage</option>
+                                        {stages
+                                            .filter(stage => !stage.title.toLowerCase().includes('fingerlings')) // Filter out "Fingerlings"
+                                            .map((stage, index) => (
+                                                <option key={index} value={stage.id}>
+                                                    {stage.title || 'No Data Yet'}
+                                                </option>
+                                        ))}
+                                    </Form.Select>
+                                </Col>
+
+                                {/* Total Product Weight (Not Readonly) */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Total Product Weight (KG)</Form.Label>
+                                    <Form.Control
+                                        placeholder="Enter product weight"
+                                        type="number"
+                                        name="productWeight"
+                                        value={freshData.productWeight}
+                                        required
+                                        onChange={handleInputChangeFresh}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
+
+                                {/* Quantity */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Quantity</Form.Label>
+                                    <Form.Control
+                                        placeholder="Enter quantity"
+                                        type="number"
+                                        name="quantity"
+                                        value={freshData.quantity}                                            
+                                        required
+                                        onChange={handleInputChangeFresh}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
+
+                                {/* Description */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Description</Form.Label>
+                                    <Form.Control
+                                        placeholder="Enter description"
+                                        as="textarea"
+                                        name="description"
+                                        value={freshData.description}
+                                        onChange={handleInputChangeFresh}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
+
+                                {/* Total Price (Readonly) */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Total Price</Form.Label>
+                                    <Form.Control
+                                        placeholder="Total price"
+                                        type="text"
+                                        name="totalPrice"
+                                        value={freshData.totalPrice ? `₦${new Intl.NumberFormat().format(freshData.totalPrice)}` : ''}
+                                        readOnly
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
+                            </Row>
+                            <div className='text-end'>
+                                <Button
+                                    variant='dark'
+                                    disabled={loader}
+                                    className='fw-semibold py-2 px-5 mb-3'
+                                    type='submit'
+                                >
+                                    {loader ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Adding Sale...
+                                        </>
+                                    ) : (
+                                        'Add Sale'
+                                    )}
+                                </Button>
+                            </div>
+                        </Form>}
+                        {salesType === 'Fingerlings Fish' && <Form onSubmit={handleAddSales}>
+                            <Row xxl={2} xl={2} lg={2}>  
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Product Name</Form.Label>
+                                    <Form.Select
+                                        name="productName"
+                                        required
+                                        value={fingerlingsData.productName || ''}
+                                        onChange={handleProductSelectFinger}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    >
+                                        <option value="" disabled>Select Fingerlings Product</option>
+                                        {products
+                                            .filter(product => product.productName && product.productName.toLowerCase().includes('fingerlings'))
+                                            .map((product, index) => (
+                                                <option key={index} value={product.productName} data-id-finger={product.id}>
+                                                    {product.productName ? `${product.productName} - (${product.basePrice})` : 'No Data Yet'}
+                                                </option>
+                                            ))
+                                        }
+                                    </Form.Select>
+                                </Col>
+                                                                                                                                    
+                                {/*  Name Select */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Stage From</Form.Label>
+                                    <Form.Select
+                                        name="stageId_from"
+                                        required
+                                        value={fingerlingsData.stageId_from}
+                                        onChange={handleInputChangeFingerlings}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    >
+                                        <option value="" disabled>Select Stage</option>
+                                        {stages
+                                            .filter(stage => stage.title.toLowerCase().includes('fingerlings')) // Only include stages with "Fingerlings" in the title
+                                            .map((stage, index) => (
                                                 <option key={index} value={stage.id}>
                                                     {stage.title || 'No Data Yet'}
                                                 </option>
                                             ))}
-                                        </Form.Select>
-                                    </Col>
+                                    </Form.Select>
+                                </Col>
 
-                                    {/* Quantity */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Quantity</Form.Label>
-                                        <Form.Control
-                                            placeholder="Enter quantity"
-                                            type="number"
-                                            name="quantity"
-                                            value={fingerlingsData.quantity}
-                                            min="0"
-                                            required
-                                            onChange={handleInputChangeFingerlings}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
+                                {/* Quantity */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Quantity</Form.Label>
+                                    <Form.Control
+                                        placeholder="Enter quantity"
+                                        type="number"
+                                        name="quantity"
+                                        value={fingerlingsData.quantity}
+                                        min="0"
+                                        required
+                                        onChange={handleInputChangeFingerlings}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
 
-                                    {/* Description */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Description</Form.Label>
-                                        <Form.Control
-                                            placeholder="Enter description"
-                                            as="textarea"
-                                            name="description"
-                                            value={fingerlingsData.description}
-                                            onChange={handleInputChangeFingerlings}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
+                                {/* Description */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Description</Form.Label>
+                                    <Form.Control
+                                        placeholder="Enter description"
+                                        as="textarea"
+                                        name="description"
+                                        value={fingerlingsData.description}
+                                        onChange={handleInputChangeFingerlings}
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
 
-                                    {/* Total Price (Readonly) */}
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Total Price</Form.Label>
-                                        <Form.Control
-                                            placeholder="Total price"
-                                            type="text"
-                                            name="totalPrice"
-                                            value={fingerlingsData.totalPrice}
-                                            readOnly
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        />
-                                    </Col>
-
-                                </Row>
-                                <div className='text-end'>
-                                    <Button
-                                        variant='dark'
-                                        disabled={loader}
-                                        className='fw-semibold py-2 px-5 mb-3'
-                                        type='submit'
-                                    >
-                                        {loader ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                Adding Sale...
-                                            </>
-                                        ) : (
-                                            'Add Sale'
-                                        )}
-                                    </Button>
-                                </div>
-                            </Form>}
+                                {/* Total Price (Readonly) */}
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Total Price</Form.Label>
+                                    <Form.Control
+                                        placeholder="Total price"
+                                        type="text"
+                                        name="totalPrice"
+                                        value={fingerlingsData.totalPrice ? `₦${new Intl.NumberFormat().format(fingerlingsData.totalPrice)}` : ''}
+                                        readOnly
+                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    />
+                                </Col>
+                            </Row>
+                            <div className='text-end'>
+                                <Button
+                                    variant='dark'
+                                    disabled={loader}
+                                    className='fw-semibold py-2 px-5 mb-3'
+                                    type='submit'
+                                >
+                                    {loader ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Adding Sale...
+                                        </>
+                                    ) : (
+                                        'Add Sale'
+                                    )}
+                                </Button>
+                            </div>
+                        </Form>}
                     </main>
                 </section>
             </div>

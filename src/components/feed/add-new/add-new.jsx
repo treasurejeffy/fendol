@@ -11,7 +11,7 @@ const AddFeed = () => {
         feedName: '',
         feedType: '',
         unit:'',
-        threshold: 0
+        threshold: Number
     });
     const [loader, setLoader] = useState(false);
 
@@ -44,7 +44,7 @@ const AddFeed = () => {
                 feedName: '',
                 unit: '',
                 feedType: '',
-                threshold: 0,
+                threshold: Number,
             });
         } catch (error) {
             toast.update(loadingToast, {

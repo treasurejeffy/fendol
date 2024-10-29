@@ -25,7 +25,7 @@ export default function CreateProducts() {
         productName: "",
         productWeight: "",
         unit: "",
-        basePrice: ""
+        basePrice: ''
     });
 
     // Handle form input change

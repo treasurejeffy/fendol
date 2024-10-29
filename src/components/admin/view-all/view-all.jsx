@@ -20,25 +20,26 @@ export default function ViewAll() {
   const [showModal, setShowModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // State for password visibility
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await Api.get('/admins');
-        console.log('API Response:', response);
+  const fetchData = async () => {
+    try {
+      const response = await Api.get('/admins');
+      console.log('API Response:', response);
 
-        if (Array.isArray(response.data.data)) {
-          setAdmins(response.data.data);
-        } else {
-          throw new Error("Expected an array of admins");
-        }
-      } catch (err) {
-        setError('Failed to fetch data. Please try again.');
-        console.error(err);
-      } finally {
-        setLoading(false);
+      if (Array.isArray(response.data.data)) {
+        setAdmins(response.data.data);
+      } else {
+        throw new Error("Expected an array of admins");
       }
-    };
+    } catch (err) {
+      setError('Failed to fetch data. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -61,7 +62,7 @@ export default function ViewAll() {
     });
   
     try {
-      await Api.put(`/admins/${selectedAdmin.id}`, selectedAdmin);
+      await Api.put(`/edit-admin/${selectedAdmin.id}`, selectedAdmin);
   
       toast.update(loadingToast, {
         render: "Admin saved successfully!",
@@ -70,7 +71,7 @@ export default function ViewAll() {
         autoClose: 3000,
         className: 'dark-toast'
       });
-  
+      fetchData();
       setShowModal(false);
     } catch (error) {
       console.error("Failed to save admin:", error);

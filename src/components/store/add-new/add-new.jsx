@@ -11,7 +11,7 @@ const AddStock = () => {
     const [formData, setFormData] = useState({
         name: '',
         unit: '',
-        threshold: 0,
+        threshold: Number,
     });
     const [loader, setLoader] = useState(false);
 
@@ -42,7 +42,7 @@ const AddStock = () => {
             setFormData({
                 name: '',
                 unit: '',
-                threshold: 0,
+                threshold: Number,
             });
         } catch (error) {
             toast.update(loadingToast, {

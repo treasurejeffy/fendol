@@ -3,12 +3,13 @@ import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../feed.module.scss'; // Use your product styles
-import { BsThreeDotsVertical } from "react-icons/bs"; // Dropdown icon
+import { BsThreeDotsVertical} from "react-icons/bs"; // Dropdown icon
 import Api from "../../shared/api/apiLink";
 import { Spinner, Alert, Modal, Form, Button } from 'react-bootstrap'; // Import Bootstrap Spinner and Alert
 import ReactPaginate from 'react-paginate'; // Import React Paginate
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FaExclamationTriangle } from "react-icons/fa";
 
 const DropdownMenu = ({ show, onClickOutside, onAddClick, onRemoveClick, onEditClick }) => {
   if (!show) return null;
@@ -35,14 +36,19 @@ export default function UpdateFeedInventory() {
   const itemsPerPage = 5; // Define how many items per page
   const [activeDropdown, setActiveDropdown] = useState(null); // State to track active dropdown
   const [stages, setStages] = useState([]);
-  const [quantityUsed, setQuantityUsed] = useState();
-  const [quantity, setQuantity] = useState();
-  const [feedPrice, setFeedPrice] = useState();
+  const [quantityUsed, setQuantityUsed] = useState(null);
+  const [quantity, setQuantity] = useState(null);
+  const [feedPrice, setFeedPrice] = useState(null);
   const [stage, setStage] = useState('');
   const [thresholdValue, setThresholdValue] = useState();
   const [unit, setUnit] = useState('');
   const [disabled, setDisabled] = useState(false); // Add disabled state
 
+  const formatWithCommas = (number) => {
+    if (number === null || number === '') return '';
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+  
   // Handle Save click in Modal
   const handleSaveClick = async () => {
     const feedName = selectedProduct?.feedName;
@@ -96,11 +102,11 @@ export default function UpdateFeedInventory() {
       }
 
       // Reset state after successful save
-      setQuantityUsed(0);
-      setQuantity(0);
+      setQuantityUsed();
+      setQuantity();
       setFeedPrice('');
       setStage('');
-      setThresholdValue(0);
+      setThresholdValue();
       setUnit('');
       fetchData();
       setShowModal(false); // Close the modal
@@ -137,25 +143,28 @@ export default function UpdateFeedInventory() {
 
   // Fetch data from API
   useEffect(() => {
-
-
     const fetchStages = async () => {
-        try {
+      try {
           const response = await Api.get('/fish-stages'); // Replace with your API URL
           console.log(response.data);
+          
           if (Array.isArray(response.data.data)) {
-            setStages(response.data.data);
+              // Filter out "washing", "smoking", and "drying"
+              const filteredStages = response.data.data.filter(stage => 
+                  !["washing", "smoking", "drying"].includes(stage.title.toLowerCase())
+              );
+              setStages(filteredStages); // Set the filtered stages to state
           } else {
-            throw new Error('Expected an array of stages');
+              throw new Error('Expected an array of stages');
           }
-        } catch (err) {
+      } catch (err) {
           console.log(err.response?.data?.message || 'Failed to fetch data. Please try again.');
-        } finally {
-          console.log('get success')
-        }
-      };
-  
-      fetchStages();
+      } finally {
+          console.log('Fetch stages success');
+      }
+  };
+
+  fetchStages();
 
     fetchData(); // Call the function to fetch data
   }, []);
@@ -231,9 +240,11 @@ export default function UpdateFeedInventory() {
             
             {/* Error Message */}
             {error && (
-              <Alert variant="danger" className="text-center">
-                {error}
+              <div className="d-flex justify-content-center">
+              <Alert variant="danger" className="text-center w-50 py-5 my-5">
+                <FaExclamationTriangle  size={30} /> <span>{error}</span>
               </Alert>
+            </div>
             )}
 
             {!loading && !error && products.length === 0 && (
@@ -369,23 +380,26 @@ export default function UpdateFeedInventory() {
                     <Form.Control 
                       type="number" 
                       required 
-                      value={quantity} 
-                      onChange={(e) => setQuantity(Number(e.target.value))} 
+                      value={quantity ?? ''} // Shows empty string if quantity is null
+                      onChange={(e) => setQuantity(Number(e.target.value) || null)} 
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
-                      placeholder="Quantity (kg)" 
+                      placeholder="Enter Quantity (kg)" 
                     />
                   </div>
                 </Form.Group>
 
-                {/* Price Bought */}
+                {/* price bought input */}
                 <Form.Group className="mb-3 row">
-                  <Form.Label className="col-4">Price Bought</Form.Label>
+                  <Form.Label className="col-4">Price Bought (₦)</Form.Label>
                   <div className="col-8">
                     <Form.Control 
-                      type="number" 
+                      type="text" 
                       required 
-                      value={feedPrice} 
-                      onChange={(e) => setFeedPrice(e.target.value)} 
+                      value={feedPrice !== null ? formatWithCommas(feedPrice) : ''} 
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/,/g, ''); // Remove commas for internal value
+                        setFeedPrice(value);
+                      }} 
                       placeholder="Price Bought" 
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
                     />
@@ -428,8 +442,8 @@ export default function UpdateFeedInventory() {
                   <div className="col-8">
                     <Form.Control 
                       type="number" 
-                      value={quantityUsed} 
-                      onChange={(e) => setQuantityUsed(Number(e.target.value))} 
+                      value={quantityUsed ?? ''} // Shows empty string if quantity is null
+                      onChange={(e) => setQuantityUsed(Number(e.target.value) || null)} 
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
                       placeholder="Quantity" 
                     />
@@ -449,8 +463,8 @@ export default function UpdateFeedInventory() {
                       type="text" 
                       placeholder="Threshold Value" 
                       required 
-                      value={thresholdValue} 
-                      onChange={(e) => setThresholdValue(Number(e.target.value))} 
+                      value={thresholdValue ?? ''} // Shows empty string if quantity is null
+                      onChange={(e) => setThresholdValue(Number(e.target.value) || null)} 
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
                     />
                   </div>

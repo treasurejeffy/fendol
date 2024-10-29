@@ -35,13 +35,28 @@ export default function UpdateStoreInventory() {
   const itemsPerPage = 5; // Define how many items per page
   const [activeDropdown, setActiveDropdown] = useState(null); // State to track active dropdown
   const [stages, setStages] = useState([]);
-  const [quantity, setQuantity] = useState();
-  const [quantityUsed, setQuantityUsed] = useState();
-  const [price, setPrice] = useState();
+  const [quantity, setQuantity] = useState(null);
+  const [quantityUsed, setQuantityUsed] = useState(null);
+  const [price, setPrice] = useState(null);
   const [stage, setStage] = useState('');
-  const [threshold, setThreshold] = useState();
+  const [threshold, setThreshold] = useState(null);
   const [unit, setUnit] = useState('');
   const [disabled, setDisabled] = useState(false); // Add disabled state
+
+  const formatWithCommas = (value) => {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await Api.get('/stores'); 
+      setProducts(response.data.data);
+    } catch (err) {
+      setError('Failed to fetch data. Please try again.'); // Set error message if API call fails
+    } finally {
+      setLoading(false); // Stop loading once data is fetched
+    }
+  };
 
   // Handle Save click in Modal
   const handleSaveClick = async () => {
@@ -96,12 +111,13 @@ export default function UpdateStoreInventory() {
       }
 
       // Reset state after successful save
-      setQuantity(0);
-      setQuantityUsed(0);
-      setPrice(0);
+      setQuantity(null);
+      setQuantityUsed(null);
+      setPrice(null);
       setStage('');
-      setThreshold(0);
+      setThreshold(null);
       setUnit('');
+      fetchData();
       setShowModal(false); // Close the modal
     } catch (error) {
       console.error('Error processing the request:', error.response?.data?.message || error.message);
@@ -125,34 +141,28 @@ export default function UpdateStoreInventory() {
 
   // Fetch data from API
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await Api.get('/stores'); 
-        setProducts(response.data.data);
-      } catch (err) {
-        setError('Failed to fetch data. Please try again.'); // Set error message if API call fails
-      } finally {
-        setLoading(false); // Stop loading once data is fetched
-      }
-    };
-
     const fetchStages = async () => {
-        try {
+      try {
           const response = await Api.get('/fish-stages'); // Replace with your API URL
           console.log(response.data);
+          
           if (Array.isArray(response.data.data)) {
-            setStages(response.data.data);
+              // Filter out "washing", "smoking", and "drying"
+              const filteredStages = response.data.data.filter(stage => 
+                  !["washing", "smoking", "drying"].includes(stage.title.toLowerCase())
+              );
+              setStages(filteredStages); // Set the filtered stages to state
           } else {
-            throw new Error('Expected an array of stages');
+              throw new Error('Expected an array of stages');
           }
-        } catch (err) {
+      } catch (err) {
           console.log(err.response?.data?.message || 'Failed to fetch data. Please try again.');
-        } finally {
-          console.log('get success')
-        }
-      };
-  
-      fetchStages();
+      } finally {
+          console.log('Fetch stages success');
+      }
+  };
+
+  fetchStages();
 
     fetchData(); // Call the function to fetch data
   }, []);
@@ -347,33 +357,38 @@ export default function UpdateStoreInventory() {
               <>
                 {/* Quantity */}
                 <Form.Group className="mb-3 row">
-                  <Form.Label className="col-4  fw-semibold">Quantity (kg)</Form.Label>
+                  <Form.Label className="col-4 fw-semibold">Quantity (kg)</Form.Label>
                   <div className="col-8">
                     <Form.Control 
                       type="number" 
                       required 
-                      value={quantity} 
-                      onChange={(e) =>  setQuantity(Number(e.target.value))} 
+                      value={quantity ?? ''} // Shows empty string if quantity is null
+                      onChange={(e) => setQuantity(Number(e.target.value) || null)} 
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
                       placeholder="Quantity (kg)" 
                     />
                   </div>
                 </Form.Group>
-
+                
                 {/* Price Bought */}
                 <Form.Group className="mb-3 row">
-                  <Form.Label className="col-4 fw-semibold">Price Bought</Form.Label>
+                  <Form.Label className="col-4 fw-semibold">Price Bought(₦)</Form.Label>
                   <div className="col-8">
                     <Form.Control 
-                      type="number" 
+                      type="text" // Change to text to allow commas
                       required 
-                      value={price} 
-                      onChange={(e) => setPrice(Number(e.target.value))} 
+                      value={price !== null ? formatWithCommas(price) : ''} // Format price with commas
+                      onChange={(e) => {
+                        // Remove commas before setting the price in the state
+                        const value = e.target.value.replace(/,/g, "");
+                        setPrice(value ? Number(value) : null);
+                      }} 
                       placeholder="Price Bought" 
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
                     />
                   </div>
                 </Form.Group>
+
               </>
             )}
 
@@ -407,14 +422,14 @@ export default function UpdateStoreInventory() {
 
                 {/* Quantity */}
                 <Form.Group className="mb-4 row">
-                  <Form.Label className="col-4 fw-semibold">Quantity</Form.Label>
-                  <div className="col-8">
+                  <Form.Label className="col-4 fw-semibold">Quantity(KG)</Form.Label>
+                  <div className="col-8 d-flex align-items-center">
                     <Form.Control 
                       type="number" 
-                      value={quantityUsed} 
-                      onChange={(e) => setQuantityUsed(Number(e.target.value))}
+                      value={quantityUsed ?? ''} // Shows empty string if quantityUsed is null
+                      onChange={(e) => setQuantityUsed(Number(e.target.value) || null)} 
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
-                      placeholder="Quantity" 
+                      placeholder="Enter Quantity" 
                     />
                   </div>
                 </Form.Group>
@@ -429,11 +444,11 @@ export default function UpdateStoreInventory() {
                   <Form.Label className="col-4">Threshold Value</Form.Label>
                   <div className="col-8">
                     <Form.Control 
-                      type="text" 
+                      type="number" 
                       placeholder="Threshold Value" 
                       required 
-                      value={threshold} 
-                      onChange={(e) => setThreshold(Number(e.target.value))} 
+                      value={threshold ?? ''} // Shows empty string if quantityUsed is null
+                      onChange={(e) => setThreshold(Number(e.target.value) || null)} 
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
                     />
                   </div>

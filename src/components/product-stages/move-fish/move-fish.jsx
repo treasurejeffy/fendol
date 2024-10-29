@@ -20,7 +20,7 @@ export default function MoveFish() {
         actual_quantity: '',
         remarks: '',
     });
-    const [showSecondForm, setShowSecondForm] = useState(true);
+    const [showSecondForm, setShowSecondForm] = useState(false);
     const [showFirstForm, setShowFirstForm] = useState(true);
     const [loader, setLoader] = useState(false);
     
@@ -149,8 +149,7 @@ export default function MoveFish() {
     }, [showSecondForm, checkStages]);
 
     const fetchWashQuantity = async (id) => {
-        try {
-            console.log(`Fetching wash-quantity for ID: ${id}`); // Debugging statement
+        try {            
             const response = await Api.get(`/fish-stage/${id}`); // Make the API call
             console.log('API Response:', response.data); // Debugging statement
         } catch (error) {
@@ -405,9 +404,6 @@ export default function MoveFish() {
                                     {/* Showcase item */}
                                     <Dropdown.Item href="#/action-showcase" className='fw-semibold'>SHOWCASE</Dropdown.Item>
                                 </DropdownButton>
-                            </div>
-                            <div className='d-flex justify-content-end mt-4'>
-                                <Button type="submit" className="fw-semibold">Submit</Button>
                             </div>
                         </Form>)}
                     </main>
