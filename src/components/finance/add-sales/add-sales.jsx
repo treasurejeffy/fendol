@@ -11,7 +11,8 @@ const AddSales = () => {
     const [dryData, setDryData] = useState({
         productName: "",
         quantity: Number,
-        description: ""
+        description: "",
+        quantityUsedToPack:null
     });
 
     const [freshData, setFreshData] = useState({        
@@ -72,7 +73,7 @@ const AddSales = () => {
         setDryData(prevData => ({
             ...prevData,
             [name]: value,
-            totalPrice: name === 'quantity' ? (prevData.basePrice || 0) * (parseFloat(value) || 0) : prevData.totalPrice
+            totalPrice: name === 'quantity' && name === 'quantityUsedToPack' ? (prevData.basePrice || 0) * (parseFloat(value) || 0) : prevData.totalPrice
         }));
     };
 
@@ -348,8 +349,8 @@ const AddSales = () => {
                                     <Form.Control
                                         placeholder="Enter quantity used to pack"
                                         type="number"
-                                        name="quantity_pack"
-                                        value={dryData.quantity_pack || ''}
+                                        name="quantityUsedToPack"
+                                        value={dryData.quantityUsedToPack || ''}
                                         min="0"                                    
                                         onChange={handleInputChange}
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}

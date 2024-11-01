@@ -7,6 +7,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import axios from 'axios';
 import { Spinner, Alert } from "react-bootstrap";
 import { FaExclamationTriangle } from "react-icons/fa";
+import Api from '../../shared/api/apiLink';
 
 export default function ViewMoveFishHistory() {
   const [moveFishHistory, setMoveFishHistory] = useState([]);
@@ -16,9 +17,8 @@ export default function ViewMoveFishHistory() {
   useEffect(() => {
     const fetchMoveFishHistory = async () => {
       try {
-        // Replace 'YOUR_API_ENDPOINT' with your actual API endpoint
-        const response = await axios.get('YOUR_API_ENDPOINT'); 
-        setMoveFishHistory(response.data); // Assuming the response contains an array of history data
+        const response = await Api.get('fish-movements'); 
+        setMoveFishHistory(response.data.data); // Assuming the response contains an array of history data
       } catch (error) {
         setError("Error fetching move fish history. Please try again.");
       } finally {
@@ -27,6 +27,14 @@ export default function ViewMoveFishHistory() {
     };
     fetchMoveFishHistory();
   }, []);
+
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
   return (
     <section className={`d-none d-lg-block ${styles.body}`} >
@@ -62,20 +70,24 @@ export default function ViewMoveFishHistory() {
                     <th>DATE CREATED</th>
                     <th>STAGE FROM</th>
                     <th>STAGE TO</th>
+                    <th>FISH TYPE</th>
                     <th>QUANTITY</th>
                     <th>REMARK</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {moveFishHistory.map((history, index) => (
+                  {moveFishHistory.map((history, index) =>  {
+                  const formattedDate = formatDate(history.createdAt);
+                  return (
                     <tr key={index}>
-                      <td>{history.dateCreated}</td>
-                      <td>{history.stageFrom}</td>
-                      <td>{history.stageTo}</td>
-                      <td>{history.quantity}</td>
-                      <td>{history.remark}</td>
+                      <td>{formattedDate}</td>
+                      <td>{history.fromStageTitle}</td>
+                      <td>{history.toStageTitle}</td>
+                      <td>{history.speciesName}</td>
+                      <td>{history.actual_quantity}</td>
+                      <td>{history.remarks ? history.remarks.slice(0, 40) + (history.remarks.length > 40 ? '...' : '') : ''}</td>
                     </tr>
-                  ))}
+                  )})}
                 </tbody>
               </table>
             )}

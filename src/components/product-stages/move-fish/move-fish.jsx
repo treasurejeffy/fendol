@@ -11,8 +11,9 @@ export default function MoveFish() {
     const [fishType, setFishType] = useState([]);
     const [selectedStages, setSelectedStages] = useState([]);
     const [selectedTitle, setSelectedTitle] = useState('');
-    const [checkStages, setCheckStages] = useState([]);
-    const [selectedStageId, setSelectedStageId] = useState(null); // State to store the selected dropdown item's ID
+    const [checkStages, setCheckStages] = useState([]);    
+    const [whole, setWhole] = useState(0);
+    const [selectedStageName, setSelectedStageName] = useState('Move to');
     const [moveFishData, setMoveFishData] = useState({
         stageId_from: '',
         stageId_to: '',
@@ -21,9 +22,10 @@ export default function MoveFish() {
         remarks: '',
     });
     const [showSecondForm, setShowSecondForm] = useState(false);
-    const [showFirstForm, setShowFirstForm] = useState(true);
     const [loader, setLoader] = useState(false);
-    
+    const [getEndpoint, setGetEndpoint] = useState('/wash-quantity');
+
+
     useEffect(() => {
         const fetchStages = async () => {
             try {
@@ -33,10 +35,26 @@ export default function MoveFish() {
                         (stage) => stage.title !== "Smoking" && stage.title !== "Drying"
                       );
                       setStages(filteredProcessStages); // Set the filtered stages
-                    const filteredStages = response.data.data.filter(stage => 
-                        ["WASHING", "SMOKING", "DRYING"].includes(stage.title.toUpperCase())
-                    );            
+                      const filteredStages = response.data.data
+                      .filter(stage => 
+                          ["WASHING", "SMOKING", "DRYING"].includes(stage.title.toUpperCase())
+                      )
+                      .sort((a, b) => {
+                          const order = ["WASHING", "SMOKING", "DRYING"];
+                          return order.indexOf(a.title.toUpperCase()) - order.indexOf(b.title.toUpperCase());
+                      });
+                  
                     setCheckStages(filteredStages);
+
+                    // Set the first stage as checked by default
+                    if (filteredStages.length > 0) {
+                        const firstStage = filteredStages[0];
+                        setMoveData((prevData) => ({
+                            ...prevData,
+                            stageId_from: firstStage.id, // Set the first stage ID as checked
+                        }));
+                        fetchQuantity(firstStage.id); // Fetch the quantity for the first stage
+                    }
                 } else {
                     throw new Error('Expected an array of stages');
                 }
@@ -65,12 +83,15 @@ export default function MoveFish() {
 
     const handleInputChangeMoveFish = (e) => {
         const { name, value } = e.target;
-        if (name === 'stageid_to') {
+        if (name === 'stageId_to') {
             const selectedOption = e.target.options[e.target.selectedIndex];
             const title = selectedOption.getAttribute('data-title');
-            setSelectedTitle(title)
+            setSelectedTitle(title);
         }
-        setMoveFishData({ ...moveFishData, [name]: value });
+        setMoveFishData({ 
+            ...moveFishData, 
+            [name]: name === 'actual_quantity' ? parseFloat(value) : value // Ensure actual_quantity is a number
+        });
     };
 
     const handleMoveFishes = async (e) => {
@@ -80,6 +101,7 @@ export default function MoveFish() {
     
         try {
             const response = await Api.post('/move-fish', moveFishData);
+            
             toast.update(loadingToast, {
                 render: "Fish moved successfully!",
                 type: "success",
@@ -87,29 +109,20 @@ export default function MoveFish() {
                 autoClose: 3000,
             });
     
-            // Reset the moveFishData state
+            // Reset the form data
             setMoveFishData({
                 stageId_from: '',
                 stageId_to: '',
                 speciesId: '',
-                actual_quantity: '',
+                actual_quantity: 0,
                 remarks: '',
             });
     
-            // Check if stageId_to is "washing" to display the second form
-            setTimeout(() => {
-                setLoader(false);
-                if (moveFishData.stageId_to === selectedTitle) {
-                    setShowSecondForm(true);
-                    setShowFirstForm(false);
-                } else {
-                    setShowSecondForm(false);
-                    setShowFirstForm(true);
-
-
-                }
-            }, 1000);
-    
+            // Toggle showSecondForm if moved to "washing"
+            if (selectedTitle.toLowerCase() === "washing") {
+                setShowSecondForm(!showSecondForm);
+            }
+            
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error moving fish. Please try again.",
@@ -126,37 +139,35 @@ export default function MoveFish() {
     const [moveData, setMoveData] = useState({
         stageId_from: "",
         stageId_to: "",
-        wholeFishQuantity: 0,
-        brokenFishQuantity: 0,
-        damageOrLoss: 0,
+        wholeFishQuantity: null,
+        brokenFishQuantity: null,
+        damageOrLoss: null,
     });
 
     const handleMoveFish = (e) => {
         const { name, value } = e.target;
-        setMoveData({ ...moveData, [name]: value });
+        
+        // Convert value to a float if it's one of the quantity fields
+        setMoveData((prevData) => ({
+            ...prevData,
+            [name]: ["wholeFishQuantity", "brokenFishQuantity", "damageOrLoss"].includes(name) 
+                ? parseFloat(value) 
+                : value,
+        }));
     };
-    // Effect to automatically check the first stage when showSecondForm is true
-    useEffect(() => {
-        if (showSecondForm) {
-            const firstStage = checkStages[0]; // Get the first stage, or adapt as needed
-            if (firstStage) {
-                setMoveData({ stageId_from: firstStage.id });
 
-                // Fetch wash quantity when the stage is set automatically
-                fetchWashQuantity(firstStage.id);
-            }
-        }
-    }, [showSecondForm, checkStages]);
-
-    const fetchWashQuantity = async (id) => {
+    // Function to fetch wash quantity for a given stage ID
+    const fetchQuantity = async (id) => {
         try {            
-            const response = await Api.get(`/fish-stage/${id}`); // Make the API call
-            console.log('API Response:', response.data); // Debugging statement
+            const response = await Api.get(`/wash-quantity/${id}`); // Make the API call
+            setWhole(response.data.data);
         } catch (error) {
-            console.error('Error fetching data:', error); // Handle the error
+            console.error('Error fetching data:', error);
+            setWhole(0);
         }
     };
 
+    // Handle checkbox change
     const handleCheckboxChange = async (e) => {
         const { value, checked } = e.target;
         console.log('Checkbox changed:', { value, checked }); // Debugging statement
@@ -168,15 +179,70 @@ export default function MoveFish() {
 
         // Fetch wash quantity if the checkbox is checked
         if (checked) {
-            await fetchWashQuantity(value);
+            await fetchQuantity(value);
         }
     };
 
-    const onFormSubmit = (e) => {
-        e.preventDefault();
-        console.log("Submitted Data:", moveData);
-        // handleSubmit();
+    const handleSelect = (event, stageId, stageName) => {
+        event.preventDefault();
+    
+        // Update `moveData` state directly to include `stageId_to`
+        setMoveData((prevData) => ({
+            ...prevData,
+            stageId_to: stageId,
+        }));
+    
+        // Update `selectedStageName` for dropdown display
+        setSelectedStageName(stageName);
+    
+        // Call form submission function with selected `stageId` and `stageName`
+        onFormSubmit(stageId, stageName);
     };
+    
+    const onFormSubmit = async (stageId, stageName) => {
+        const loadingToastId = toast.loading("Submitting data...");
+    
+        // Determine endpoint based on `stageName`
+        let endpoint = '';
+        if (stageName == "smoking") {
+            endpoint = "/fish-process";
+        } else if (stageName == "Drying") {
+            endpoint = "/smoking-to-drying";
+        } else {
+            toast.update(loadingToastId, { 
+                render: "Invalid stage selection.",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+            });
+            return;
+        }
+    
+        try {
+            // Await API call to submit `moveData`
+            const response = await Api.post(endpoint, {
+                ...moveData,
+                stageId_to: stageId, // Ensure `stageId_to` is included in payload
+            });
+    
+            toast.update(loadingToastId, { 
+                render: "Data submitted successfully!",
+                type: "success",
+                isLoading: false,
+                autoClose: 3000,
+            });
+            
+            console.log("Submitted Data:", response.data);
+        } catch (error) {
+            toast.update(loadingToastId, { 
+                render: error.response?.data?.message || "Submission failed. Please try again.",
+                type: "error",
+                isLoading: false,
+                autoClose: 5000,
+            });
+            console.error("Error submitting data:", error);
+        }
+    };    
 
     return (
         <section className={`d-none d-lg-block ${styles.body}`}>
@@ -190,7 +256,7 @@ export default function MoveFish() {
                 <section className={`${styles.content}`}>
                     <main className={styles.create_form}>
                         <ToastContainer/>
-                        {showFirstForm && (<Form onSubmit={handleMoveFishes}>
+                        {!showSecondForm && (<Form onSubmit={handleMoveFishes}>
                             <h4 className="my-5">Move Fish</h4>
                             <Row xxl={2} xl={2} lg={2}>
                                 <Col className="mb-4">
@@ -290,20 +356,19 @@ export default function MoveFish() {
                                 </Button>
                             </div>
                         </Form>)}
-                        <hr />
                         {showSecondForm &&(<Form >
                             <div className='d-flex gap-5'>
-                                {checkStages.map((stage) => (
-                                    <Form.Check
-                                        key={stage.id} // Use the unique id as the key
-                                        label={stage.title} // Display the title
-                                        value={stage.id} // Use the id as the value
-                                        className="text-muted fw-semibold text-uppercase"
-                                        name="stageId_from"                                    
-                                        checked={moveData.stageId_from === stage.id} // Check if selected
-                                        onChange={handleCheckboxChange} // Handle checkbox change
-                                    />
-                                ))}
+                            {checkStages.map((stage) => (
+                                <Form.Check
+                                    key={stage.id} // Use the unique id as the key
+                                    label={stage.title} // Display the title
+                                    value={stage.id} // Use the id as the value
+                                    className="text-muted fw-semibold text-uppercase"
+                                    name="stageId_from"
+                                    checked={moveData.stageId_from === stage.id} // Check if selected
+                                    onChange={handleCheckboxChange} // Handle checkbox change                                        
+                                />
+                            ))}
                             </div>
                             <div className='mt-5 mb-4'>
                                 <div className='d-flex align-items-center mb-4'>
@@ -317,7 +382,7 @@ export default function MoveFish() {
                                             <Form.Control
                                                 readOnly
                                                 type='number'
-                                                value={moveData.wholeFishBefore} // Ensure this value is set correctly
+                                                value={whole} // Ensure this value is set correctly
                                                 className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                             />
                                         </Form.Group>
@@ -382,28 +447,34 @@ export default function MoveFish() {
                                 </div>
                             </div>
                             <div className='d-flex justify-content-end'>
-                                <DropdownButton
-                                    id="dropdown-button-dark-example2"
-                                    variant="dark"
-                                    title="Move To"
-                                    className="mt-2 px-4 py-2 fw-semibold"
-                                    data-bs-theme="dark"
-                                >
-                                    {checkStages.map((stage) => (
-                                        <Dropdown.Item
-                                            key={stage.id}
-                                            // disabled={isDisabled(stage.title.toUpperCase())}
-                                            // onClick={() => handleDropdownSelect(stage.id)} // Select the stage
+                                <Dropdown>
+                                    <Dropdown.Toggle 
+                                        variant="dark" 
+                                        className="px-4 py-2 bg-dark text-white border-secondary shadow-none fw-semibold"
+                                    >
+                                        {selectedStageName} {/* Display the selected stage name */}
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item 
+                                            as="button" 
+                                            disabled 
+                                            className="text-uppercase"
                                         >
-                                            <span className='text-uppercase fw-semibold'>{stage.title}</span>
+                                            Move to
                                         </Dropdown.Item>
-                                    ))}
-
-                                    <Dropdown.Divider />
-
-                                    {/* Showcase item */}
-                                    <Dropdown.Item href="#/action-showcase" className='fw-semibold'>SHOWCASE</Dropdown.Item>
-                                </DropdownButton>
+                                        {checkStages.map((stage) => (
+                                            <Dropdown.Item 
+                                                key={stage.id} 
+                                                as="button" 
+                                                disabled={stage.id === moveData.stageId_from} 
+                                                onClick={(event) => handleSelect(event, stage.id, stage.title)}
+                                            >
+                                                {stage.title}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown>
                             </div>
                         </Form>)}
                     </main>

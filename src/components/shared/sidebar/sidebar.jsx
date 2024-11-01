@@ -46,8 +46,8 @@ export default function SideBar() {
                 <Nav className={`flex-column ${styles.navs}`}>
                     <Nav.Item className="mt-3">
                         <Nav.Link
-                            onClick={() => navigate('/dashboard')}
-                            className={`${location.pathname === "/dashboard" ? styles.activeLink : styles.nonactiveLink}`}
+                            onClick={() => navigate('#/dashboard')}
+                            className={`${location.pathname === "#/dashboard" ? styles.activeLink : styles.nonactiveLink}`}
                         >
                             <IoGridOutline size={25} className="me-1 text-dark" /> <span className={styles.title}>Dashboard</span>
                         </Nav.Link>
@@ -237,7 +237,7 @@ export default function SideBar() {
                         </Card>
                         
                         {/* Showcase navigation */}
-                        <Card className={styles.card}>
+                        {/* <Card className={styles.card}>
                             <Card.Header 
                                 onClick={() => handleToggle('showcase')} 
                                 aria-controls="showcase-collapse-text" 
@@ -285,7 +285,7 @@ export default function SideBar() {
                                     </Card.Body>
                                 </div>
                             </Collapse>
-                        </Card>
+                        </Card> */}
 
                         {/* Feed navigation */}
                         <Card className={styles.card}>
@@ -441,7 +441,7 @@ export default function SideBar() {
                         </Card>
 
                         {/* Report navigation*/}
-                        <Card className={styles.card}>
+                        {/* <Card className={styles.card}>
                             <Card.Header 
                                 onClick={() => handleToggle('report')} 
                                 aria-controls="report-collapse-text" 
@@ -516,10 +516,10 @@ export default function SideBar() {
                                     </Card.Body>
                                 </div>
                             </Collapse>
-                        </Card>
+                        </Card> */}
 
                         {/* Notification navigation */}
-                        <Card className={styles.card}>
+                        {/* <Card className={styles.card}>
                             <Card.Header 
                                 onClick={() => handleToggle('notification')} 
                                 aria-controls="notification-collapse-text" 
@@ -549,7 +549,7 @@ export default function SideBar() {
                                     </Card.Body>
                                 </div>
                             </Collapse>
-                        </Card>                            
+                        </Card>                             */}
                     </div>
                 </Nav>
             </section>
