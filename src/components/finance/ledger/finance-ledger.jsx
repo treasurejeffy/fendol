@@ -113,8 +113,8 @@ const FinanceLedger = () => {
                       <th className="pt-3">PRODUCT</th>
                       <th className="pt-3">DESCRIPTION</th>
                       <th className="pt-3">QUANTITY</th>
-                      <th style={{ color: 'green' }} className="pt-3">CREDIT()</th>
-                      <th  style={{ color: 'red' }} className="pt-3">DEBIT()</th>
+                      <th style={{ color: 'green' }} className="pt-3">CREDIT(₦)</th>
+                      <th  style={{ color: 'red' }} className="pt-3">DEBIT(₦)</th>
                       <th >BALANCE()</th>
                       
                     </tr>
@@ -131,7 +131,7 @@ const FinanceLedger = () => {
                               <td>{record.quantity}</td>
                               <td style={{ color: 'green' }}>{record.credit ? `₦${record.credit}` : '-'}</td>
                               <td style={{ color: 'red' }}>{record.debit ? `₦${record.debit}` : '-'}</td>
-                              <td>{record.balance}</td>
+                              <td>{`₦${record.balance}`}</td>
                             </tr>                          
                         </React.Fragment>
                       );
