@@ -322,7 +322,7 @@ const AddSales = () => {
                                         )
                                         .map(product => (
                                             <option key={product.id} value={product.productName} data-id={product.id}>
-                                                {`${product.productName} - (${product.basePrice})`}
+                                                {`${product.productName} - (₦ ${product.basePrice})`}
                                             </option>
                                         ))
                                     }
@@ -431,7 +431,7 @@ const AddSales = () => {
                                             .filter(product => product.productName && product.productName.toLowerCase().includes('fresh'))
                                             .map((product, index) => (
                                                 <option key={index} value={product.productName} data-id-fresh={product.id}>
-                                                    {product.productName ? `${product.productName} - (${product.basePrice})` : 'No Data Yet'}
+                                                    {product.productName ? `${product.productName} - (₦ ${product.basePrice})` : 'No Data Yet'}
                                                 </option>
                                             ))
                                         }
@@ -546,7 +546,7 @@ const AddSales = () => {
                                             .filter(product => product.productName && product.productName.toLowerCase().includes('fingerlings'))
                                             .map((product, index) => (
                                                 <option key={index} value={product.productName} data-id-finger={product.id}>
-                                                    {product.productName ? `${product.productName} - (${product.basePrice})` : 'No Data Yet'}
+                                                    {product.productName ? `${product.productName} - (₦ ${product.basePrice})` : 'No Data Yet'}
                                                 </option>
                                             ))
                                         }
