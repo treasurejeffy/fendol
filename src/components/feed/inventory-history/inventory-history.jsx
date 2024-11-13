@@ -82,7 +82,7 @@ export default function InventoryHistory() {
                       <th>DATE CREATED</th>                    
                       <th>FEED NAME</th>
                       <th>FEED TYPE</th>
-                      <th>PRODUCT <br /> STAGE</th>
+                      <th>POND</th>
                       <th>QUANTITY <br /> ADDED (KG)</th>
                       <th>QUANTITY <br /> USED (KG)</th>
                       <th>QUANTITY <br /> REMAINING(KG)</th>

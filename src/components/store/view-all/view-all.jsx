@@ -16,7 +16,7 @@ const DropdownMenu = ({ show, onClickOutside, onAddClick, onRemoveClick, onEditC
   return (
     <div className={styles.dropdownMenu} onClick={onClickOutside}>
       <ul className={styles.menuList}>
-        <li className={` mx-2 mt-2 rounded ${styles.menuItem}`} onClick={onAddClick}>Add </li>
+        <li className={` mx-2 mt-2 rounded ${styles.menuItem}`} onClick={onAddClick}>Top Up Feed </li>
         <li className={` mx-2 rounded ${styles.menuItem}`} onClick={onRemoveClick}>Remove </li>
         <li className={` mx-2 mb-2 rounded ${styles.menuItem}`} onClick={onEditClick}>Edit</li>
       </ul>
@@ -245,7 +245,7 @@ export default function UpdateStoreInventory() {
 
             {!loading && !error && products.length === 0 && (
               <Alert variant="info">
-                No products available.
+                No store available.
               </Alert>
             )}
 
@@ -335,7 +335,7 @@ export default function UpdateStoreInventory() {
         <Modal show={showModal} onHide={() => setShowModal(false)} className="rounded-0 ">
           <Modal.Header closeButton className="border-0">
             <Modal.Title className="fw-semibold mx-2">
-              {modalType === 'add' ? 'Add' : modalType === 'remove' ? 'Remove' : 'Edit'}
+              {modalType === 'add' ? 'Top Up Feed' : modalType === 'remove' ? 'Remove' : 'Edit'}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body className="mt-5 mx-2">
@@ -397,7 +397,7 @@ export default function UpdateStoreInventory() {
               <>
                 {/* Product Stage */}
                 <Form.Group className="mb-3 row">
-                  <Form.Label className="col-4 fw-semibold">Product Stage</Form.Label>
+                  <Form.Label className="col-4 fw-semibold">Pond</Form.Label>
                   <div className="col-8">
                     <Form.Select
                       name="stage"
@@ -406,7 +406,7 @@ export default function UpdateStoreInventory() {
                       onChange={(e) => setStage(e.target.value)}
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                     >
-                      <option value="" disabled>Choose Stage</option>
+                      <option value="" disabled>Choose Pond</option>
                       {!stages ? (
                           <option>Please wait...</option>
                       ) : stages.length < 1 ? (

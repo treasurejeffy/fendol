@@ -91,3 +91,17 @@
     display: none;
   }
 }
+
+.inputContainer {
+  // Ensure the container is relative for positioning the sign
+  position: relative;
+}
+
+.nairaSign {
+  position: absolute;
+  right: 10px; // Adjust this value as needed for spacing
+  top: 50%;
+  transform: translateY(-50%); // Center it vertically
+  pointer-events: none; // Prevent mouse events on the sign
+  color: #524d4d; // Change color as needed
+}

@@ -18,7 +18,8 @@ export default function InventoryHistory() {
         const response = await Api.get('/stores-histories'); 
         setInventoryHistory(response.data.data); // Assuming the response contains an array of history data
       } catch (error) {
-        setError("Error fetching inventory history. Please try again.");
+        const errorMessage = error.response?.data?.message || "An unexpected error occurred. Please try again.";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -69,7 +70,7 @@ export default function InventoryHistory() {
                   <tr className="fw-semibold">
                     <th>DATE CREATED</th>                    
                     <th>NAME</th>
-                    <th>PRODUCT <br /> STAGE</th>
+                    <th>POND</th>
                     <th>QUANTITY <br /> ADDED (KG)</th>
                     <th>QUANTITY <br /> USED (KG)</th>
                     <th>QUANTITY <br /> REMAINING(KG)</th>

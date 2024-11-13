@@ -4,7 +4,6 @@ import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../product-stages.module.scss';
 import { BsExclamationTriangleFill } from "react-icons/bs";
-import axios from "axios";
 import { Spinner, Alert, Button, Form, Modal } from 'react-bootstrap';
 import Api from "../../shared/api/apiLink";
 import ReactPaginate from 'react-paginate';

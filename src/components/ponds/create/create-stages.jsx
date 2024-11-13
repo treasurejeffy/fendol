@@ -33,7 +33,7 @@ export default function CreateStages() {
         // Fetch the token from sessionStorage
         const token = sessionStorage.getItem('authToken'); // Ensure the key matches what you have set
 
-        const loadingToast = toast.loading("Creating Stage...", {
+        const loadingToast = toast.loading("Creating Pond...", {
             className: 'dark-toast'
         });
 
@@ -42,7 +42,7 @@ export default function CreateStages() {
 
             // After a successful API call
             toast.update(loadingToast, {
-                render: "Created Stage successfully!",
+                render: "Created Pond successfully!",
                 type: "success", // Use string for type
                 isLoading: false,
                 autoClose: 3000,
@@ -83,10 +83,10 @@ export default function CreateStages() {
                     <main>
                         <Form className={styles.create_form} onSubmit={handleSubmit}>
                             <ToastContainer/>
-                            <h4 className="mt-3 mb-5">Create Stages</h4>                            
+                            <h4 className="mt-3 mb-5">Create Pond</h4>                            
                             <Form.Label className="fw-semibold">Name</Form.Label>
                             <Form.Control
-                                placeholder="Eg. Fingerlings, Small, Medium, Large, washing, smoking, drying..."
+                                placeholder="Enter Pond Name.."
                                 className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                 type="text"
                                 name="title" // Change this to match the key in formData

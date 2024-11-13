@@ -149,11 +149,9 @@ const AddNew = () => {
                                         onChange={handleInputChange}
                                         required
                                     >
-                                        <option value="" disabled>Select Role</option>
-                                        <option value="Product Manager">Product Manager</option>                                        
-                                        <option value="Inventory Manager">Inventory Manager</option>
-                                        <option value="Sale Manager">Sale Manager</option>
-                                        <option value="Admin">Admin</option>
+                                        <option value="" disabled>Select Role</option>                                
+                                        <option value="admin">Admin</option>
+                                        <option value="super_admin">Super Admin</option>
                                     </Form.Select>
                                 </Col>
                             </Row>

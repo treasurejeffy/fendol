@@ -25,6 +25,7 @@ export default function Header() {
                         aria-label="Large"
                         aria-describedby="inputGroup-sizing-sm"
                         placeholder="Search..."
+                        readOnly
                         className='border-start-0 rounded-end-pill border-1 border-secondary shadow-none'
                         />
                     </InputGroup>

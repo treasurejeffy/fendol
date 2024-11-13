@@ -11,13 +11,24 @@ const AddFeed = () => {
         feedName: '',
         feedType: '',
         unit:'',
-        threshold: Number
+        threshold: Number,
+        weightPerBag: null
     });
     const [loader, setLoader] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+                // Handle price input separately to format it with commas
+            if (name === 'weightPerBag') {
+                // Remove commas to get the pure number
+                const numberValue = value.replace(/[^0-9]/g, '');
+                setFormData({
+                    ...formData,
+                    weightPerBag: numberValue, // Format the price with commas for display
+                });            
+            } else {
+                setFormData({ ...formData, [name]: value });
+            }
     };
 
     const handleAddFeed = async (e) => {
@@ -45,6 +56,7 @@ const AddFeed = () => {
                 unit: '',
                 feedType: '',
                 threshold: Number,
+                weightPerBag: null
             });
         } catch (error) {
             toast.update(loadingToast, {
@@ -123,6 +135,21 @@ const AddFeed = () => {
                                         onChange={handleInputChange}
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                     />
+                                </Col>
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Weight Per Bag</Form.Label>
+                                    <div className={`${styles.inputContainer} position-relative`}>
+                                        <Form.Control
+                                            placeholder="Enter weight Per Bag"
+                                            type="text" // Change input type to text to handle commas
+                                            name="weightPerBag"
+                                            value={formData.weightPerBag} // Display the formatted price
+                                            required
+                                            onChange={handleInputChange}
+                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        />
+                                        <span className={`${styles.nairaSign} position-absolute end-0 top-50 translate-middle-y pe-2`}>KG</span>
+                                    </div>
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-end my-4">

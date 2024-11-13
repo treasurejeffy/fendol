@@ -104,3 +104,45 @@ $text-color: #2E3135;
         font-size: 14px;
     }
 }
+
+.active {
+    background-color: $text-color;
+    color: $active-color;
+    border-radius: 15px;
+    font-family: "Roboto Flex", system-ui;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 14px;
+    box-shadow: 2px 2px 5px $text-color;
+    padding: 7px 6px;
+    margin: 0 15px;
+}
+
+.activeIcon{
+    color: $active-color;
+}
+
+.activehover{
+    color: $active-color;
+    background-color: $text-color;
+    box-shadow: 2px 2px 2px $text-color;
+}
+
+.active:active{
+    color: $active-color;
+    box-shadow: 2px 2px 6px $text-color;
+}
+  
+.nonactive{
+    color: $text-color;
+    font-family: "Roboto Flex", system-ui;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 14px;
+}
+
+.nonactive:hover{
+    color: $text-color;    
+}

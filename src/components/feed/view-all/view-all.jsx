@@ -17,7 +17,7 @@ const DropdownMenu = ({ show, onClickOutside, onAddClick, onRemoveClick, onEditC
   return (
     <div className={styles.dropdownMenu} onClick={onClickOutside}>
       <ul className={styles.menuList}>
-        <li className={` mx-2 mt-2 rounded ${styles.menuItem}`} onClick={onAddClick}>Add feed</li>
+        <li className={` mx-2 mt-2 rounded ${styles.menuItem}`} onClick={onAddClick}>Top Up Feed</li>
         <li className={` mx-2 rounded ${styles.menuItem}`} onClick={onRemoveClick}>Remove feed</li>
         <li className={` mx-2 mb-2 rounded ${styles.menuItem}`} onClick={onEditClick}>Edit feed</li>
       </ul>
@@ -33,12 +33,13 @@ export default function UpdateFeedInventory() {
   const [modalType, setModalType] = useState(''); // Track modal type
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [currentPage, setCurrentPage] = useState(0); // State for current page
-  const itemsPerPage = 5; // Define how many items per page
+  const itemsPerPage = 10; // Define how many items per page
   const [activeDropdown, setActiveDropdown] = useState(null); // State to track active dropdown
   const [stages, setStages] = useState([]);
-  const [quantityUsed, setQuantityUsed] = useState(null);
-  const [quantity, setQuantity] = useState(null);
+  const [quantityUsed, setQuantityUsed] = useState(null)
+  const [noOfBag, setNoOfBag] = useState(null);
   const [feedPrice, setFeedPrice] = useState(null);
+  const [weightPerBag, setWeightPerBag] = useState(null);
   const [stage, setStage] = useState('');
   const [thresholdValue, setThresholdValue] = useState();
   const [unit, setUnit] = useState('');
@@ -65,7 +66,7 @@ export default function UpdateFeedInventory() {
       if (modalType === 'add') {
         // Add feed logic
         response = await Api.post(`/add?feedName=${feedName}&feedType=${feedType}`, {
-          quantity,
+          noOfBag,
           feedPrice
         });
         toast.update(loadingToast, {
@@ -90,7 +91,8 @@ export default function UpdateFeedInventory() {
       } else if (modalType === 'edit') {
         // Edit feed logic
         response = await Api.put(`/feed/edit-threshold/${id}`, {
-          thresholdValue
+          thresholdValue,
+          weightPerBag
         });
         toast.update(loadingToast, {
           render: "Feed edited successfully!",
@@ -100,15 +102,15 @@ export default function UpdateFeedInventory() {
           className: 'dark-toast'
         });
       }
-
       // Reset state after successful save
       setQuantityUsed();
-      setQuantity();
+      setNoOfBag(null);
       setFeedPrice('');
       setStage('');
       setThresholdValue();
       setUnit('');
-      fetchData();
+      setWeightPerBag();
+      fetchData();      
       setShowModal(false); // Close the modal
     } catch (error) {
       console.error('Error processing the request:', error.response?.data?.message || error.message);
@@ -189,8 +191,6 @@ export default function UpdateFeedInventory() {
     setModalType('edit'); // Set modal type for Edit
     setShowModal(true); // Show modal
   };
-  
-
 
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
@@ -340,7 +340,7 @@ export default function UpdateFeedInventory() {
         <Modal show={showModal} onHide={() => setShowModal(false)} className="rounded-0">
           <Modal.Header closeButton className="border-0">
             <Modal.Title className="fw-semibold">
-              {modalType === 'add' ? 'Add Feed' : modalType === 'remove' ? 'Remove Feed' : 'Edit Feed'}
+              {modalType === 'add' ? 'Top Up Feed' : modalType === 'remove' ? 'Remove Feed' : 'Edit Feed'}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body className="mt-5">
@@ -373,17 +373,31 @@ export default function UpdateFeedInventory() {
             {/* Add Feed (Quantity and Price Bought) */}
             {modalType === 'add' && (
               <>
+                {/* No. of bag */}
+                <Form.Group className="mb-3 row">
+                  <Form.Label className="col-4">No. of Bags</Form.Label>
+                  <div className="col-8">
+                    <Form.Control 
+                      type="number" 
+                      required
+                      value={noOfBag ?? ''} // Shows empty string if quantity is null
+                      onChange={(e) => setNoOfBag(Number(e.target.value) || null)} 
+                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      placeholder="Enter number of bags" 
+                    />
+                  </div>
+                </Form.Group>
+
                 {/* Quantity */}
                 <Form.Group className="mb-3 row">
                   <Form.Label className="col-4">Quantity (kg)</Form.Label>
                   <div className="col-8">
                     <Form.Control 
                       type="number" 
-                      required 
-                      value={quantity ?? ''} // Shows empty string if quantity is null
-                      onChange={(e) => setQuantity(Number(e.target.value) || null)} 
+                      readOnly
+                      value={noOfBag * selectedProduct?.weightPerBag || 0} // Shows empty string if quantity is null                    
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
-                      placeholder="Enter Quantity (kg)" 
+                      placeholder="Show Quantity (kg)" 
                     />
                   </div>
                 </Form.Group>
@@ -413,7 +427,7 @@ export default function UpdateFeedInventory() {
               <>
                 {/* Product Stage */}
                 <Form.Group className="mb-3 row">
-                  <Form.Label className="col-4">Product Stage</Form.Label>
+                  <Form.Label className="col-4">Pond </Form.Label>
                   <div className="col-8">
                     <Form.Select
                       name="stage"
@@ -422,7 +436,7 @@ export default function UpdateFeedInventory() {
                       onChange={(e) => setStage(e.target.value)}
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                     >
-                       <option value="" disabled>Choose Stage</option>
+                       <option value="" disabled>Choose Pond</option>
                         {!stages ? (
                             <option>Please wait...</option>
                         ) : stages.length < 1 ? (
@@ -438,7 +452,7 @@ export default function UpdateFeedInventory() {
 
                 {/* Quantity */}
                 <Form.Group className="mb-4 row">
-                  <Form.Label className="col-4">Quantity</Form.Label>
+                  <Form.Label className="col-4">Quantity(KG)</Form.Label>
                   <div className="col-8">
                     <Form.Control 
                       type="number" 
@@ -446,6 +460,7 @@ export default function UpdateFeedInventory() {
                       onChange={(e) => setQuantityUsed(Number(e.target.value) || null)} 
                       className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
                       placeholder="Quantity" 
+                      min={'0'}
                     />
                   </div>
                 </Form.Group>
@@ -482,13 +497,29 @@ export default function UpdateFeedInventory() {
                     />
                   </div>
                 </Form.Group>
+
+                {/* weightPerBag */}
+                <Form.Group className="mb-3 row">
+                  <Form.Label className="col-4">Weight Per Bag (KG)</Form.Label>
+                  <div className="col-8">
+                    <Form.Control 
+                      type="number" 
+                      required
+                      placeholder="Edit Weight Per Bag"
+                      defaultValue={selectedProduct?.weightPerBag} 
+                      value={weightPerBag ?? ''} // Shows empty string if quantity is null
+                      onChange={(e) => setWeightPerBag(Number(e.target.value) || null)} 
+                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                    />
+                  </div>
+                </Form.Group>
               </>
             )}
           </Modal.Body>
 
           <Modal.Footer className="mt-5 mb-3 border-0">
             <Button className={`px-5 btn-dark fw-semibold`} onClick={handleSaveClick}>
-              {modalType === 'add' ? 'Add Feed' : modalType === 'remove' ? 'Remove Feed' : 'Edit Feed'}
+              {modalType === 'add' ? 'Top Up Feed' : modalType === 'remove' ? 'Remove Feed' : 'Edit Feed'}
             </Button>
             <ToastContainer /> {/* Include ToastContainer for notifications */}
           </Modal.Footer>

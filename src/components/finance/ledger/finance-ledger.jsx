@@ -115,7 +115,7 @@ const FinanceLedger = () => {
                       <th className="pt-3">QUANTITY</th>
                       <th style={{ color: 'green' }} className="pt-3">CREDIT(₦)</th>
                       <th  style={{ color: 'red' }} className="pt-3">DEBIT(₦)</th>
-                      <th >BALANCE()</th>
+                      <th >BALANCE(₦)</th>
                       
                     </tr>
                   </thead>

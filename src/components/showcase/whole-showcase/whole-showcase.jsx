@@ -9,7 +9,7 @@ import ReactPaginate from 'react-paginate';
 import Api from "../../shared/api/apiLink";
 import { format } from 'date-fns';
 
-export default function ViewBrokenHistory() {
+export default function ViewWholeHistory() {
   const [brokenQuantity, setBrokenQuantity] = useState(null);
   const [tableData, setTableData] = useState([]);
   const [currentPage, setCurrentPage] = useState(0); 
@@ -29,7 +29,7 @@ export default function ViewBrokenHistory() {
 const fetchTableData = async () => {
     setLoadingTable(true);
     try {
-      const response = await Api.get('/show-glass/broken');
+      const response = await Api.get('/show-glass/whole');
       if (response.data && response.data.data) {
         // Assuming response.data.data is an object containing the details you need
         setTableData([response.data.data]); // Wrap in array if it's a single object
@@ -49,9 +49,12 @@ const fetchTableData = async () => {
   const fetchQuantityData = async () => {
     setLoadingStages(true);
     try {
-      const response = await Api.get('/show-glass/total-broken');   
-      // setBrokenQuantity(response); 
-      setBrokenQuantity(response.data.data.totalBrokenQuantity);
+      const response = await Api.get('/show-glass/total-whole');
+      if (response.data && typeof response.data.data.totalWholeQuantity === "number") {
+        setBrokenQuantity(response.data.data.totalWholeQuantity); // Use the numeric value
+      } else {
+        throw new Error('Expected totalWholeQuantity to be a number');
+      }
     } catch (error) {
       console.error(error);
       setErrorStages("Error fetching broken quantity data.");
@@ -66,7 +69,7 @@ const fetchTableData = async () => {
   }, []);
 
   const paginatedData = tableData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
-  console.log(brokenQuantity);
+  console.log(tableData);
   
   return (
     <section className={`d-none d-lg-block ${styles.body}`}>
@@ -80,8 +83,9 @@ const fetchTableData = async () => {
 
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
-            <h4 className="mt-3 mb-5">View Broken Fish History</h4>
+            <h4 className="mt-3 mb-5">View Whole Fish History</h4>
 
+    
             <div className={`d-flex mb-5`}>
               {loadingStages ? (
                 <div className="text-start w-25 shadow py-5 px-3">                
@@ -96,7 +100,7 @@ const fetchTableData = async () => {
                 </div>
               ) : brokenQuantity ? (
                 <div className="w-50 ">
-                      <div className="w-50 px-3 shadow-sm">
+                    <div className="w-50 px-3 shadow-sm">
                       <p className="text-end text-muted fw-semibold" style={{fontSize:'12px'}}>In Stock</p>
                       <p className="text-start text-muted fw-semibold" style={{fontSize:'14px'}}>Total Quantity</p>
                       <div className="d-flex pb-3">
@@ -149,7 +153,7 @@ const fetchTableData = async () => {
                 </table>
 
                 <div className="d-flex justify-content-center mt-4">
-                <ReactPaginate
+                  <ReactPaginate
                     previousLabel={"<"}
                     nextLabel={">"}
                     breakLabel={"..."}

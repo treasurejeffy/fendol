@@ -15,7 +15,7 @@ export default function ViewAll() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [adminsPerPage] = useState(5);
+  const [adminsPerPage] = useState(10);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // State for password visibility

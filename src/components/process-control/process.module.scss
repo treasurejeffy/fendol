@@ -22,17 +22,56 @@
     }
 }
 
+.stageBox {
+  background-color: #FAFCFF;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 15px;
+  h6 {
+    color: #8C949B;
+  }
+  
+  p {
+    color: #2E3135;
+    font-size: 30px;
+    font-weight: 600;
+
+    span {
+    color: #8C949B;
+      font-size: small;
+      font-weight: 400;
+    }
+  }
+  &:hover {
+    box-shadow: 2px 4px 8px #2E3135; // Increase shadow
+    transform: scale(1.05); // Slightly increase size on hover
+  }
+}
+
 .inputs{
   &::placeholder {
     opacity: 0.5;
   }
 }
 
-.Pweight{
-  opacity: 0.8;
-  &::placeholder{
-    opacity: 0.5;
+.styled_table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; // Fixed layout for equal column widths
+
+  th, td {
+    padding: 8px;
+    text-align: left;
+    overflow: hidden; // Prevent overflow
+    text-overflow: ellipsis; // Add ellipsis for overflowed text
+    white-space: nowrap; // Prevent text wrapping
   }
+}
+
+.styled_table th {
+  color: #8C949B;
+  padding: 20px 9px;
+  text-align: left; // Optional: align text to the left
 }
 
 .theader{
@@ -42,34 +81,23 @@
     &:first-of-type {
       border-top-left-radius: 8px; // Adjust to desired radius
       border-bottom-left-radius: 8px;
-      padding: 10px 9px;
     }
     &:last-of-type {
       border-top-right-radius: 8px; // Adjust to desired radius
       border-bottom-right-radius: 8px;
-      padding: 10px 5px;
     }
+  }
+
+}
+
+.trow{
+  &:hover{
+    cursor: pointer;
   }
 }
 
-.styled_table {
-  width: 100%;
-  position: relative; // Ensure that child elements with absolute positioning are relative to this table
-}
-
-.styled_table th,
 .styled_table td {
-  white-space: nowrap; // Prevent text wrapping
-}
-
-.styled_table th {
-  color: #2E3135;
-  padding-bottom: 20px;
-  text-align: left; // Optional: align text to the left
-}
-
-.styled_table td {
-  padding: 18px 0px;
+  padding: 19px 8px;
   border-bottom:  0.2px solid #d0d6db;
   font-family: Roboto Flex;
   font-size: 16px;
@@ -78,6 +106,9 @@
   letter-spacing: 0.04em;
   color: #2E3135;
   position: relative; // Ensure td can contain absolute positioned elements like the dropdown
+  :hover{
+    cursor: pointer;
+  }
 }
 
 .dropdownMenu {
@@ -109,6 +140,11 @@
   }
 }
 
+.border_dot {
+  border-bottom: 2px dotted #616468; /* Adjust thickness and color */
+  width: 100px; /* Adjust this value to control the width */
+  margin: 8px 10px;
+}
 
 @media (max-width: 992) {
   .body{
@@ -116,55 +152,51 @@
   }
 }
 
-.position-relative {
-  position: relative;
-}
-
-.position_absolute {
-  position: absolute;
+.successOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   right: 0;
-  padding-right: 2rem;
-  top: 50px;
-  transform: translateY(-50%);
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); // Shadow effect
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
-.suggestions_box {
-  position: absolute;
-  max-height: 170px;
-  width: calc(100% - 2px); /* Adjust for borders */
-  overflow-y: auto;
-  z-index: 1000;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  margin: 0; /* Ensure no margin is applied */
-  padding: 0; /* Reset padding */
+.successBox {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  max-width: 730px;
+  width: 100%;
 }
 
-.suggestions_box ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-.suggestions_box li {
-  padding: 8px;
-  cursor: pointer;
-}
-.suggestions_box li:hover {
-  background-color: #f0f0f0;
+.fade_in {
+  opacity: 1;
+  transition: opacity 0.5s ease-in;
 }
 
-.inputContainer {
-  // Ensure the container is relative for positioning the sign
-  position: relative;
+.fade_out {
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
 }
 
-.nairaSign {
-  position: absolute;
-  right: 10px; // Adjust this value as needed for spacing
-  top: 50%;
-  transform: translateY(-50%); // Center it vertically
-  pointer-events: none; // Prevent mouse events on the sign
-  color: #524d4d; // Change color as needed
+.refresh {
+  border-radius: 50%;
+  padding: 3.5px;
+  transition: transform 0.3s ease, opacity 0.5s ease-in, box-shadow 0.3s ease;
+
+  &:hover {
+    background-color: #fbfcfd;
+    opacity: 1;
+    transform: translateY(-1.8px);
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); // Add shadow on hover
+  }
 }
+
+

@@ -20,7 +20,7 @@ const AddFish = () => {
             if (Array.isArray(response.data.data)) {
                 // Filter out "washing", "smoking", and "drying"
                 const filteredStages = response.data.data.filter(stage => 
-                    !["washing", "smoking", "drying"].includes(stage.title.toLowerCase())
+                    !["harvest", "damage",'loss'].includes(stage.title.toLowerCase())
                 );
                 setStages(filteredStages); // Set the filtered stages to state
             } else {
@@ -95,7 +95,7 @@ const AddFish = () => {
             // Reset form or handle success as needed
             setFormData({
                 stageId: '',
-                quantity: 0,        
+                quantity: '',        
                 speciesId: ''
             });
         } catch (error) {
@@ -127,7 +127,7 @@ const AddFish = () => {
                             <h4 className="mt-5 mb-5">Add Fish</h4>
                             <Row xxl={2} xl={2} lg={2}>
                                 <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Stage</Form.Label>
+                                    <Form.Label className="fw-semibold">Pond</Form.Label>
                                     <Form.Select
                                         name="stageId"
                                         value={formData.stageId}

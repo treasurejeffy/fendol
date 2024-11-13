@@ -134,7 +134,7 @@ export default function ViewAddFishHistory() {
                   <thead className={`rounded-2 ${styles.theader}`}>
                     <tr>
                       <th>DATE CREATED</th>
-                      <th>STAGE</th>
+                      <th>POND</th>
                       <th>QUANTITY ADDED</th>
                       <th>FISH TYPE</th>
                     </tr>

@@ -143,8 +143,8 @@ export default function CreateProducts() {
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                                     >
                                         <option value="" disabled>Select Unit</option>
-                                        <option value="kg">Kilogram</option>
-                                        <option value="g">Gram</option>
+                                        <option value="KG">Kilogram</option>
+                                        <option value="G">Gram</option>
                                     </Form.Select>
                                 </Col>
                                 <Col className="mb-4">
