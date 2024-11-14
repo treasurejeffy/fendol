@@ -23,8 +23,7 @@ const isTokenExpired = (token) => {
 // Request interceptor to add Authorization header and check for token expiration
 Api.interceptors.request.use(
     (config) => {
-        const token = sessionStorage.getItem('authToken');
-        console.log(token)
+        const token = sessionStorage.getItem('authToken');        
         if (token) {
             if (isTokenExpired(token)) {
                 console.warn("Token is expired, please login again.");

@@ -38,6 +38,7 @@ export default function LogIn() {
         try {
           const response = await axios.post('https://dev-api.fendolgroup.com/api/v1/login', loginData);
           const token = response.data.token; // Adjust according to API response structure
+          const role = response.data.role; // Adjust according to API response structure
           const success = response.data.success; // Assuming your API sends a 'success' field
     
           if (success) {
@@ -45,6 +46,7 @@ export default function LogIn() {
     
             // Store token in local storage
             sessionStorage.setItem('authToken',(token));
+            sessionStorage.setItem('role',(role));
     
             // Dispatch token to Redux
             dispatch({ type: LOGIN_USER, payload: token });

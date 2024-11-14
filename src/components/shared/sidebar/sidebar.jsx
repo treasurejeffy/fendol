@@ -12,8 +12,10 @@ export default function SideBar() {
     const location = useLocation();
     const navigate = useNavigate();
     const [open, setOpen] = useState({});
+    const [role, setRole] = useState(null);
+    
 
-    useEffect(() => {
+    useEffect(() => {        
         const path = location.pathname;
         if (path.includes('/admin')) {
             setOpen(prev => ({ ...prev, admin: true }));
@@ -38,6 +40,9 @@ export default function SideBar() {
         } else if (path.includes('/notification')) {
             setOpen(prev => ({ ...prev, notification: true }));
         }
+        if(role === null){
+            setRole(sessionStorage.getItem('role'));
+        }        
     }, [location.pathname]);
 
     const handleToggle = (key) => {
@@ -65,6 +70,7 @@ export default function SideBar() {
                                 onClick={() => handleToggle('admin')}
                                 aria-controls="admin-collapse-text"
                                 aria-expanded={open.admin}
+                                style={{ cursor: 'pointer' }}
                                 className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
                             >
                                 <span className={`${styles.title}`}>
@@ -80,7 +86,7 @@ export default function SideBar() {
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
                                             <OverlayTrigger
-                                                placement="right"
+                                                placement="top"
                                                 overlay={<Tooltip id="tooltip-add-new">Add a new admin</Tooltip>}
                                             >
                                                 <div
@@ -94,7 +100,7 @@ export default function SideBar() {
                                         </Nav.Item>
                                         <Nav.Item className="my-3">
                                             <OverlayTrigger
-                                                placement="right"
+                                                placement="top"
                                                 overlay={<Tooltip id="tooltip-view-all">View all admins</Tooltip>}
                                             >
                                                 <div
@@ -114,6 +120,7 @@ export default function SideBar() {
                         {/* Customer navigation */}
                         <Card className={styles.card}>
                             <Card.Header
+                                style={{ cursor: 'pointer' }}
                                 onClick={() => handleToggle('customer')}
                                 aria-controls="customer-collapse-text"
                                 aria-expanded={open.customer}
@@ -228,7 +235,7 @@ export default function SideBar() {
                                                 <FaRegCircle size={17} className="me-1" /> Move Fish
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="my-3">
+                                        <Nav.Item className="my-3" title="View Add Fish History">
                                             <div
                                                 onClick={() => navigate('/ponds/view-add-fish-history')}
                                                 className={`${location.pathname === "/ponds/view-add-fish-history" ? styles.activeLink : styles.nonactiveLink}`}
@@ -237,7 +244,7 @@ export default function SideBar() {
                                                 <FaRegCircle size={17} className="me-1" /> View Add Fish History
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="my-3">
+                                        <Nav.Item className="my-3" title="View Move Fish History">
                                             <div
                                                 onClick={() => navigate('/ponds/view-move-fish-history')}
                                                 className={`${location.pathname === "/ponds/view-move-fish-history" ? styles.activeLink : styles.nonactiveLink}`}
@@ -257,6 +264,7 @@ export default function SideBar() {
                                 onClick={() => handleToggle('process')}
                                 aria-controls="process-collapse-text"
                                 aria-expanded={open.process}
+                                style={{ cursor: 'pointer' }}
                                 className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
                             >
                                 <span className={`${styles.title}`}>
@@ -305,6 +313,7 @@ export default function SideBar() {
                         {/* Products navigation */}
                         <Card className={styles.card}>
                             <Card.Header
+                                style={{ cursor: 'pointer' }}
                                 onClick={() => handleToggle('products')}
                                 aria-controls="products-collapse-text"
                                 aria-expanded={open.products}
@@ -350,6 +359,7 @@ export default function SideBar() {
                                 onClick={() => handleToggle('showcase')} 
                                 aria-controls="showcase-collapse-text" 
                                 aria-expanded={open.showcase}
+                                style={{ cursor: 'pointer' }}
                                 className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
                             >
                                 <span className={`${styles.title}`}>
@@ -410,6 +420,7 @@ export default function SideBar() {
                                 onClick={() => handleToggle('feed')} 
                                 aria-controls="feed-collapse-text" 
                                 aria-expanded={open.feed}
+                                style={{ cursor: 'pointer' }}
                                 className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
                             >
                                 <span className={`${styles.title}`}>
@@ -461,6 +472,7 @@ export default function SideBar() {
                                 onClick={() => handleToggle('store')} 
                                 aria-controls="store-collapse-text" 
                                 aria-expanded={open.store}
+                                style={{ cursor: 'pointer' }}
                                 className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
                             >
                                 <span className={`${styles.title}`}>
@@ -474,7 +486,7 @@ export default function SideBar() {
                             <Collapse in={open.store} style={{ transitionDuration: "0s" }}>
                                 <div id="feed-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
-                                        <Nav.Item className="mb-3">
+                                        <Nav.Item className="mb-3" title="Create Feed">
                                             <div 
                                                 onClick={() => navigate('/store/add-new')} 
                                                 className={`${location.pathname === "/store/add-new" ? styles.activeLink : styles.nonactiveLink}`}
@@ -509,6 +521,7 @@ export default function SideBar() {
                         {/* finance navigation */}
                         <Card className={styles.card}>
                             <Card.Header 
+                                style={{ cursor: 'pointer' }}
                                 onClick={() => handleToggle('finance')} 
                                 aria-controls="finance-collapse-text" 
                                 aria-expanded={open.finance}
@@ -525,7 +538,7 @@ export default function SideBar() {
                             <Collapse in={open.finance} style={{ transitionDuration: "0s" }}>
                                 <div id="finance-collapse-text">
                                     <Card.Body className={styles.navigationLinks}>
-                                        <Nav.Item className="mb-3">
+                                        <Nav.Item className="mb-3" title="Make A Sale">
                                             <div 
                                                 onClick={() => navigate('/finance/add-sales')} 
                                                 className={`${location.pathname === "/finance/add-sales" ? styles.activeLink : styles.nonactiveLink}`}
@@ -534,7 +547,7 @@ export default function SideBar() {
                                                 <FaRegCircle size={20} className="me-1" /> Add Sales
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="mb-3">
+                                        <Nav.Item className="mb-3" title="Add Expenses">
                                             <div 
                                                 onClick={() => navigate('/finance/add-expenses')} 
                                                 className={`${location.pathname === "/finance/add-expenses" ? styles.activeLink : styles.nonactiveLink}`}
@@ -543,7 +556,7 @@ export default function SideBar() {
                                                 <FaRegCircle size={20} className="me-1" /> Add Expenses
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="mb-3">
+                                        <Nav.Item className="mb-3" title="Add staff Salary">
                                             <div 
                                                 onClick={() => navigate('/finance/staff-salary')} 
                                                 className={`${location.pathname === "/finance/staff-salary" ? styles.activeLink : styles.nonactiveLink}`}
@@ -552,7 +565,7 @@ export default function SideBar() {
                                                 <FaRegCircle size={20} className="me-1" /> Staff Salary
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="mb-3">
+                                        <Nav.Item className="mb-3" title="Financial Ledger">
                                             <div 
                                                 onClick={() => navigate('/finance/ledger')} 
                                                 className={`${location.pathname === "/finance/ledger" ? styles.activeLink : styles.nonactiveLink}`}
@@ -644,12 +657,13 @@ export default function SideBar() {
                             </Collapse>
                         </Card> */}
 
-                        <Nav.Item className="mt-3">
+                        <Nav.Item className="mt-3" title="Damage and Loss">
                             <Nav.Link
+                                style={{ cursor: 'pointer' }}
                                 onClick={() => navigate('/damage-loss')}
                                 className={` ${location.pathname === "/damage-loss" ? styles.active: styles.nonactive}`}
                             >
-                              <LuClipboardCheck size={25}  className={`${location.pathname === "/damage-loss" ? styles.activeIcon : styles.nonactiveIcon}`} /> <span className={ `me-1 fw-semibold ${location.pathname === "/damage-loss" ? styles.active : styles.nonactive}`} >Damage/Loss</span>
+                              <LuClipboardCheck size={25}  className={`${location.pathname === "/damage-loss" ? styles.activeIcon : styles.nonactiveIcon}`} /> <span className={ `fw-semibold ${location.pathname === "/damage-loss" ? styles.active : styles.nonactive}`} >Damage/Loss</span>
                             </Nav.Link>
                             <Link to={''}></Link>
                         </Nav.Item>

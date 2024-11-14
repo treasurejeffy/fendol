@@ -32,7 +32,7 @@ export default function RouterSwitch() {
             <Route path='store/*' element={<ProtectedRoute><StoreNavigations/></ProtectedRoute>}/>
             <Route path='damage-loss' element={<ProtectedRoute><DamageLoss/></ProtectedRoute>}/>
             <Route path='finance/*' element={<ProtectedRoute><FinanceNavigations/></ProtectedRoute>}/>            
-            <Route path='showcase*' element={<ProtectedRoute><ShowcaseNavigations/></ProtectedRoute>}/>            
+            <Route path='showcase/*' element={<ProtectedRoute><ShowcaseNavigations/></ProtectedRoute>}/>            
         </Routes>
       </Router>
     </Provider>

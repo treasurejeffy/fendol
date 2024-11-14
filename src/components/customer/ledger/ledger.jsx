@@ -18,6 +18,8 @@ const CustomerLedger = () => {
     date: '',
     paymentType: ''
   });
+  const [filteredCustomer, setFilteredCustomer] = useState([]);
+  const [customer, setCustomer] = useState([]);
   const [loader, setLoader] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -42,6 +44,21 @@ const CustomerLedger = () => {
         setLoading(false);
       }
     };
+
+    const fetchCustomers = async () => {
+      try {
+          const response = await Api.get('/customers');
+          if (Array.isArray(response.data.data)) {
+              setCustomer(response.data.data);
+          } else {
+              throw new Error('Expected an array of customers');
+          }
+      } catch (err) {
+          console.log(err.response?.data?.message || 'Failed to fetch data. Please try again.');
+      }
+    };
+
+    fetchCustomers();
     fetchLedgerData();
   }, []);
 
@@ -69,8 +86,25 @@ const CustomerLedger = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFilterData({ ...filterData, [name]: value });
+    setFilterData((prev) => ({ ...prev, [name]: value }));
+
+    // Filter customers based on the input value from the original list of all customers
+    const filteredResults = customer.filter((customer) =>
+      customer.fullName.toLowerCase().includes(value.toLowerCase())
+    );
+    console.log(filteredResults);
+
+    setFilteredCustomer(filteredResults);
   };
+
+
+  // Set the selected name in the input
+  const handleSelectCustomer = (fullName) => {
+    setFilterData({ fullName });
+    setFilteredCustomer([]); // Clear suggestions after selection
+  };
+
+
 
   // filter function
   const handleSave = async(e)=>{  
@@ -212,20 +246,37 @@ const CustomerLedger = () => {
           </main>
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton className="border-0">
-              <Modal.Title className="fw-semibold">Filter Customer Ledger</Modal.Title>
+              <Modal.Title className="fw-semibold">Filter Ledger</Modal.Title>
             </Modal.Header>
             <Modal.Body className="border-0 pt-5">
                 <Form>
-                  <Form.Group className="mb-3 ">
-                    <Form.Label className=" fw-semibold">Filter By Full Name</Form.Label>                   
-                      <Form.Control
-                        type="text"
-                        name="fullName"
-                        placeholder="Enter Full Name"
-                        value={filterData.fullName}
-                        onChange={handleInputChange}
-                        className="py-2 shadow-none border-secondary-subtle border-1"
-                      />               
+                  <Form.Group className="mb-3 ">                  
+                    <Form.Label className="fw-semibold">Filter By Full Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="fullName"
+                      placeholder="Search Name..."
+                      value={filterData.fullName}
+                      onChange={handleInputChange}
+                      className="py-2 shadow-none border-secondary-subtle border-1"
+                    />                    
+
+                    {/* Display suggestions if there are matches */}
+                    {filterData.fullName && filteredCustomer.length > 0 && (
+                      <div className={styles.suggestions_box}>
+                        <ul>
+                          {filteredCustomer.map((customer, index) => (
+                            <li
+                              key={index}
+                              onClick={() => handleSelectCustomer(customer.fullName)}
+                              style={{ cursor: "pointer" }}
+                            >
+                              {customer.fullName}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}             
                   </Form.Group>
 
                   <Form.Group className="mb-3">                    

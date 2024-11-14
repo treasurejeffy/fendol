@@ -127,7 +127,7 @@ const FinanceLedger = () => {
                             <tr key={index}>
                               <td>{formatDate(record.date)}</td>
                               <td>{record.productName}</td>
-                              <td>{record.description || 'No description'}</td>
+                              <td>{record.description ? record.description.slice(0, 60) + (record.description.length > 60 ? '...' : '-') : ''}</td>
                               <td>{record.quantity}</td>
                               <td style={{ color: 'green' }}>{record.credit ? `₦${record.credit}` : '-'}</td>
                               <td style={{ color: 'red' }}>{record.debit ? `₦${record.debit}` : '-'}</td>

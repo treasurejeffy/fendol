@@ -171,26 +171,27 @@ const FreshForm = ({ customers, stages, products}) => {
                     </Form.Select>
                 </Col>
 
-                {/* Stage From */}
+               {/* Stage From */}
                 <Col className="mb-4">
                     <Form.Label className="fw-semibold">Stage From</Form.Label>
                     <Form.Select
-                    name="stageId_from"
-                    required
-                    value={freshData.stageId_from || ''}
-                    onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        name="stageId_from"
+                        required
+                        value={freshData.stageId_from || ''}
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                     >
-                    <option value="" disabled>Select Stage</option>
-                    {stages
-                        .filter(stage => !stage.title.toLowerCase().includes(['fingerlings', 'washing', 'smoking', 'drying'])) // Filter out specific stages
-                        .map((stage, index) => (
-                        <option key={index} value={stage.id}>
-                            {stage.title || 'No Data Yet'}
-                        </option>
-                    ))}
+                        <option value="" disabled>Select Stage</option>
+                        {stages
+                            .filter(stage => !/(harvest|fingerlings|damage)/i.test(stage.title))
+                            .map((stage, index) => (
+                                <option key={index} value={stage.id}>
+                                    {stage.title || 'No Data Yet'}
+                                </option>
+                            ))}
                     </Form.Select>
-                </Col>                              
+                </Col>
+                             
 
                 {/* Total Product Weight */}
                 <Col className="mb-4">

@@ -17,7 +17,7 @@ export default function DamageLoss() {
   useEffect(() => {
     const fetchMoveFishHistory = async () => {
       try {
-        const response = await Api.get('/fish-stages'); 
+        const response = await Api.get('/damage-loss'); 
         setMoveFishHistory(response.data.data); // Assuming the response contains an array of history data
       } catch (error) {
         setError("Error fetching move fish history. Please try again.");
@@ -88,10 +88,10 @@ export default function DamageLoss() {
                       <tr key={index}>
                         <td>{formattedDate}</td>
                         <td>{history.fromStageTitle}</td>
-                        <td>{history.toStageTitle}</td>
+                        <td>{history.stage_from}</td>
                         <td>{history.speciesName}</td>
-                        <td>{history.actual_quantity}</td>
-                        <td>{history.remarks ? history.remarks.slice(0, 40) + (history.remarks.length > 40 ? '...' : '') : ''}</td>
+                        <td>{history.quantity}</td>
+                        <td>{history.description ? history.description.slice(0, 60) + (history.description.length > 60 ? '...' : '') : ''}</td>
                       </tr>
                     );
                   })}
