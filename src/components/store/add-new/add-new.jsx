@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header';
 import Api from '../../shared/api/apiLink';
+import { useNavigate } from 'react-router-dom';
 
 const AddStock = () => {
     const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const AddStock = () => {
         unit: '',
         threshold: Number,
     });
+    const navigate = useNavigate();
     const [loader, setLoader] = useState(false);
 
     const handleInputChange = (e) => {
@@ -31,6 +33,12 @@ const AddStock = () => {
             // Replace 'YOUR_API_ENDPOINT' with your actual endpoint URL
             const response = await Api.post('/create-store', formData);
 
+            setFormData({
+                name: '',
+                unit: '',
+                threshold: Number,
+            });
+
             toast.update(loadingToast, {
                 render: "Stock added successfully!",
                 type: "success",
@@ -39,11 +47,8 @@ const AddStock = () => {
                 className: 'dark-toast'
             });
 
-            setFormData({
-                name: '',
-                unit: '',
-                threshold: Number,
-            });
+            navigate('/store/view-all');
+          
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message ||  "Error adding stock. Please try again.",

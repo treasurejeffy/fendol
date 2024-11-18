@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React,{useState} from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LogIn from "./shared/login/login";
 import ProtectedRoute from "./protect-routes";
 import { Provider } from "react-redux";
@@ -17,13 +17,17 @@ import ShowcaseNavigations from "./showcase/showcaseRoute";
 import { ToastContainer } from 'react-toastify';
 
 export default function RouterSwitch() {
+  const [role, setRole]= useState(null);
+  if(role === null){
+    setRole(sessionStorage.getItem('role'));    
+  }
   return (
     <Provider store={store}>
       <Router>
       <ToastContainer />
         <Routes>
             < Route path="/" element={<LogIn/>}/>                       
-            <Route path='admin/*' element={<ProtectedRoute><AdminNavigations/></ProtectedRoute> }/>
+            {role === 'super_admin' && (<Route path='admin/*' element={<ProtectedRoute><AdminNavigations/></ProtectedRoute> }/>)}
             <Route path='customer/*' element={<ProtectedRoute><CustomerNavigations/></ProtectedRoute> }/>
             <Route path='ponds/*' element={<ProtectedRoute><ProductStagesNavigations/></ProtectedRoute>}/>
             <Route path='process-control/*' element={<ProtectedRoute><ProcessNavigations/></ProtectedRoute> }/>

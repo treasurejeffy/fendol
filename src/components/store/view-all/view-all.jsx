@@ -422,7 +422,7 @@ export default function UpdateStoreInventory() {
 
                 {/* Quantity */}
                 <Form.Group className="mb-4 row">
-                  <Form.Label className="col-4 fw-semibold">Quantity(KG)</Form.Label>
+                  <Form.Label className="col-4 fw-semibold">Quantity</Form.Label>
                   <div className="col-8 d-flex align-items-center">
                     <Form.Control 
                       type="number" 

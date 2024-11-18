@@ -6,9 +6,11 @@ import { Form, Button } from 'react-bootstrap';
 import styles from '../product-stages.module.scss';
 import { toast, ToastContainer } from 'react-toastify';
 import Api from "../../shared/api/apiLink";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateStages() {
     const [loader, setLoader] = useState(false);
+    const navigate = useNavigate();
 
     // Form fields state
     const [formData, setFormData] = useState({
@@ -40,20 +42,21 @@ export default function CreateStages() {
         try {
             const response = await Api.post('/fish-stage', formData);
 
+            // Reset form or andle success as needed
+            setFormData({
+                title: "",
+                description: "",
+            });
             // After a successful API call
             toast.update(loadingToast, {
                 render: "Created Pond successfully!",
                 type: "success", // Use string for type
                 isLoading: false,
-                autoClose: 3000,
+                autoClose: 5000,
                 className: 'dark-toast'
             });
-
-            // Reset form or handle success as needed
-            setFormData({
-                title: "",
-                description: "",
-            });
+            
+           navigate('/ponds/view-all-ponds');
 
         } catch (error) {
             toast.update(loadingToast, {

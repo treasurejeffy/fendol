@@ -64,7 +64,11 @@ export default function LogIn() {
             setLoginData({ email: '', password: '' });
     
             // Navigate to the desired page after success
-            navigate('/admin/add-new-admin');
+           if (role === 'super_admin') {
+                navigate('/admin/add-new-admin');
+           } else {
+                navigate('/customer/view-all');
+           } 
           } else {
             // Handle failure
             throw new Error("Login failed");

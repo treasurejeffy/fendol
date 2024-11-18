@@ -61,21 +61,23 @@ const AddSpecies = () => {
         try {
             // Make the actual API call to post species data
             const response = await Api.post('/species', formData);
-    
+            
+            setFormData({
+                speciesName: '',
+                description: '',
+            });
+
             // After a successful API call
             toast.update(loadingToast, {
                 render: "Species added successfully!",
                 type: "success",
                 isLoading: false,
-                autoClose: 3000,
+                autoClose: 5000,
                 className: 'dark-toast'
-            });
-            // Reset form after successful submission
-            setFormData({
-                speciesName: '',
-                description: '',
-            });
+            });          
+            
             fetchStages();
+            setView(!view)
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error adding species. Please try again.",

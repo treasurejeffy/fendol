@@ -70,6 +70,12 @@ export default function CreateProcess() {
         try {
             const response = await Api.post('/process-stage', formData);
 
+            // Reset form or handle success as needed
+            setFormData({
+                title: "",
+                description: "",
+            });
+
             // After a successful API call
             toast.update(loadingToast, {
                 render: "Created Process successfully!",
@@ -78,14 +84,9 @@ export default function CreateProcess() {
                 autoClose: 3000,
                 className: 'dark-toast'
             });
-
-            // Reset form or handle success as needed
-            setFormData({
-                title: "",
-                description: "",
-            });
-            fetchStages();
             
+            fetchStages();
+            setView(!view);
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error creating stage. Please try again.",
@@ -172,16 +173,19 @@ export default function CreateProcess() {
                                 <ToastContainer/> 
                                 <div className="d-flex justify-content-between"><h4 className="mt-3 mb-5">Create Process</h4> <span style={{cursor: 'pointer'}} onClick={()=>{setView(!view)}} className="border-1 mt-3 me-2 text-decoration-underline text-muted fw-semibold">View Process</span></div>
                                 <Form.Label className="fw-semibold">Name</Form.Label>
-                                <Form.Control
-                                    placeholder="Enter process name Eg. washing, smoking, drying..."
-                                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                    type="text"
-                                    name="title" // Change this to match the key in formData
-                                    value={formData.title}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                        
+                                <Form.Select
+                                className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                name="title"
+                                value={formData.title}
+                                onChange={handleInputChange}
+                                required
+                                >
+                                <option value="" disabled>Select Process</option>
+                                    <option value="washing">Washing</option>
+                                    <option value="smoking">Smoking</option>
+                                    <option value="drying">Drying</option>
+                                </Form.Select>
+
                                 <Form.Label className="fw-semibold fs-6 mt-4">Description</Form.Label>
                                 <Form.Control
                                     as="textarea"

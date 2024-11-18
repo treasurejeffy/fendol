@@ -172,7 +172,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
 
                 {/* Stage From */}
                 <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Stage From</Form.Label>
+                    <Form.Label className="fw-semibold">Pond From</Form.Label>
                     <Form.Select
                         name="stageId_from"
                         required
@@ -180,7 +180,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                         onChange={handleInputChange}
                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
                     >
-                        <option value="" disabled>Select Stage</option>
+                        <option value="" disabled>Select Pond</option>
                         {stages
                             .filter(stage => stage.title.toLowerCase().includes('fingerlings'))
                             .map((stage, index) => (

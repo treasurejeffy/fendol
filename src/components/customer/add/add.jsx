@@ -6,9 +6,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header';
 import Api from '../../shared/api/apiLink';
+import {useNavigate} from 'react-router-dom';
 
 const AddCustomer = () => {
     const [loader, setLoader] = useState(false);
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         fullName: "",
         phone: "",
@@ -33,6 +35,13 @@ const AddCustomer = () => {
             const response = await Api.post('/customers', formData);
             const { message } = response.data;
 
+            setFormData({
+                fullName: "",
+                phone: "",
+                category: "",
+                address: ""
+            });
+
             toast.update(loadingToast, {
                 render: message || "Customer added successfully!",
                 type: "success",
@@ -41,12 +50,8 @@ const AddCustomer = () => {
                 className: 'dark-toast'
             });
 
-            setFormData({
-                fullName: "",
-                phone: "",
-                category: "",
-                address: ""
-            });
+            navigate('/customer/view-all');
+            
         } catch (error) {
             const errorMessage = error.response?.data?.message || "Error adding customer. Please try again.";
             toast.update(loadingToast, {

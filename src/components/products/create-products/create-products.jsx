@@ -6,38 +6,41 @@ import { Col, Form, Row, Button } from 'react-bootstrap';
 import styles from '../product.module.scss';
 import { toast, ToastContainer } from 'react-toastify';
 import Api from "../../shared/api/apiLink";
-
-// Function to format numbers with commas
-const formatNumberWithCommas = (number) => {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-};
-
-// Function to remove commas from the formatted number
-const removeCommas = (number) => {
-    return number.toString().replace(/,/g, "");
-};
+import { useNavigate } from "react-router-dom";
 
 export default function CreateProducts() {
     const [loader, setLoader] = useState(false);
+    const navigate = useNavigate();
 
     // Form fields state
     const [formData, setFormData] = useState({
         productName: "",
-        productWeight: "",
+        productWeight: null,
         unit: "",
-        basePrice: ''
+        basePrice: ""
     });
+
+    // Function to format numbers with commas
+    const formatNumberWithCommas = (value) => {
+        if (!value) return "";
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    // Function to remove commas from formatted numbers
+    const removeCommas = (value) => {
+        return value ? value.toString().replace(/,/g, "") : "";
+    };
 
     // Handle form input change
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
-        // If changing basePrice, format with commas for display
         if (name === "basePrice") {
-            const formattedValue = value ? formatNumberWithCommas(removeCommas(value)) : "";
+            // Ensure only numeric input for basePrice
+            const numericValue = value.replace(/[^\d]/g, "");
             setFormData({
                 ...formData,
-                [name]: formattedValue
+                basePrice: formatNumberWithCommas(numericValue)
             });
         } else {
             setFormData({
@@ -64,6 +67,14 @@ export default function CreateProducts() {
 
             const response = await Api.post('/product', formDataToSubmit);
 
+            // Reset form or handle success as needed
+            setFormData({
+                productName: "",
+                productWeight: "",
+                unit: "",
+                basePrice: ""
+            });
+
             // After a successful API call
             toast.update(loadingToast, {
                 render: "Created Product successfully!",
@@ -73,13 +84,7 @@ export default function CreateProducts() {
                 className: 'dark-toast'
             });
 
-            // Reset form or handle success as needed
-            setFormData({
-                productName: "",
-                productWeight: "",
-                unit: "",
-                basePrice: ""
-            });
+            navigate('/products/view-all');
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error creating product. Please try again.",
@@ -126,7 +131,7 @@ export default function CreateProducts() {
                                     <Form.Control
                                         placeholder="Enter product weight"
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        type="text"
+                                        type="number"
                                         name="productWeight"
                                         value={formData.productWeight}
                                         onChange={handleInputChange}
@@ -152,7 +157,7 @@ export default function CreateProducts() {
                                     <Form.Control
                                         placeholder="Enter base price"
                                         className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
-                                        type="text"
+                                        type="text" // Text to allow commas
                                         name="basePrice"
                                         value={formData.basePrice}
                                         required

@@ -5,6 +5,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import SideBar from '../../shared/sidebar/sidebar'; 
 import Header from '../../shared/header/header'; 
 import Api from '../../shared/api/apiLink';
+import { useNavigate } from 'react-router-dom';
 
 export default function MoveFish() {
     const [stages, setStages] = useState([]);
@@ -21,6 +22,7 @@ export default function MoveFish() {
         actual_quantity: null,
         remarks: '',
     });
+    const navigate = useNavigate();
     const [showSecondForm, setShowSecondForm] = useState(false);
     const [loader, setLoader] = useState(false);
     const [getEndpoint, setGetEndpoint] = useState('/wash-quantity');
@@ -107,27 +109,21 @@ export default function MoveFish() {
     
         try {
             const response = await Api.post('/move-fish', moveFishData);
-            
-            toast.update(loadingToast, {
-                render: "Fish moved successfully!",
-                type: "success",
-                isLoading: false,
-                autoClose: 3000,
-            });
-    
             // Reset the form data
             setMoveFishData({
-                stageId_from: [],
+                stageId_from: '',
                 stageId_to: '',
                 speciesId: '',
                 actual_quantity: '',
                 remarks: '',
             });
-    
-            // Toggle showSecondForm if moved to "washing"
-            if (selectedTitle.toLowerCase() === "washing") {
-                setShowSecondForm(!showSecondForm);
-            }
+
+            toast.update(loadingToast, {
+                render: "Fish moved successfully!",
+                type: "success",
+                isLoading: false,
+                autoClose: 3000,
+            });           
             
         } catch (error) {
             toast.update(loadingToast, {
@@ -168,7 +164,7 @@ export default function MoveFish() {
                                         <option value="" disabled>Choose Pond</option>
                                         {stages && stages.length > 0 ? (
                                             stages
-                                            .filter((stage) => !['damage', 'loss', 'harvest'].includes(stage.title.toLowerCase())) // Exclude unwanted stages
+                                            .filter((stage) => !['damages','damage', 'loss','harvest', 'harvests'].includes(stage.title.toLowerCase())) // Exclude unwanted stages
                                             .map((stage, index) => (
                                                 <option value={stage.id} key={index} data-title={stage.title}>
                                                 {stage.title}

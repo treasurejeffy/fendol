@@ -10,17 +10,22 @@
   width: $sidebar-width;
 }
 
+.create_form {
+  height: 100vh; // Full viewport height
+  padding: 40px;
+  background-color: #FAFCFF;
 
-.create_form{
-    padding: 40px 40px;
-    background-color:  #FAFCFF;
-    h4{
-        font-size: 20px;
-        font-weight: 500;
-        line-height: 30px;
-        color: #2E3135;        
-    }
+
+  h4 {
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 30px;
+      color: #2E3135;
+  }
 }
+
+
+
 
 .inputs{
   &::placeholder {

@@ -6,10 +6,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header';
 import Api from '../../shared/api/apiLink'
+import { useNavigate } from 'react-router-dom';
 
 const AddFish = () => {
   const [stages, setStages] = useState([]);
   const [fishType, setfishType] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStages = async () => {
@@ -84,20 +86,24 @@ const AddFish = () => {
         try {
             const response = await Api.post('/fish', formData);
 
-            // After a successful API call
-            toast.update(loadingToast, {
-                render: "Fish added successfully!",
-                type: "success", // Use string for type
-                isLoading: false,
-                autoClose: 3000,
-                className: 'dark-toast'
-            });
-            // Reset form or handle success as needed
+               // Reset form or handle success as needed
             setFormData({
                 stageId: '',
                 quantity: '',        
                 speciesId: ''
             });
+
+            // After a successful API call
+            toast.update(loadingToast, {
+                render: "Fish added successfully!",
+                type: "success", // Use string for type
+                isLoading: false,
+                autoClose: 5000,
+                className: 'dark-toast'
+            });
+            
+            navigate('/ponds/view-add-fish-history');
+
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message ||  "Error adding fish. Please try again.",

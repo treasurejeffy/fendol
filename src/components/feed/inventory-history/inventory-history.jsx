@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from "react";
 import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
-import { Spinner, Alert, Table } from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../feed.module.scss';
-import Api from '../../shared/api/apiLink';
+import { Spinner, Alert } from "react-bootstrap";
 import { FaExclamationTriangle } from "react-icons/fa";
-import ReactPaginate from 'react-paginate'; // Make sure to install this library using `npm install react-paginate`
+import ReactPaginate from 'react-paginate';
+import Api from '../../shared/api/apiLink';
 
 export default function InventoryHistory() {
   const [inventoryHistory, setInventoryHistory] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(0); // Page starts from 0 for ReactPaginate
   const itemsPerPage = 10; // Items per page
+  const [selectedDate, setSelectedDate] = useState("");
 
   useEffect(() => {
     const fetchInventoryHistory = async () => {
       try {
         const response = await Api.get('/feeds-histories');
         setInventoryHistory(response.data.data); // Assuming the response contains an array of history data
+        setFilteredData(response.data.data); // Set the initial filtered data to all data
       } catch (error) {
         setError("Error fetching inventory history. Please try again.");
       } finally {
@@ -32,23 +35,38 @@ export default function InventoryHistory() {
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-  
     return `${day}/${month}/${year}`;
   };
 
-  // Handle pagination changes
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
+  const handleDateChange = (event) => {
+    const date = event.target.value;
+    setSelectedDate(date);
+
+    if (date) {
+      const filtered = inventoryHistory.filter((history) => {
+        const createdDate = new Date(history.createdAt);
+        const formattedDate = createdDate.toISOString().split('T')[0]; // Get the date in YYYY-MM-DD format
+        return formattedDate === date; // Filter by the selected date
+      });
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(inventoryHistory); // Reset if no date is selected
+    }
   };
 
-  // Determine which items to show for the current page
+  // Calculate pagination data
   const offset = currentPage * itemsPerPage;
-  const currentItems = inventoryHistory.slice(offset, offset + itemsPerPage);
+  const paginatedData = filteredData.slice(offset, offset + itemsPerPage);
+  const pageCount = Math.ceil(filteredData.length / itemsPerPage);
+
+  const handlePageClick = (event) => {
+    setCurrentPage(event.selected);
+  };
 
   return (
-    <section className={`d-none d-lg-block ${styles.body}`}>
+    <section className={`d-none d-lg-block ${styles.body}`} >
       <div className="sticky-top">
         <Header />
       </div>
@@ -61,8 +79,22 @@ export default function InventoryHistory() {
         {/* Content */}
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
-            <h4 className="mt-3 mb-5">Feed Inventory History</h4>
-            
+            <div className="d-flex justify-content-between mt-3 ">
+              <h4 className="mb-4">Feed Inventory History</h4>
+              
+              {/* Date Picker for filtering */}
+              <div className="mb-4 d-flex gap-2">
+                <span className="fw-semibold fs-6 mt-1">Filter</span>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                  className="form-control"
+                  placeholder="Filter By Date"
+                />
+              </div>
+            </div>
+
             {/* Table */}
             {loading ? (
               <div className="text-center my-5">
@@ -70,16 +102,24 @@ export default function InventoryHistory() {
               </div>
             ) : error ? (
               <div className="d-flex justify-content-center">
-                <Alert variant="danger" className="text-center w-50 py-5 my-5">
-                  <FaExclamationTriangle size={30}/> <span>{error}</span>
+                <Alert variant="danger" className="text-center w-50 py-5">
+                  <FaExclamationTriangle size={40} />
+                  <span className="fw-semibold">{error}</span>
+                </Alert>
+              </div>
+            ) : filteredData.length === 0 ? (
+              <div className="d-flex justify-content-center">
+                <Alert variant="info" className="text-center w-50 py-5">
+                  <FaExclamationTriangle size={40} />
+                  <span className="fw-semibold">No data available.</span>
                 </Alert>
               </div>
             ) : (
               <>
-                <table responsive className={styles.styled_table}>
+                <table className={styles.styled_table}> 
                   <thead>
-                    <tr className="fw-semibold">
-                      <th>DATE CREATED</th>                    
+                    <tr>
+                      <th>DATE CREATED</th>
                       <th>FEED NAME</th>
                       <th>FEED TYPE</th>
                       <th>POND</th>
@@ -90,11 +130,11 @@ export default function InventoryHistory() {
                     </tr>
                   </thead>
                   <tbody>
-                    {currentItems.map((history, index) => {
-                      const formattedCreatedAt = formatDate(history.createdAt);
+                    {paginatedData.map((history, index) => {
+                      const formattedDate = formatDate(history.createdAt);
                       return (
                         <tr key={index}>
-                          <td>{formattedCreatedAt}</td>
+                          <td>{formattedDate}</td>
                           <td>{history.feedDetails.feedName}</td>
                           <td>{history.feedDetails.feedType}</td>
                           <td>{history.stage}</td>
@@ -119,27 +159,27 @@ export default function InventoryHistory() {
                     })}
                   </tbody>
                 </table>
-
-                {/* ReactPaginate for pagination */}
-                <ReactPaginate
-                  previousLabel={"<"}
-                  nextLabel={">"}
-                  breakLabel={"..."}
-                  pageCount={Math.ceil(inventoryHistory.length / itemsPerPage)}
-                  marginPagesDisplayed={2}
-                  pageRangeDisplayed={3}
-                  onPageChange={handlePageChange}
-                  containerClassName={"pagination justify-content-center mt-4"}
-                  pageClassName={"page-item"}
-                  pageLinkClassName={"page-link"}
-                  previousClassName={"page-item"}
-                  previousLinkClassName={"page-link"}
-                  nextClassName={"page-item"}
-                  nextLinkClassName={"page-link"}
-                  breakClassName={"page-item"}
-                  breakLinkClassName={"page-link"}
-                  activeClassName={"active"}
-                />
+                <div className="d-flex justify-content-center mt-4">
+                  <ReactPaginate
+                    previousLabel={"<"}
+                    nextLabel={">"}
+                    breakLabel={"..."}
+                    pageCount={pageCount}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={3}
+                    onPageChange={handlePageClick}
+                    containerClassName={"pagination"}
+                    pageClassName={"page-item"}
+                    pageLinkClassName={"page-link"}
+                    previousClassName={"page-item"}
+                    previousLinkClassName={"page-link"}
+                    nextClassName={"page-item"}
+                    nextLinkClassName={"page-link"}
+                    breakClassName={"page-item"}
+                    breakLinkClassName={"page-link"}
+                    activeClassName={"active"}
+                  />
+                </div>
               </>
             )}
           </main>        

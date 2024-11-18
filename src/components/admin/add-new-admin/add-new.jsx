@@ -7,9 +7,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header';
 import Api from '../../shared/api/apiLink';
+import { useNavigate } from 'react-router-dom';
+
 
 const AddNew = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
     const [loader, setLoader] = useState(false);
     const [formData, setFormData] = useState({
         fullName: "",
@@ -41,16 +44,7 @@ const AddNew = () => {
     
             // Extract the response data
             const { message, admin } = response.data; // Adjust based on your API response
-    
-            // After a successful API call
-            toast.update(loadingToast, {
-                render: message || "Created Admin successfully!", // Use the message from response if available
-                type: "success", // Use string for type
-                isLoading: false,
-                autoClose: 3000,
-                className: 'dark-toast'
-            });
-    
+
             // Reset form or handle success as needed
             setFormData({
                 fullName: "",
@@ -58,6 +52,18 @@ const AddNew = () => {
                 password: "",
                 role: ""
             });
+    
+            // After a successful API call
+            toast.update(loadingToast, {
+                render: message || "Created Admin successfully!", // Use the message from response if available
+                type: "success", // Use string for type
+                isLoading: false,
+                autoClose: 5000,
+                className: 'dark-toast'
+            });
+
+            navigate('/admin/view-all');
+                
         } catch (error) {
             // Log the error response for debugging
             console.error("Error creating admin:", error);

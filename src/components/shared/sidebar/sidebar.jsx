@@ -41,7 +41,7 @@ export default function SideBar() {
             setOpen(prev => ({ ...prev, notification: true }));
         }
         if(role === null){
-            setRole(sessionStorage.getItem('role'));
+            setRole(sessionStorage.getItem('role'));    
         }        
     }, [location.pathname]);
 
@@ -49,11 +49,13 @@ export default function SideBar() {
         setOpen(prev => ({ ...prev, [key]: !prev[key] }));
     };
 
+    console.log(role);
+
     return (
         <aside>
             <section className={`position-fixed d-none d-lg-block ${styles.sidebar}`}>
                 <Nav className={`flex-column ${styles.navs}`}>
-                    <Nav.Item className="mt-3">
+                    {role === 'super_admin' && (<Nav.Item className="mt-3">
                         <Nav.Link
                             onClick={() => navigate('#/dashboard')}
                             className={`${location.pathname === "#/dashboard" ? styles.activeLink : styles.nonactiveLink}`}
@@ -61,11 +63,12 @@ export default function SideBar() {
                             <IoGridOutline size={25} className="me-1 text-dark" /> <span className={styles.title}>Dashboard</span>
                         </Nav.Link>
                         <Link to={''}></Link>
-                    </Nav.Item>
+                    </Nav.Item>)}
                     <div className={`mb-4 ${styles.navigationDropdown}`}>
 
-                        {/* Admin navigations */}
-                        <Card className={styles.card}>
+                         {/* Admin navigations */}
+                       {role === 'super_admin' && (
+                         <Card className={styles.card}>
                             <Card.Header
                                 onClick={() => handleToggle('admin')}
                                 aria-controls="admin-collapse-text"
@@ -116,7 +119,9 @@ export default function SideBar() {
                                 </div>
                             </Collapse>
                         </Card>
-                        
+                     
+                       )}
+
                         {/* Customer navigation */}
                         <Card className={styles.card}>
                             <Card.Header
@@ -399,16 +404,7 @@ export default function SideBar() {
                                             >
                                                 <FaRegCircle size={20} className="me-1" /> Whole Showcase
                                             </div>
-                                        </Nav.Item>
-                                        <Nav.Item className="mb-3">
-                                            <div 
-                                                onClick={() => navigate('/showcase/place-order')} 
-                                                className={`${location.pathname === "/sshowcase/place-order"? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> Package History
-                                            </div>
-                                        </Nav.Item>
+                                        </Nav.Item>                                        
                                     </Card.Body>
                                 </div>
                             </Collapse>
@@ -556,15 +552,17 @@ export default function SideBar() {
                                                 <FaRegCircle size={20} className="me-1" /> Add Expenses
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="mb-3" title="Add staff Salary">
-                                            <div 
-                                                onClick={() => navigate('/finance/staff-salary')} 
-                                                className={`${location.pathname === "/finance/staff-salary" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={20} className="me-1" /> Staff Salary
-                                            </div>
-                                        </Nav.Item>
+                                        {role === 'super_admin' && (
+                                            <Nav.Item className="mb-3" title="Add staff Salary">
+                                                <div 
+                                                    onClick={() => navigate('/finance/staff-salary')} 
+                                                    className={`${location.pathname === "/finance/staff-salary" ? styles.activeLink : styles.nonactiveLink}`}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
+                                                    <FaRegCircle size={20} className="me-1" /> Staff Salary
+                                                </div>
+                                            </Nav.Item>
+                                        )}
                                         <Nav.Item className="mb-3" title="Financial Ledger">
                                             <div 
                                                 onClick={() => navigate('/finance/ledger')} 

@@ -160,8 +160,8 @@ export default function ViewAll() {
 
             {!loading && !error && (
               <div>
-                <table className={styles.styled_table}>
-                  <thead>
+                <table className={styles.styled_tables}>
+                  <thead className={styles.theaders}>
                     <tr>
                       <th>DATE</th>
                       <th>NAME</th>
@@ -182,7 +182,6 @@ export default function ViewAll() {
                     ))}
                   </tbody>
                 </table>
-
                 <div className="d-flex justify-content-center mt-3">
                   <ReactPaginate
                     previousLabel={<FaArrowLeft />}

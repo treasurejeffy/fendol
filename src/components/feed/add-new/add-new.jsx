@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header';
 import Api from '../../shared/api/apiLink';
+import { useNavigate } from 'react-router-dom';
 const AddFeed = () => {
     const [formData, setFormData] = useState({
         feedName: '',
@@ -14,6 +15,7 @@ const AddFeed = () => {
         threshold: Number,
         weightPerBag: null
     });
+    const navigate = useNavigate();
     const [loader, setLoader] = useState(false);
 
     const handleInputChange = (e) => {
@@ -42,15 +44,7 @@ const AddFeed = () => {
             // Make the actual API call
             const response = await Api.post('/create-feed', formData);
 
-            // After a successful API call
-            toast.update(loadingToast, {
-                render: "Feed added successfully!",
-                type: "success",
-                isLoading: false,
-                autoClose: 3000,
-                className: 'dark-toast'
-            });
-            // Reset form or handle success as needed
+             // Reset form or handle success as needed
             setFormData({
                 feedName: '',
                 unit: '',
@@ -58,6 +52,16 @@ const AddFeed = () => {
                 threshold: Number,
                 weightPerBag: null
             });
+            // After a successful API call
+            toast.update(loadingToast, {
+                render: "Feed added successfully!",
+                type: "success",
+                isLoading: false,
+                autoClose: 5000,
+                className: 'dark-toast'
+            });
+           
+            navigate('/feed/view-all');
         } catch (error) {
             toast.update(loadingToast, {
                 render:error.response?.data?.message || "Error adding feed. Please try again.",
