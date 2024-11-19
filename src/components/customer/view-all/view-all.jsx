@@ -277,7 +277,7 @@ export default function ViewAll() {
           )}
         </Modal.Body>
         <Modal.Footer className="border-0 d-flex justify-content-end mt-5">
-          <Button variant="dark" className="text-white" onClick={handleSave}>
+          <Button variant="dark"  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} onClick={handleSave}>
             Save Changes
           </Button>
         </Modal.Footer>

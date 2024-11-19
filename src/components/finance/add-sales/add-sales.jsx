@@ -78,7 +78,7 @@ const AddSales = () => {
                                     <Form.Select
                                         value={salesType || ''}
                                         onChange={(e) => setSalesType(e.target.value)}
-                                        className="bg-light shadow-none border-secondary-subtle border-1"
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     >
                                         <option value="" disabled>Select Sales Type</option>
                                         <option value="Dry Fish">Dry Fish</option>
@@ -98,7 +98,7 @@ const AddSales = () => {
                                     <Form.Select
                                         value={salesType || ''}
                                         onChange={(e) => setSalesType(e.target.value)}
-                                        className="bg-light shadow-none border-secondary-subtle border-1 p-3"
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     >
                                         <option value="" disabled>Select Sales Type</option>
                                         <option value="Dry Fish">Dry Fish</option>

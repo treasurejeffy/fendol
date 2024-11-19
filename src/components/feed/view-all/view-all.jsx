@@ -352,7 +352,7 @@ export default function UpdateFeedInventory() {
                   type="text" 
                   readOnly 
                   defaultValue={selectedProduct?.feedName} 
-                  className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                  className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                 />
               </div>
             </Form.Group>
@@ -365,7 +365,7 @@ export default function UpdateFeedInventory() {
                   type="text" 
                   readOnly 
                   defaultValue={selectedProduct?.feedType} 
-                  className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                  className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                 />
               </div>
             </Form.Group>
@@ -382,7 +382,7 @@ export default function UpdateFeedInventory() {
                       required
                       value={noOfBag ?? ''} // Shows empty string if quantity is null
                       onChange={(e) => setNoOfBag(Number(e.target.value) || null)} 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                       placeholder="Enter number of bags" 
                     />
                   </div>
@@ -396,7 +396,7 @@ export default function UpdateFeedInventory() {
                       type="number" 
                       readOnly
                       value={noOfBag * selectedProduct?.weightPerBag || 0} // Shows empty string if quantity is null                    
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                       placeholder="Show Quantity (kg)" 
                     />
                   </div>
@@ -415,7 +415,7 @@ export default function UpdateFeedInventory() {
                         setFeedPrice(value);
                       }} 
                       placeholder="Price Bought" 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                     />
                   </div>
                 </Form.Group>
@@ -434,7 +434,7 @@ export default function UpdateFeedInventory() {
                       required
                       value={stage}
                       onChange={(e) => setStage(e.target.value)}
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`}
                     >
                        <option value="" disabled>Choose Pond</option>
                         {!stages ? (
@@ -458,7 +458,7 @@ export default function UpdateFeedInventory() {
                       type="number" 
                       value={quantityUsed ?? ''} // Shows empty string if quantity is null
                       onChange={(e) => setQuantityUsed(Number(e.target.value) || null)} 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                       placeholder="Quantity" 
                       min={'0'}
                     />
@@ -480,7 +480,7 @@ export default function UpdateFeedInventory() {
                       required 
                       value={thresholdValue ?? ''} // Shows empty string if quantity is null
                       onChange={(e) => setThresholdValue(Number(e.target.value) || null)} 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                     />
                   </div>
                 </Form.Group>
@@ -493,7 +493,7 @@ export default function UpdateFeedInventory() {
                       type="text" 
                       readOnly 
                       defaultValue={selectedProduct?.unit} 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                     />
                   </div>
                 </Form.Group>
@@ -509,7 +509,7 @@ export default function UpdateFeedInventory() {
                       defaultValue={selectedProduct?.weightPerBag} 
                       value={weightPerBag ?? ''} // Shows empty string if quantity is null
                       onChange={(e) => setWeightPerBag(Number(e.target.value) || null)} 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                     />
                   </div>
                 </Form.Group>
@@ -518,7 +518,7 @@ export default function UpdateFeedInventory() {
           </Modal.Body>
 
           <Modal.Footer className="mt-5 mb-3 border-0">
-            <Button className={`px-5 btn-dark fw-semibold`} onClick={handleSaveClick}>
+            <Button className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} onClick={handleSaveClick}>
               {modalType === 'add' ? 'Top Up Feed' : modalType === 'remove' ? 'Remove Feed' : 'Edit Feed'}
             </Button>
             <ToastContainer /> {/* Include ToastContainer for notifications */}

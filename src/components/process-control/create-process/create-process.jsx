@@ -174,7 +174,7 @@ export default function CreateProcess() {
                                 <div className="d-flex justify-content-between"><h4 className="mt-3 mb-5">Create Process</h4> <span style={{cursor: 'pointer'}} onClick={()=>{setView(!view)}} className="border-1 mt-3 me-2 text-decoration-underline text-muted fw-semibold">View Process</span></div>
                                 <Form.Label className="fw-semibold">Name</Form.Label>
                                 <Form.Select
-                                className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                 name="title"
                                 value={formData.title}
                                 onChange={handleInputChange}
@@ -193,12 +193,12 @@ export default function CreateProcess() {
                                     value={formData.description}
                                     required
                                     onChange={handleInputChange}
-                                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     style={{ height: '200px' }}
                                 />
                                 
                                 <div className="d-flex justify-content-end my-4">
-                                    <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
+                                    <Button className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} disabled={loader} type="submit">
                                         {loader ? (
                                         ' Creating...'
                                             

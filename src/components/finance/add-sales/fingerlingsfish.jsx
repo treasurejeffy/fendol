@@ -156,7 +156,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                         required
                         value={fingerlingsData.productName || ''}
                         onChange={handleProductSelect}
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
                         <option value="" disabled>Select Fingerlings Product</option>
                         {products
@@ -178,7 +178,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                         required
                         value={fingerlingsData.stageId_from || ''}
                         onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
                         <option value="" disabled>Select Pond</option>
                         {stages
@@ -202,7 +202,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                         min="0"
                         required
                         onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
 
@@ -216,7 +216,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                             name="discount"
                             value={fingerlingsData.discount || ''}                
                             onChange={handleInputChange}
-                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} pe-5`} 
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`} 
                         />
                         <span className="position-absolute end-0 top-50 translate-middle-y pe-2">₦</span>
                     </div>
@@ -230,7 +230,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                         value={fingerlingsData.category || ''}
                         onChange={handleInputChange}
                         required
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
                         <option value="" disabled>Select Category</option>
                         <option value="Marketer">Marketer</option>
@@ -250,7 +250,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                                 value={fingerlingsData.fullName || ''}
                                 onChange={handleSearchChange}
                                 style={{ width: '100%' }} 
-                                className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                             />
                             {fingerlingsData.fullName && filteredCustomer.length > 0 && (
                                 <div className={`${styles.suggestions_box}`}>
@@ -276,7 +276,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                     name="description"
                     value={fingerlingsData.description || ''}
                     onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
 
@@ -287,7 +287,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                     name='paymentType'
                     value={fingerlingsData.paymentType || ''}
                     onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
                     <option value="" disabled>Select Payment Type</option>
                     <option value="Cash">Cash</option>
@@ -306,7 +306,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                     name="totalPrice"
                     value={fingerlingsData.totalPrice ? `₦${new Intl.NumberFormat().format(fingerlingsData.totalPrice)}` : ''}
                     readOnly
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
 
@@ -315,7 +315,7 @@ const FingerlingsForm = ({ customers, stages, products}) => {
                 <Button
                     variant='dark'
                     disabled={loader}
-                    className='fw-semibold py-2 px-5 mb-3'
+                    className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
                     type='submit'
                 >
                     {loader ? ' Adding Sale...' : 'Add Sale'}

@@ -153,7 +153,7 @@ const SalesForm = ({ customers, stages, products}) => {
                         required
                         value={dryData.productName || ''}
                         onChange={handleProductSelect}
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
                         <option value="" disabled>Select Product</option>
                         {products
@@ -184,7 +184,7 @@ const SalesForm = ({ customers, stages, products}) => {
                         value={dryData.quantity || ''}
                         required
                         onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
 
@@ -198,7 +198,7 @@ const SalesForm = ({ customers, stages, products}) => {
                         value={dryData.quantityUsedToPack || ''}
                         min="0"
                         onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
 
@@ -211,7 +211,7 @@ const SalesForm = ({ customers, stages, products}) => {
                         name="productWeight"
                         value={dryData.productWeight || ''}
                         readOnly
-                        className={`py-2 bg-light-subtle text-secondary shadow-none border-secondary-subtle border-1 ${styles.inputs} ${styles.Pweight}`}
+                        className={`py-2 bg-light-subtle text-secondary shadow-none  border-1 ${styles.inputs} ${styles.Pweight}`}
                     />
                 </Col>
 
@@ -223,7 +223,7 @@ const SalesForm = ({ customers, stages, products}) => {
                         value={dryData.category || ''}
                         onChange={handleInputChange}
                         required
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} pe-5`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
                     >
                         <option value="" disabled>Select Category</option>
                         <option value="Marketer">Marketer</option>
@@ -243,7 +243,7 @@ const SalesForm = ({ customers, stages, products}) => {
                                 value={dryData.fullName || ''}
                                 onChange={handleSearchChange}
                                 style={{ width: '100%' }}
-                                className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} pe-5`}
+                                className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
                             />
                             {dryData.fullName && filteredCustomer.length > 0 && (
                                 <div className={`${styles.suggestions_box}`}>
@@ -274,7 +274,7 @@ const SalesForm = ({ customers, stages, products}) => {
                             name="discount"
                             value={dryData.discount || ''}                            
                             onChange={handleInputChange}
-                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} pe-5`}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
                         />
                         <span className={`${styles.nairaSign} position-absolute end-0 top-50 translate-middle-y pe-2`}>₦</span>
                     </div>
@@ -289,7 +289,7 @@ const SalesForm = ({ customers, stages, products}) => {
                         name="description"
                         value={dryData.description || ''}
                         onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
 
@@ -301,7 +301,7 @@ const SalesForm = ({ customers, stages, products}) => {
                         value={dryData.paymentType || ''}
                         onChange={handleInputChange}
                         required
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
                         <option value="" disabled>Select Payment Type</option>
                         <option value="Cash">Cash</option>
@@ -324,7 +324,7 @@ const SalesForm = ({ customers, stages, products}) => {
                                 : ''
                         }
                         readOnly
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
             </Row>
@@ -332,7 +332,7 @@ const SalesForm = ({ customers, stages, products}) => {
                 <Button
                     variant="dark"
                     disabled={loader}
-                    className="fw-semibold py-2 px-5 mb-3"
+                    className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
                     type="submit"
                 >
                     {loader ? 'Adding Sale...' : 'Add Sale'}

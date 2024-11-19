@@ -258,7 +258,7 @@ export default function ViewAll() {
               )}
             </Modal.Body>
             <Modal.Footer className="border-0 mt-5" style={{height: '200px'}} >
-              <Button variant="dark" className="px-5" onClick={handleSave}>
+              <Button variant="dark"  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} onClick={handleSave}>
                 Save
               </Button>
             </Modal.Footer>

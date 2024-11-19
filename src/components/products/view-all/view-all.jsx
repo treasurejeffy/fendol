@@ -296,7 +296,7 @@ export default function ViewAllProducts() {
         </Modal.Body>
         <Modal.Footer className="border-0">
           <Button
-            className={`btn ${styles.save_btn} btn-dark px-5 py-2 fw-semibold border-0`}
+            className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} 
             onClick={handleSaveClick}
           >
             Save

@@ -6,8 +6,8 @@ import { GoQuestion } from "react-icons/go";
 import { IoMdNotifications } from "react-icons/io";
 import { FaRegUserCircle } from 'react-icons/fa';
 import {useNavigate} from 'react-router-dom';
-
-import styles from './header.module.scss'
+import Logo from '../../../assests/logo.png';
+import styles from './header.module.scss';
 
 
 export default function Header() {
@@ -15,26 +15,33 @@ export default function Header() {
     return(
         <header>
             <div className={`shadow-sm sticky-top d-flex pe-5 ps-3 aligns-items-center ${styles.header}`} style={{height:'70px'}} >
-                <div className={`d-flex align-items-center mt-2 ms-1 ${styles.brand}`}>
-                    <h3>FENDOL FISH</h3>
+                <div className={`d-flex align-items-center mt-2 ${styles.brand}`}>
+                    <img src={Logo} alt="logo" />
                 </div>            
+
                 <Form className={`d-flex align-items-center ${styles.search}`}>
-                    <InputGroup >
-                        <InputGroup.Text id="inputGroup-sizing-lg" className='rounded-start-pill border-secondary bg-white border-1 border-end-0'><FaSearch/></InputGroup.Text>
-                        <Form.Control size="50"
-                        aria-label="Large"
-                        aria-describedby="inputGroup-sizing-sm"
-                        placeholder="Search..."
-                        readOnly
-                        className='border-start-0 rounded-end-pill border-1 border-secondary shadow-none'
+                    <div className="position-relative w-100">
+                        <Form.Control
+                            size="50"
+                            aria-label="Large"
+                            aria-describedby="inputGroup-sizing-sm"
+                            placeholder="Search..."
+                            readOnly
+                            id={styles.input}
+                            className="ps-5 border-1 shadow-none rounded-pill"
                         />
-                    </InputGroup>
+                        <FaSearch
+                            className="position-absolute top-50 translate-middle-y ms-3 text-secondary"
+                            style={{ pointerEvents: 'none' }}
+                        />
+                    </div>
                 </Form>
+
                 <div className={`d-flex align-items-center justify-content-end ${styles.icon}`}>
-                    <IoMdNotifications size={25} className="me-3" />
+                    <IoMdNotifications size={25} className={`me-3 ${styles.icons}`} />
                     <Dropdown as={ButtonGroup}>
                         <Dropdown.Toggle className="bg-transparent text-dark border-0" id="dropdown-basic">
-                            <FaRegUserCircle size={32} className="me-1 " /> <span>Admin</span>
+                            <FaRegUserCircle size={32} className={`me-1 ${styles.icons}`} /> <span>Admin</span>
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="border border-secondary bg-light-subtle">

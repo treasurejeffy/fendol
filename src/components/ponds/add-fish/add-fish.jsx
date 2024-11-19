@@ -139,7 +139,7 @@ const AddFish = () => {
                                         value={formData.stageId}
                                         onChange={handleInputChange}
                                         required
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                                     >
                                         <option value="" disabled>Choose Stage</option>
                                         {!stages ? (
@@ -163,7 +163,7 @@ const AddFish = () => {
                                         min="1"
                                         onChange={handleInputChange}
                                         required
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                                     />
                                 </Col>
                                 <Col className="mb-4">
@@ -173,7 +173,7 @@ const AddFish = () => {
                                         value={formData.speciesId}
                                         onChange={handleInputChange}
                                         required
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                                     >
                                         <option value="" disabled>Choose fishType</option>
                                         {!fishType ? (
@@ -189,7 +189,7 @@ const AddFish = () => {
                                 </Col>         
                             </Row>
                             <div className="d-flex justify-content-end my-4">
-                                <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
+                                <Button className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}  disabled={loader} type="submit">
                                     {loader ? (
                                       ' Adding...'
                                         

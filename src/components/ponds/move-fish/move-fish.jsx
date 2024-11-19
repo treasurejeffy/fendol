@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Button, Dropdown, ButtonGroup } from 'react-bootstrap';
+import { Form, Row, Col, Button} from 'react-bootstrap';
 import styles from '../product-stages.module.scss'; 
 import { toast, ToastContainer } from 'react-toastify';
 import SideBar from '../../shared/sidebar/sidebar'; 
 import Header from '../../shared/header/header'; 
 import Api from '../../shared/api/apiLink';
-import { useNavigate } from 'react-router-dom';
+
+
 
 export default function MoveFish() {
     const [stages, setStages] = useState([]);
     const [fishType, setFishType] = useState([]);
-    const [selectedStages, setSelectedStages] = useState([]);
     const [selectedTitle, setSelectedTitle] = useState('');
     const [selectedQuantity, setSelectedQuantity] = useState('');
-    const [whole, setWhole] = useState(0);
-    const [selectedStageName, setSelectedStageName] = useState('Move to');
     const [moveFishData, setMoveFishData] = useState({
         stageId_from: '',
         stageId_to: '',
@@ -22,10 +20,7 @@ export default function MoveFish() {
         actual_quantity: null,
         remarks: '',
     });
-    const navigate = useNavigate();
-    const [showSecondForm, setShowSecondForm] = useState(false);
     const [loader, setLoader] = useState(false);
-    const [getEndpoint, setGetEndpoint] = useState('/wash-quantity');
 
 
     useEffect(() => {
@@ -150,7 +145,7 @@ export default function MoveFish() {
                         <main className={styles.create_form}>
                             <ToastContainer/>
                             <Form onSubmit={handleMoveFishes}>
-                                <h4 className="my-5">Move Fish</h4>
+                                <h4 className="my-5">Move Fish</h4>                                                   
                                 <Row xxl={2} xl={2} lg={2}>
                                     <Col className="mb-4">
                                         <Form.Label className="fw-semibold">Pond From</Form.Label>
@@ -159,7 +154,7 @@ export default function MoveFish() {
                                         value={moveFishData.stageId_from}
                                         onChange={handleInputChangeMoveFish}
                                         required
-                                        className="py-2 bg-light-subtle shadow-none border-secondary-subtle border-1"
+                                         className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                         >
                                         <option value="" disabled>Choose Pond</option>
                                         {stages && stages.length > 0 ? (
@@ -182,7 +177,7 @@ export default function MoveFish() {
                                             value={moveFishData.stageId_to}
                                             onChange={handleInputChangeMoveFish}
                                             required
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                         >
                                             <option value="" disabled>Choose Pond</option>
                                             {!stages ? (
@@ -203,7 +198,7 @@ export default function MoveFish() {
                                             value={moveFishData.speciesId}
                                             onChange={handleInputChangeMoveFish}
                                             required
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                         >
                                             <option value="" disabled>Choose Fish  Type</option>
                                             {!fishType ? (
@@ -227,7 +222,7 @@ export default function MoveFish() {
                                             min='1'
                                             required
                                             onChange={handleInputChangeMoveFish}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                         />
                                     </Col>
                                     <Col className="mb-4">
@@ -238,12 +233,12 @@ export default function MoveFish() {
                                             name="remarks"                                        
                                             value={moveFishData.remarks}
                                             onChange={handleInputChangeMoveFish}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                         />
                                     </Col>
                                 </Row>
                                 <div className="d-flex justify-content-end my-4">
-                                    <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
+                                    <Button className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} disabled={loader} type="submit">
                                         {loader ? 'Moving' : "Move"}
                                     </Button>
                                 </div>

@@ -99,7 +99,7 @@ const AddFeed = () => {
                                         value={formData.feedName}
                                         onChange={handleInputChange}
                                         required
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     />
                                 </Col>
                                 <Col className="mb-4">
@@ -109,7 +109,7 @@ const AddFeed = () => {
                                         required
                                         value={formData.unit}
                                         onChange={handleInputChange}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     >
                                         <option value="" disabled>Select Unit</option>
                                         <option value="kg">Kg</option>
@@ -124,7 +124,7 @@ const AddFeed = () => {
                                         required
                                         value={formData.feedType}
                                         onChange={handleInputChange}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     />
                                 </Col>                         
                                 <Col className="mb-4">
@@ -137,7 +137,7 @@ const AddFeed = () => {
                                         required
                                         min="1"
                                         onChange={handleInputChange}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     />
                                 </Col>
                                 <Col className="mb-4">
@@ -150,14 +150,14 @@ const AddFeed = () => {
                                             value={formData.weightPerBag} // Display the formatted price
                                             required
                                             onChange={handleInputChange}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                         />
                                         <span className={`${styles.nairaSign} position-absolute end-0 top-50 translate-middle-y pe-2`}>KG</span>
                                     </div>
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-end my-4">
-                                <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
+                                <Button className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} disabled={loader} type="submit">
                                     {loader ? ' Adding...' : 'Add'}
                                 </Button>
                             </div>

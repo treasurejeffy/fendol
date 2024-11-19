@@ -1,39 +1,41 @@
 // Variables
 $login-width-desktop: 48%;
-$bg-color: #adb5bd; // Background color for the section and middle area
-$form-bg-color: #B9C0CB47;
-
-
-
+$bg-color: #833f0833; // Background color for the section and middle area
+$form-bg-color: #B0642633;
 
 // Main Section
 .login_section {
-  background: radial-gradient(58.43% 103.88% at 56.74% 50%, #8C949B 0%, #1E1E1E 100%);
+  background: radial-gradient(
+    110.09% 195.72% at 108.4% 50%, 
+    rgba(208, 122, 52, 0.852) 0%, 
+    #783d0de9 100%
+  );
   position: relative; // Required for absolute positioning of top and bottom images
   overflow: hidden; // Hide any overflow from the images
   height: 100vh; // Ensure the height does not exceed 100vh
-  mix-blend-mode: luminosity;
 }
 
 // Top and Bottom Images
 section img {
   position: absolute;
-  z-index: 1; 
-  opacity: 0.5; 
+  z-index: 1;
+  opacity: 0.2; // Adjust the opacity for better blending
+  mix-blend-mode: multiply; // Blend the images with the gradient background
 }
 
-section .top-img {
+section .top_img {
   top: 0;
   right: 0;
 }
 
-section .bottom-img {
+section .bottom_img {
   bottom: 0;
   left: 0;
 }
 
+
 // Form Box
-.form-box {
+.form_box {
   width: $login-width-desktop;
   padding: 50px 0;
   background-color: $form-bg-color;
@@ -43,7 +45,7 @@ section .bottom-img {
   z-index: 2; // Ensure it's above the background images
   position: relative; // For stacking context
   border: 3.39px solid;
-  border: 3px rgba(224, 224, 224, 0.568) solid;
+  border: 3px rgba(116, 73, 45, 0.568) solid;
   border-radius: 20%;
 
 
@@ -54,26 +56,21 @@ section .bottom-img {
   width: 65%;
 }
 
-// Login Heading
-.login {
-  font-size: 19px;
-}
-
-.input {
+.inputs {
     background-color: $form-bg-color; // Custom background color for input fields
-    color: #ffffff; // Input text color
-    border: #ffffff 1.9px solid;
+    color: #512728 ; // Input text color
+    border: #674141  1.9px solid;
 }
   
 // Placeholder Text Styling
-.input::placeholder {
-    color: #adb5bd; // Placeholder text color
+.inputs::placeholder {
+    color: #9b7878 ; // Placeholder text color
 }
 
-.input:focus {
-    background-color: $form-bg-color;
-    color: #ffffff;
-    border: #ffffff 0.2Npx solid;
+.inputs:focus {
+    background-color: #B0642633;
+    color: #beb7b7 ;
+    border: #9b7878 0.2px solid;
 }
   
 
@@ -83,7 +80,13 @@ a {
 }
 
 .btn{
-    background-color: #2E3135;
+    background-color: #512728;
+    &:hover{
+      background-color: #512728;
+    }
+    &:active{
+      background-color: #512728;
+    }
 }
 
 // Media Queries for responsiveness

@@ -19,7 +19,10 @@ export default function NewBatchFish() {
         actual_quantity: '',
         remarks: '',
     });
-    const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
+    const [showSuccessOverlay, setShowSuccessOverlay] = useState(() => {
+        const savedValue = sessionStorage.getItem('showSuccessOverlay');
+        return savedValue ? JSON.parse(savedValue) : false;
+      });
     const [loader, setLoader] = useState(false);
 
     const fetchWashingStage = async () => {
@@ -40,6 +43,10 @@ export default function NewBatchFish() {
             console.error(err.response?.data?.message || 'Failed to fetch washing stage. Please try again.');
         }
     };
+
+    useEffect(() => {
+        sessionStorage.setItem('showSuccessOverlay', JSON.stringify(showSuccessOverlay));
+      }, [showSuccessOverlay]);
 
     useEffect(() => {
         const fetchHarvestStage = async () => {
@@ -101,18 +108,10 @@ export default function NewBatchFish() {
                 type: "success",
                 isLoading: false,
                 autoClose: 3000,
-            });
-    
-            setMoveFishData({
-                stageId_from: stages.harvest ? stages.harvest.id : '',
-                stageId_to: stages.washing ? stages.washing.id : '',
-                speciesId: '',
-                actual_quantity: '',
-                remarks: '',
-            });
+            });            
 
-            setShowSuccessOverlay(true);
-            
+            const newSuccessOverlay = !showSuccessOverlay;
+            setShowSuccessOverlay(newSuccessOverlay || true); // Update the state            
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error moving fish. Please try again.",
@@ -306,7 +305,7 @@ export default function NewBatchFish() {
     }, [message]);
                
     return (
-        <section className={`d-none d-lg-block ${styles.body}`}>
+        <section className={`d-none d-lg-block ${styles.body}`} >
             <div className="sticky-top">
                 <Header />
             </div>
@@ -330,7 +329,7 @@ export default function NewBatchFish() {
                                                     || 'No Value'            // Show "No data" if title or data is missing
                                             }
                                             readOnly
-                                            className={`py-2 bg-light-subtle text-muted shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                            className={`py-2 bg-light-subtle text-muted shadow-none  border-1 ${styles.inputs}`}
                                         />
                                     <input
                                         type="hidden"
@@ -344,7 +343,7 @@ export default function NewBatchFish() {
                                     <Form.Control
                                         value={stages.washing === null ? 'Loading...' : stages.washing.title || 'No Value'}
                                         readOnly
-                                        className={`py-2 bg-light-subtle text-muted shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle text-muted shadow-none  border-1 ${styles.inputs}`}
                                     />
                                     <input
                                         type="hidden"
@@ -360,7 +359,7 @@ export default function NewBatchFish() {
                                         value={moveFishData.speciesId}
                                         onChange={handleInputChangeMoveFish}
                                         required
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     >
                                         <option value="" disabled>Choose Fish Type</option>
                                         {fishType.length < 1 ? (
@@ -382,7 +381,7 @@ export default function NewBatchFish() {
                                         min="1"
                                         required
                                         onChange={handleInputChangeMoveFish}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     />
                                 </Col>
                                 <Col className="mb-4">
@@ -393,12 +392,12 @@ export default function NewBatchFish() {
                                         name="remarks"
                                         value={moveFishData.remarks}
                                         onChange={handleInputChangeMoveFish}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     />
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-end my-4">
-                                <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
+                                <Button  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} disabled={loader} type="submit">
                                     {loader ? 'Creating' : "Create"}
                                 </Button>
                             </div>
@@ -445,7 +444,7 @@ export default function NewBatchFish() {
                                                             readOnly
                                                             type='text'  // Use 'text' to handle both numbers and the 'Loading...' text
                                                             value={whole !== null && whole !== undefined ? whole : 'Loading...'}
-                                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                         />
                                                     </Form.Group>
                                                     <Form.Group>
@@ -456,7 +455,7 @@ export default function NewBatchFish() {
                                                             onChange={handleMoveFish}
                                                             type='number'
                                                             required
-                                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                         />
                                                     </Form.Group>
                                                 </div>
@@ -473,7 +472,7 @@ export default function NewBatchFish() {
                                                         type='number'
                                                         placeholder='It will not be visible'
                                                         value={moveData.brokenFishBefore} // Ensure this value is set correctly
-                                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} me-2`}
+                                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} me-2`}
                                                     />
                                                     <Form.Control
                                                         type='number'
@@ -481,7 +480,7 @@ export default function NewBatchFish() {
                                                         value={moveData.brokenFishQuantity}
                                                         onChange={handleMoveFish}
                                                         required
-                                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                     />
                                                 </div>
                                             </div>
@@ -497,7 +496,7 @@ export default function NewBatchFish() {
                                                         type='number'
                                                         placeholder='It will not be visible'
                                                         value={moveData.damageBefore} // Ensure this value is set correctly
-                                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                     />
                                                     <Form.Control
                                                         required
@@ -505,13 +504,13 @@ export default function NewBatchFish() {
                                                         name="damageOrLoss"
                                                         value={moveData.damageOrLoss}
                                                         onChange={handleMoveFish}
-                                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                     />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className='d-flex justify-content-end'>
-                                            <Button onClick={handleNext} disabled={loading} className='border-0 btn btn-dark py-2 px-5 fw-semibold'>
+                                            <Button onClick={handleNext} disabled={loading}  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}>
                                                 Next
                                             </Button>
                                         </div>

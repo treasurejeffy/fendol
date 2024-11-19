@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Nanum+Myeongjo:wght@400;700;800&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Sevillana&display=swap');
-$siderbar-color:  #D0D5DD;
-$active-color: #fff9f9;
-$text-color: #2E3135;
+$siderbar-color: #B06426;
+$active-color: #512728;
+$text-color: #ffffff;
 @import '../style.scss';
 
 
@@ -49,31 +49,31 @@ $text-color: #2E3135;
 }
 
 .activeLink {
-    background-color: $text-color;
-    color: $active-color;
+    background-color: $active-color;
+    color: #ffffff;
     border-radius: 15px;
     font-family: "Roboto Flex", system-ui;
     font-optical-sizing: auto;
     font-weight: 500;
     font-style: normal;
     font-size: 14px;
-    box-shadow: 2px 2px 5px $text-color;
+    box-shadow: 2px 2px 5px $active-color;
     padding: 7px 10px;
 }
 
 .activeLink:hover{
-    color: $active-color;
-    background-color: $text-color;
-    box-shadow: 2px 2px 2px $text-color;
+    color: #ffffff;    
+    background-color: $active-color;
+    box-shadow: 2px 2px 2px $active-color;
 }
 
 .activeLink:active{
-    color: $active-color;
-    box-shadow: 2px 2px 6px $text-color;
+    color: #ffffff;
+    box-shadow: 2px 2px 6px $active-color;
 }
   
 .nonactiveLink{
-    color: $text-color;
+    color: #ffffff;
     font-family: "Roboto Flex", system-ui;
     font-optical-sizing: auto;
     font-weight: 500;
@@ -82,13 +82,13 @@ $text-color: #2E3135;
 }
 
 .nonactiveLink:hover{
-    color: $text-color;    
+    color: #ffffff;    
 }
 
 .navs{
 
     .title{
-        color: $text-color;
+        color: #ffffff;
         font-family: "Roboto Flex", system-ui;
         font-optical-sizing: auto;
         font-weight: 500;
@@ -96,53 +96,11 @@ $text-color: #2E3135;
         font-size: 15px;
     }
     .navigationLinks{
-        color: $text-color;
+        color: #ffffff;
         font-family: "Roboto Flex", system-ui;
         font-optical-sizing: auto;
         font-weight: 500;
         font-style: normal;
         font-size: 14px;
     }
-}
-
-.active {
-    background-color: $text-color;
-    color: $active-color;
-    border-radius: 15px;
-    font-family: "Roboto Flex", system-ui;
-    font-optical-sizing: auto;
-    font-weight: 500;
-    font-style: normal;
-    font-size: 14px;
-    box-shadow: 2px 2px 5px $text-color;
-    padding: 7px 6px;
-    margin: 0 15px;
-}
-
-.activeIcon{
-    color: $active-color;
-}
-
-.activehover{
-    color: $active-color;
-    background-color: $text-color;
-    box-shadow: 2px 2px 2px $text-color;
-}
-
-.active:active{
-    color: $active-color;
-    box-shadow: 2px 2px 6px $text-color;
-}
-  
-.nonactive{
-    color: $text-color;
-    font-family: "Roboto Flex", system-ui;
-    font-optical-sizing: auto;
-    font-weight: 500;
-    font-style: normal;
-    font-size: 14px;
-}
-
-.nonactive:hover{
-    color: $text-color;    
 }

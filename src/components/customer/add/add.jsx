@@ -85,7 +85,7 @@ const AddCustomer = () => {
                                     <Form.Label className="fw-semibold">Full Name</Form.Label>
                                     <Form.Control
                                         placeholder="Enter Full Name"
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
                                         type="text"
                                         name="fullName"
                                         required
@@ -97,7 +97,7 @@ const AddCustomer = () => {
                                     <Form.Label className="fw-semibold">Phone</Form.Label>
                                     <Form.Control
                                         placeholder="Enter Phone Number"
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
                                         type="tel"
                                         name="phone"
                                         value={formData.phone}
@@ -108,7 +108,7 @@ const AddCustomer = () => {
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Category</Form.Label>
                                     <Form.Select
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                         name="category"
                                         value={formData.category}
                                         onChange={handleInputChange}
@@ -123,7 +123,7 @@ const AddCustomer = () => {
                                     <Form.Label className="fw-semibold">Address</Form.Label>
                                     <Form.Control
                                         placeholder="Enter Address"
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
                                         type="text"
                                         name="address"
                                         value={formData.address}
@@ -133,7 +133,7 @@ const AddCustomer = () => {
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-end my-5">
-                                <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
+                                <Button  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} disabled={loader} type="submit">
                                     {loader ? ' Adding...' : 'Add'}
                                 </Button>                                
                             </div>

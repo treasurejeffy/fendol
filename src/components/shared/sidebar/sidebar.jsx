@@ -55,12 +55,12 @@ export default function SideBar() {
         <aside>
             <section className={`position-fixed d-none d-lg-block ${styles.sidebar}`}>
                 <Nav className={`flex-column ${styles.navs}`}>
-                    {role === 'super_admin' && (<Nav.Item className="mt-3">
+                    {role === 'super_admin' && (<Nav.Item className={`mt-3 ${location.pathname === "/damage-loss" ? 'mx-2' : ''}`}>
                         <Nav.Link
                             onClick={() => navigate('#/dashboard')}
                             className={`${location.pathname === "#/dashboard" ? styles.activeLink : styles.nonactiveLink}`}
                         >
-                            <IoGridOutline size={25} className="me-1 text-dark" /> <span className={styles.title}>Dashboard</span>
+                            <IoGridOutline size={25} className="me-1 text-light" /> <span className={styles.title}>Dashboard</span>
                         </Nav.Link>
                         <Link to={''}></Link>
                     </Nav.Item>)}
@@ -80,7 +80,7 @@ export default function SideBar() {
                                     <LuClipboardCheck size={25} className="me-1" /> Admin
                                 </span>
                                 <span>
-                                    {open.admin ? <FaCaretUp /> : <FaCaretDown />}
+                                    {open.admin ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
@@ -89,7 +89,7 @@ export default function SideBar() {
                                     <Card.Body className={styles.navigationLinks}>
                                         <Nav.Item className="mb-3">
                                             <OverlayTrigger
-                                                placement="top"
+                                                placement="bottom"
                                                 overlay={<Tooltip id="tooltip-add-new">Add a new admin</Tooltip>}
                                             >
                                                 <div
@@ -103,7 +103,7 @@ export default function SideBar() {
                                         </Nav.Item>
                                         <Nav.Item className="my-3">
                                             <OverlayTrigger
-                                                placement="top"
+                                                placement="bottom"
                                                 overlay={<Tooltip id="tooltip-view-all">View all admins</Tooltip>}
                                             >
                                                 <div
@@ -135,7 +135,7 @@ export default function SideBar() {
                                     <LuClipboardCheck size={25} className="me-1" /> Customer
                                 </span>
                                 <span>
-                                    {open.customer ? <FaCaretUp /> : <FaCaretDown />}
+                                    {open.customer ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
@@ -188,7 +188,7 @@ export default function SideBar() {
                                 </span>
                                 
                                 <span >
-                                    {open.ponds ? <FaCaretUp /> : <FaCaretDown />}
+                                    {open.ponds ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
@@ -276,7 +276,7 @@ export default function SideBar() {
                                     <LuClipboardCheck size={25} className="me-1" /> Process Control
                                 </span>
                                 <span>
-                                    {open.process ? <FaCaretUp /> : <FaCaretDown />}
+                                    {open.process ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
@@ -328,7 +328,7 @@ export default function SideBar() {
                                     <LuClipboardCheck size={25} className="me-1" /> Products
                                 </span>
                                 <span>
-                                    {open.products ? <FaCaretUp /> : <FaCaretDown />}
+                                    {open.products ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
@@ -371,7 +371,7 @@ export default function SideBar() {
                                     <LuClipboardCheck size={25} className="me-1" /> Showcase
                                 </span> 
                                 <span>
-                                    {open.showcase ? <FaCaretUp/> : <FaCaretDown/>}
+                                    {open.showcase ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
@@ -423,7 +423,7 @@ export default function SideBar() {
                                     <LuClipboardCheck size={25} className="me-1" /> Feed
                                 </span> 
                                 <span>
-                                    {open.feed ? <FaCaretUp/> : <FaCaretDown/>}
+                                    {open.feed ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
@@ -475,7 +475,7 @@ export default function SideBar() {
                                     <LuClipboardCheck size={25} className="me-1" /> Store
                                 </span> 
                                 <span>
-                                    {open.store ? <FaCaretUp/> : <FaCaretDown/>}
+                                    {open.store ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
@@ -527,7 +527,7 @@ export default function SideBar() {
                                     <LuClipboardCheck size={25} className="me-1" /> Finance
                                 </span> 
                                 <span>
-                                    {open.finance ? <FaCaretUp/> : <FaCaretDown/>}
+                                    {open.finance ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
@@ -655,16 +655,14 @@ export default function SideBar() {
                             </Collapse>
                         </Card> */}
 
-                        <Nav.Item className="mt-3" title="Damage and Loss">
-                            <Nav.Link
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => navigate('/damage-loss')}
-                                className={` ${location.pathname === "/damage-loss" ? styles.active: styles.nonactive}`}
-                            >
-                              <LuClipboardCheck size={25}  className={`${location.pathname === "/damage-loss" ? styles.activeIcon : styles.nonactiveIcon}`} /> <span className={ `fw-semibold ${location.pathname === "/damage-loss" ? styles.active : styles.nonactive}`} >Damage/Loss</span>
-                            </Nav.Link>
-                            <Link to={''}></Link>
-                        </Nav.Item>
+                        <Nav.Item className={`mt-3 ${location.pathname === "/damage-loss" ? 'mx-2' : ''}`}>
+                        <Nav.Link
+                            onClick={() => navigate('/damage-loss')}
+                            className={`${location.pathname === "/damage-loss" ? styles.activeLink : styles.nonactiveLink}`}
+                        >
+                            <LuClipboardCheck size={25} className="me-1 text-light" /> <span className={styles.title}>Damage/Loss</span>
+                        </Nav.Link>                        
+                    </Nav.Item>
 
                         {/* Notification navigation */}
                         {/* <Card className={styles.card}>

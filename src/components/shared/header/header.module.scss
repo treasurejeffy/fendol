@@ -1,27 +1,30 @@
 $text-color: #2E3135;
 
 .brand{
-    width: 20%;
+    width: 20%;    
+    img {      
+        image-rendering: crisp-edges;
+    }
 }
 
 .header{
     background-color: #FAFCFF;
 }
 
-h3 {
-    font-family: "Roboto", sans-serif;
-    font-weight: 550;
-    font-size: 24px;
-    font-style: normal;
-    line-height: 10.78px;
-    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25); // Reduced shadow opacity
-    text-align: center;
-    color: $text-color;        
-}
-
 .search{
     width: 50%;
 }
+
+#input {
+    outline: none;
+    border: 2px solid #AA3328; /* Fallback to transparent */
+    border-radius: 20px; /* Rounds the corners */
+}
+
+.icons{
+    color: #512728;
+}
+
 
 .icon{
     width: 30%;

@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState, useEffect} from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LogIn from "./shared/login/login";
 import ProtectedRoute from "./protect-routes";
@@ -18,9 +18,11 @@ import { ToastContainer } from 'react-toastify';
 
 export default function RouterSwitch() {
   const [role, setRole]= useState(null);
-  if(role === null){
-    setRole(sessionStorage.getItem('role'));    
-  }
+  useEffect(()=>{
+    if(role === null){
+      setRole(sessionStorage.getItem('role'));    
+    }
+  })
   return (
     <Provider store={store}>
       <Router>

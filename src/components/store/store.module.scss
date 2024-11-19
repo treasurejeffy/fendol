@@ -25,9 +25,27 @@
   }
 }
 
+
 .inputs{
+  border: #b79173aa 1px solid;
   &::placeholder {
     opacity: 0.5;
+  }
+  &:focus{
+    border: #896143aa 1px solid;
+  }
+}
+
+
+.submit {
+  background-color: #512728;  // Initial background color
+  
+  &:hover {
+    background-color: #714445; // Background color on hover
+  }
+
+  &:active {
+    background-color: #512728; // Background color when the button is clicked (active)
   }
 }
 

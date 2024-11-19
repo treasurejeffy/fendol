@@ -347,7 +347,7 @@ export default function UpdateStoreInventory() {
                   type="text" 
                   readOnly 
                   defaultValue={selectedProduct?.name} 
-                  className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                  className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                 />
               </div>
             </Form.Group>
@@ -364,7 +364,7 @@ export default function UpdateStoreInventory() {
                       required 
                       value={quantity ?? ''} // Shows empty string if quantity is null
                       onChange={(e) => setQuantity(Number(e.target.value) || null)} 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                       placeholder="Quantity (kg)" 
                     />
                   </div>
@@ -384,7 +384,7 @@ export default function UpdateStoreInventory() {
                         setPrice(value ? Number(value) : null);
                       }} 
                       placeholder="Price Bought" 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                     />
                   </div>
                 </Form.Group>
@@ -404,7 +404,7 @@ export default function UpdateStoreInventory() {
                       required
                       value={stage}
                       onChange={(e) => setStage(e.target.value)}
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`}
                     >
                       <option value="" disabled>Choose Pond</option>
                       {!stages ? (
@@ -428,7 +428,7 @@ export default function UpdateStoreInventory() {
                       type="number" 
                       value={quantityUsed ?? ''} // Shows empty string if quantityUsed is null
                       onChange={(e) => setQuantityUsed(Number(e.target.value) || null)} 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                       placeholder="Enter Quantity" 
                     />
                   </div>
@@ -449,7 +449,7 @@ export default function UpdateStoreInventory() {
                       required 
                       value={threshold ?? ''} // Shows empty string if quantityUsed is null
                       onChange={(e) => setThreshold(Number(e.target.value) || null)} 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                     />
                   </div>
                 </Form.Group>
@@ -462,7 +462,7 @@ export default function UpdateStoreInventory() {
                       type="text" 
                       readOnly 
                       defaultValue={selectedProduct?.unit} 
-                      className={`py-2 shadow-none border-secondary-subtle border-1 ${styles.inputs}`} 
+                      className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
                     />
                   </div>
                 </Form.Group>
@@ -471,7 +471,7 @@ export default function UpdateStoreInventory() {
           </Modal.Body>
 
           <Modal.Footer className="mt-5 mb-3 border-0" style={{height: '200px'}}>
-            <Button className={`px-5 py-2 mt-5 btn-dark fw-semibold`} onClick={handleSaveClick}>
+            <Button className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} onClick={handleSaveClick}>
               {modalType === 'add' ? 'Add' : modalType === 'remove' ? 'Remove' : 'Edit'}
             </Button>
             <ToastContainer /> {/* Include ToastContainer for notifications */}

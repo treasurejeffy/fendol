@@ -157,7 +157,7 @@ const FreshForm = ({ customers, stages, products}) => {
                     required
                     value={freshData.productName || ''}
                     onChange={handleProductSelect}
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
                     <option value="" disabled>Select Fresh Fish Product</option>
                     {products
@@ -179,7 +179,7 @@ const FreshForm = ({ customers, stages, products}) => {
                         required
                         value={freshData.stageId_from || ''}
                         onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
                         <option value="" disabled>Select Stage</option>
                         {stages
@@ -203,7 +203,7 @@ const FreshForm = ({ customers, stages, products}) => {
                     value={freshData.productWeight || ''}
                     required
                     onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
 
@@ -217,7 +217,7 @@ const FreshForm = ({ customers, stages, products}) => {
                     value={freshData.quantity || ''}                                            
                     required
                     onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
 
@@ -229,7 +229,7 @@ const FreshForm = ({ customers, stages, products}) => {
                         value={freshData.category || ''}
                         onChange={handleInputChange}
                         required
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} pe-5`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
                     >
                         <option value="" disabled>Select Category</option>
                         <option value="Marketer">Marketer</option>
@@ -249,7 +249,7 @@ const FreshForm = ({ customers, stages, products}) => {
                             value={freshData.fullName || ''}
                             onChange={handleSearchChange}
                             style={{ width: '100%' }}
-                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} pe-5`}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
                         />
                         {freshData.fullName && filteredCustomer.length > 0 && (
                         <div className={`${styles.suggestions_box}`}>
@@ -280,7 +280,7 @@ const FreshForm = ({ customers, stages, products}) => {
                         name="discount"                                            
                         value={freshData.discount ? (new Intl.NumberFormat().format(freshData.discount)) : '' }                                                            
                         onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} pe-5`}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
                     />
                     <span className={`${styles.nairaSign} position-absolute end-0 top-50 translate-middle-y pe-2`}>₦</span>
                     </div>
@@ -295,7 +295,7 @@ const FreshForm = ({ customers, stages, products}) => {
                     name="description"
                     value={freshData.description || ''}
                     onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
 
@@ -306,7 +306,7 @@ const FreshForm = ({ customers, stages, products}) => {
                     name='paymentType'
                     value={freshData.paymentType || ''}
                     onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
                     <option value="" disabled>Select Payment Type</option>
                     <option value="Cash">Cash</option>
@@ -325,7 +325,7 @@ const FreshForm = ({ customers, stages, products}) => {
                     name="totalPrice"
                     value={freshData.totalPrice ? `₦${new Intl.NumberFormat().format(freshData.totalPrice)}` : ''}
                     readOnly
-                    className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     />
                 </Col>
             </Row>
@@ -333,7 +333,7 @@ const FreshForm = ({ customers, stages, products}) => {
                 <Button
                     variant='dark'
                     disabled={loader}
-                    className='fw-semibold py-2 px-5 mb-3'
+                    className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
                     type='submit'
                 >
                     {loader ? ' Adding Sale...' : 'Add Sale'}

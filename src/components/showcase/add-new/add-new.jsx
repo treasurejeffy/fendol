@@ -95,7 +95,7 @@ export default function AddNew() {
                                     <Form.Label className="fw-semibold">Type Of Showcase</Form.Label>
                                     <Form.Select
                                         aria-label="Select Name"
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                         name="type" // Make sure this matches the key in formData
                                         value={formData.type} // Use the value from formData for this select
                                         onChange={handleInputChange} // This will handle updates to formData
@@ -113,12 +113,12 @@ export default function AddNew() {
                                         value={formData.initialQuantity}
                                         readOnly
                                         onChange={handleInputChange}
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                     />
                                 </Col>
                             </Row>                                              
                             <div className="d-flex justify-content-end my-4">
-                                <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
+                                <Button className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}  disabled={loader} type="submit">
                                     {loader ? (
                                       ' Adding New...'
                                         

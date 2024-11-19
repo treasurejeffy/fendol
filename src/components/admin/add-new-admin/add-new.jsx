@@ -103,7 +103,7 @@ const AddNew = () => {
                                     <Form.Label className="fw-semibold">Full Name</Form.Label>
                                     <Form.Control
                                         placeholder="Enter Full Name"
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
                                         type="text"
                                         name="fullName"
                                         required
@@ -115,7 +115,7 @@ const AddNew = () => {
                                     <Form.Label className="fw-semibold">E-Mail</Form.Label>
                                     <Form.Control
                                         placeholder="Enter E-Mail"
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} ${styles.fadedPlaceholder}`}
                                         type="email"
                                         name="email"
                                         value={formData.email}
@@ -128,7 +128,7 @@ const AddNew = () => {
                                     <InputGroup className="mb-4">
                                         <Form.Control
                                             type={showPassword ? "text" : "password"}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 border-end-0 ${styles.inputs} ${styles.fadedPlaceholder}`}
+                                            className={`py-2 bg-light-subtle shadow-none  border-1 border-end-0 ${styles.inputs} ${styles.fadedPlaceholder}`}
                                             placeholder="Enter Password"
                                             name="password"
                                             value={formData.password}
@@ -139,7 +139,7 @@ const AddNew = () => {
                                         />
                                         <InputGroup.Text
                                             onClick={togglePasswordVisibility}
-                                            className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 border-start-0 ${styles.inputs}`}
+                                            className={`py-2 bg-light-subtle shadow-none  border-1 border-start-0 ${styles.inputs}`}
                                             style={{ cursor: "pointer" }}
                                         >
                                             {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -149,7 +149,7 @@ const AddNew = () => {
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold fs-6">Role</Form.Label>
                                     <Form.Select
-                                        className={`py-2 bg-light-subtle shadow-none border-secondary-subtle border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                         name="role"
                                         value={formData.role}
                                         onChange={handleInputChange}
@@ -162,7 +162,7 @@ const AddNew = () => {
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-end my-5">
-                                <Button className="btn shadow btn-dark py-2 px-5 fs-6 mb-5 fw-semibold" disabled={loader} type="submit">
+                                <Button  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} disabled={loader} type="submit">
                                     {loader ? (
                                       ' Creating...'
                                         
