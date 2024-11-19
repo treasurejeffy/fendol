@@ -91,7 +91,7 @@ export default function LogIn() {
     
     return (
         <section className={styles.login_section}>
-            <div className="text-end">
+            <div className={`${styles.imageCont} text-end`}>
                 <img src={top} alt="Top Vector" className={styles.top_img} />
             </div>
             <Container>
@@ -139,7 +139,7 @@ export default function LogIn() {
                     </div>
                 </div>
             </Container>
-            <div className="text-start">
+            <div className={`${styles.imageCont} text-start`}>
                 <img src={bottom} alt="Bottom Vector" className={styles.bottom_img} />
             </div>
             <ToastContainer />

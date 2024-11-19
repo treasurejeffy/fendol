@@ -1,14 +1,14 @@
 // Variables
 $login-width-desktop: 48%;
 $bg-color: #833f0833; // Background color for the section and middle area
-$form-bg-color: #B0642633;
+$form-bg-color: #7c5a3d4d;
 
 // Main Section
 .login_section {
   background: radial-gradient(
     110.09% 195.72% at 108.4% 50%, 
-    rgba(208, 122, 52, 0.852) 0%, 
-    #783d0de9 100%
+    #B0642633 20%, 
+    #5f3521e3 100%
   );
   position: relative; // Required for absolute positioning of top and bottom images
   overflow: hidden; // Hide any overflow from the images
@@ -16,11 +16,10 @@ $form-bg-color: #B0642633;
 }
 
 // Top and Bottom Images
-section img {
+.imageCont img {
   position: absolute;
   z-index: 1;
   opacity: 0.2; // Adjust the opacity for better blending
-  mix-blend-mode: multiply; // Blend the images with the gradient background
 }
 
 section .top_img {
