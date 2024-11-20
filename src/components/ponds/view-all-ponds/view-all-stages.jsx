@@ -22,7 +22,7 @@ const ViewAllStages = () => {
 
   const fetchStages = async () => {
     try {
-      const response = await Api.get('/fish-stages');
+      const response = await Api.get('/fishes');
       if (Array.isArray(response.data.data)) {
         setStages(response.data.data);
       } else {
@@ -55,37 +55,6 @@ const ViewAllStages = () => {
     }));
   };
 
-  const handleEdit = (stage) => {
-    setSelectedStage(stage);
-    setShowModal(true);
-  };
-
-  // save edited stage
-  const handleSave = async () => {
-    if (!selectedStage || !selectedStage.title || !selectedStage.description) {
-      toast.error("Please fill in all fields."); // Ensure all fields are filled
-      return;
-    }
-
-    let loadingToast; // Declare loadingToast here
-
-    try {
-      // Show loading toast
-      loadingToast = toast.loading("Saving stage..."); // Show loading toast
-
-      // Call your API to save the changes using the correct URL with ID
-      const response = await Api.put(`/fish-stage/${selectedStage.id}`, selectedStage);
-
-      // Show success toast
-      toast.update(loadingToast, { render: "Stage updated successfully!", type: "success", isLoading: false, autoClose: 3000 });
-      fetchStages();
-      setShowModal(false); // Close the modal after saving
-    } catch (error) {
-      console.error("Failed to save stage:", error);
-      // Show error toast
-      toast.update(loadingToast, { render: "Failed to save stage. Please try again.", type: "error", isLoading: false, autoClose: 3000 }); // Update error toast
-    }
-  };
 
 
   const handlePageChange = ({ selected }) => {
@@ -107,7 +76,7 @@ const ViewAllStages = () => {
         </div>
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
-            <h4 className="mt-3 mb-5">View Stages</h4>
+            <h4 className="mt-3 mb-5">View Ponds</h4>
 
             {loading && (
               <div className="text-center">
@@ -140,21 +109,19 @@ const ViewAllStages = () => {
                     <tr>
                       <th>DATE CREATED</th>
                       <th>NAME</th>
-                      <th>DESCRIPTION</th>
+                      <th>FISH TYPE</th>
+                      <th>QUANTITY</th>                    
                     </tr>
                   </thead>
                   <tbody>
                     {displayedStages.map((stage) => {
                       const formattedCreatedAt = formatDate(stage.createdAt);
                       return (
-                        <tr key={stage.id} onClick={() => handleEdit(stage)} className={styles.trow}>
+                        <tr key={stage.id} className={styles.trow}>
                           <td>{formattedCreatedAt}</td>
-                          <td>{stage.title}</td>
-                          <td>
-                            {stage.description.length > 40 
-                              ? `${stage.description.slice(0, 40)}...` 
-                              : stage.description}
-                          </td>
+                          <td>{stage.stageTitle}</td>
+                          <td>{stage.speciesName}</td>
+                          <td>{stage.quantity}</td>                                            
                         </tr>
                       );
                     })}
@@ -182,46 +149,6 @@ const ViewAllStages = () => {
                     activeClassName={"dark"}
                   />
                 </div>
-                <ToastContainer />
-
-                <Modal show={showModal} onHide={() => setShowModal(false)}>
-                  <Modal.Header closeButton className="border-0">
-                    <Modal.Title className="fw-semibold">Edit Stage</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body className="border-0 pt-5">
-                    {selectedStage && (
-                      <Form>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Product Name</Form.Label>
-                          <Form.Control
-                            type="text"
-                            name="title"
-                            value={selectedStage.title || ''}
-                            placeholder="*****"
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                          <Form.Label>Description</Form.Label>
-                          <Form.Control
-                            as="textarea"
-                            name="description"
-                            style={{ height: '200px' }}
-                            required
-                            value={selectedStage.description || ''}
-                            onChange={handleInputChange}
-                          />
-                        </Form.Group>
-                      </Form>
-                    )}
-                  </Modal.Body>
-                  <Modal.Footer className="border-0 mt-5">
-                    <Button variant="dark" className="px-5" onClick={handleSave}>
-                      Save
-                    </Button>
-                  </Modal.Footer>
-                </Modal>
               </>
             )}
           </main>

@@ -42,6 +42,14 @@ const AddSalary = () => {
     // Handle form submission
     const handleAddExpense = async (e) => {
         e.preventDefault();
+
+        // Show confirmation dialog
+        const isConfirmed = window.confirm("Are you sure you want to pay this salary?");
+        
+        if (!isConfirmed) {
+            return; // If the user cancels, exit the function
+        }
+
         setLoader(true);
         const loadingToast = toast.loading("Paying Salary...", {
             className: 'dark-toast'
@@ -81,6 +89,7 @@ const AddSalary = () => {
             setLoader(false);
         }
     };
+
 
     return (
         <section className={`d-none d-lg-block ${styles.body}`}>

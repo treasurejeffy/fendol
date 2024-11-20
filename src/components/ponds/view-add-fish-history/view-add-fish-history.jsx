@@ -9,15 +9,6 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import Api from "../../shared/api/apiLink";
 import ReactPaginate from 'react-paginate'; // Import ReactPaginate
 
-const FishStageBox = ({ stageName, quantity }) => {
-  return (
-    <div className={`${styles.stageBox} shadow py-3`}>
-      <h6>{stageName}</h6>
-      <p>{quantity}<span> Fishes</span></p>
-    </div>
-  );
-};
-
 export default function ViewAddFishHistory() {
   const [fishStages, setFishStages] = useState([]);
   const [tableData, setTableData] = useState([]);
@@ -28,19 +19,6 @@ export default function ViewAddFishHistory() {
   const [currentPage, setCurrentPage] = useState(0); // Current page state
   const itemsPerPage = 10; // Number of items per page
 
-  useEffect(() => {
-    const fetchFishStages = async () => {
-      try {
-        const response = await Api.get('/fishes');
-        setFishStages(response.data.data);
-      } catch (error) {
-        setErrorStages("Error fetching fishes in their stage.");
-      } finally {
-        setLoadingStages(false);
-      }
-    };
-    fetchFishStages();
-  }, []);
 
   useEffect(() => {
     const fetchTableData = async () => {
@@ -86,33 +64,7 @@ export default function ViewAddFishHistory() {
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
             <h4 className="mt-3 mb-5">View Add Fish History</h4>
-            
-            <div>
-              {loadingStages && (
-                <div className="text-center w-100">
-                  <Spinner animation="border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </Spinner>
-                </div>
-              )}
-              {errorStages && (
-                <div className=" w-100">
-                  <Alert variant="danger" className="text-center py-5">
-                    <FaExclamationTriangle size={40} /><span className="fw-semibold">{errorStages}</span>
-                  </Alert>
-                </div>
-              )}
-              <Row lg={4}>
-                {!loadingStages && !errorStages && fishStages.map((stage, index) => (
-                  <Col key={index}>
-                    <FishStageBox
-                      stageName={stage.stageTitle}
-                      quantity={stage.quantity}
-                    />
-                  </Col>
-                ))}
-              </Row>
-            </div>
+                         
 
             {loadingTable && (
               <div className="text-center">

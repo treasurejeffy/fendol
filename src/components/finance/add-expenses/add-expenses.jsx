@@ -41,18 +41,26 @@ const AddExpense = () => {
     // Handle form submission
     const handleAddExpense = async (e) => {
         e.preventDefault();
+    
+        // Show confirmation dialog
+        const isConfirmed = window.confirm("Are you sure you want to add this expense?");
+        
+        if (!isConfirmed) {
+            return; // If the user cancels, exit the function
+        }
+    
         setLoader(true);
         const loadingToast = toast.loading("Adding expense...", {
             className: 'dark-toast'
         });
-
+    
         try {
             // Post the unformatted number to the API (not the formatted one)
             const response = await Api.post('/expense', { 
                 ...formData, 
                 price: unformattedPrice // Send unformatted price
             });
-
+    
             // After a successful API call
             toast.update(loadingToast, {
                 render: "Expense added successfully!",
@@ -61,7 +69,7 @@ const AddExpense = () => {
                 autoClose: 3000,
                 className: 'dark-toast'
             });
-
+    
             // Reset form after successful submission
             setFormData({
                 price: '',
@@ -80,6 +88,7 @@ const AddExpense = () => {
             setLoader(false);
         }
     };
+    
 
     return (
         <section className={`d-none d-lg-block ${styles.body}`}>

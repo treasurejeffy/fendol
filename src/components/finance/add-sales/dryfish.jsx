@@ -106,9 +106,17 @@ const SalesForm = ({ customers, stages, products}) => {
     // Add Dry Fish sale
     const handleAddSales = async (e) => {
         e.preventDefault();
+    
+        // Show confirmation dialog
+        const isConfirmed = window.confirm("Are you sure you want to add this sale?");
+        
+        if (!isConfirmed) {
+            return; // If the user cancels, exit the function
+        }
+    
         setLoader(true);
         const loadingToast = toast.loading("Adding sale...", { className: 'dark-toast' });
-
+    
         try {
             const response = await Api.post('/sales', dryData);
             
@@ -141,6 +149,7 @@ const SalesForm = ({ customers, stages, products}) => {
             setLoader(false);
         }
     };
+    
 
     return (
         <Form onSubmit={handleAddSales}>

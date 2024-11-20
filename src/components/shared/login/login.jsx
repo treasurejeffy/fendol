@@ -64,11 +64,13 @@ export default function LogIn() {
       
       
             // Navigate based on the role
-            if (role === 'super_admin') {
-              navigate('/admin/add-new-admin');
-            } else {
-              navigate('/customer/view-all');
-            }
+            setTimeout(() => {
+              if (role === 'super_admin') {
+                  navigate('/admin/add-new-admin');
+              } else {
+                  navigate('/customer/view-all');
+              }
+          }, 100);
       
           } else {
             // Handle failed login

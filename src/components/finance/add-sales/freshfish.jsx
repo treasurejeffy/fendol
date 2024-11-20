@@ -108,9 +108,17 @@ const FreshForm = ({ customers, stages, products}) => {
     // Add Dry Fish sale
     const handleAddSales = async (e) => {
         e.preventDefault();
+    
+        // Show confirmation dialog
+        const isConfirmed = window.confirm("Are you sure you want to add this sale?");
+        
+        if (!isConfirmed) {
+            return; // If the user cancels, exit the function
+        }
+    
         setLoader(true);
         const loadingToast = toast.loading("Adding sale...", { className: 'dark-toast' });
-
+    
         try {
             const response = await Api.post('/sales-fresh-fish', freshData);
             
@@ -123,7 +131,7 @@ const FreshForm = ({ customers, stages, products}) => {
             });
             
             setFreshData({
-                productName:"",
+                productName: "",
                 productWeight: 0,
                 quantity: 0,
                 description: "",
@@ -131,7 +139,7 @@ const FreshForm = ({ customers, stages, products}) => {
                 fullName: '',
                 discount: 0,
                 stageId_from: "",
-                paymentType:''
+                paymentType: ''
             });
         } catch (error) {
             toast.update(loadingToast, {
@@ -145,7 +153,7 @@ const FreshForm = ({ customers, stages, products}) => {
             setLoader(false);
         }
     };
-
+    
     return (
         <Form onSubmit={handleAddSales}>
             <Row xxl={2} xl={2} lg={2}>  
