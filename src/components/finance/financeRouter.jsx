@@ -15,8 +15,10 @@ const FinanceNavigations = () => {
     <Routes>
       <Route path='add-sales' element={<AddSales/>}/>
       <Route path='add-expenses' element={<AddExpense/>}/>
-      {role === 'super_admin' && <Route path='staff-salary' element={<AddSalary/>}/>}
-      <Route path='ledger' element={<FinanceLedger/>}/>
+      {role === 'super_admin' && (<>
+        <Route path='staff-salary' element={<AddSalary/>}/>
+        <Route path='ledger' element={<FinanceLedger/>}/>
+      </>)}
     </Routes>
   );
 };

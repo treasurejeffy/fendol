@@ -4,21 +4,17 @@ import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../product-stages.module.scss';
 import { BsExclamationTriangleFill } from "react-icons/bs";
-import { Spinner, Alert, Button, Form, Modal } from 'react-bootstrap';
+import { Spinner, Alert } from 'react-bootstrap';
 import Api from "../../shared/api/apiLink";
 import ReactPaginate from 'react-paginate';
-import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const ViewAllStages = () => {
   const [stages, setStages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
+  const [searchTerm, setSearchTerm] = useState(''); // Add state for search term
   const itemsPerPage = 10;
-  const [selectedStage, setSelectedStage] = useState(null);
-  const [showModal, setShowModal] = useState(false);
 
   const fetchStages = async () => {
     try {
@@ -47,23 +43,20 @@ const ViewAllStages = () => {
     return `${day}/${month}/${year}`;
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setSelectedStage(prevStage => ({
-      ...prevStage,
-      [name]: value,
-    }));
-  };
-
-
-
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
 
   const startIndex = currentPage * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const displayedStages = stages.slice(startIndex, endIndex);
+
+  // Filter stages based on the search term
+  const filteredStages = stages.filter(stage => 
+    stage.stageTitle.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Get the stages to be displayed based on current page
+  const displayedStages = filteredStages.slice(startIndex, endIndex);
 
   return (
     <section className={`d-none d-lg-block ${styles.body}`}>
@@ -76,7 +69,20 @@ const ViewAllStages = () => {
         </div>
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
-            <h4 className="mt-3 mb-5">View Ponds</h4>
+            <div className="d-flex justify-content-between">
+              <h4 className="mt-3 mb-5">View Ponds</h4>
+
+              {/* Search input field */}
+              <div className="w-50s">
+              <input
+                  type="text"
+                  className="form-control mb-3 shadow-none border-dark"
+                  placeholder="Search by Pond...."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)} // Update search term
+                />
+              </div>
+            </div>
 
             {loading && (
               <div className="text-center">
@@ -94,7 +100,7 @@ const ViewAllStages = () => {
               </div>
             )}
 
-            {!loading && !error && displayedStages.length === 0 && (
+            {!loading && !error && filteredStages.length === 0 && (
               <div className="d-flex justify-content-center">
                 <Alert variant="info" className="text-center w-50 py-5">
                   No available data
@@ -133,7 +139,7 @@ const ViewAllStages = () => {
                     previousLabel={"< "}
                     nextLabel={" >"}
                     breakLabel={"..."}
-                    pageCount={Math.ceil(stages.length / itemsPerPage)}
+                    pageCount={Math.ceil(filteredStages.length / itemsPerPage)}
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={3}
                     onPageChange={handlePageChange}

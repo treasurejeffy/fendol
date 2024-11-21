@@ -137,8 +137,8 @@ export default function InventoryHistory() {
                           <td>{formattedDate}</td>
                           <td>{history.feedDetails.feedName}</td>
                           <td>{history.feedDetails.feedType}</td>
-                          <td>{history.stage}</td>
-                          <td>{history.feedDetails.quantity}</td>
+                          <td>{history.stage || '-'}</td>
+                          <td>{history.originalQuantity}</td>                        
                           <td>{history.quantityUsed}</td>
                           <td>{history.remainingFeed}</td>
                           <td className="text-uppercase fw-semibold d-flex">
@@ -177,7 +177,7 @@ export default function InventoryHistory() {
                     nextLinkClassName={"page-link"}
                     breakClassName={"page-item"}
                     breakLinkClassName={"page-link"}
-                    activeClassName={"active"}
+                    activeClassName={"active-light"}
                   />
                 </div>
               </>

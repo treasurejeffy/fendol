@@ -427,7 +427,7 @@ export default function UpdateFeedInventory() {
               <>
                 {/* Product Stage */}
                 <Form.Group className="mb-3 row">
-                  <Form.Label className="col-4">Pond </Form.Label>
+                  <Form.Label className="col-4">Pond</Form.Label>
                   <div className="col-8">
                     <Form.Select
                       name="stage"
@@ -436,19 +436,22 @@ export default function UpdateFeedInventory() {
                       onChange={(e) => setStage(e.target.value)}
                       className={`py-2 shadow-none  border-1 ${styles.inputs}`}
                     >
-                       <option value="" disabled>Choose Pond</option>
-                        {!stages ? (
-                            <option>Please wait...</option>
-                        ) : stages.length < 1 ? (
-                            <option>No data available</option>
-                        ) : (
-                            stages.map((stage, index) => (
-                                <option value={stage.title} key={index}>{stage.title}</option>
-                            ))
-                        )}
+                      <option value="" disabled>Choose Pond</option>
+                      {!stages ? (
+                        <option>Please wait...</option>
+                      ) : stages.length < 1 ? (
+                        <option>No data available</option>
+                      ) : (
+                        stages
+                          .filter(stage => !["harvest", "damage", "loss", 'damages', 'harvests'].includes(stage.title.toLowerCase())) // Filter out unwanted options
+                          .map((stage, index) => (
+                            <option value={stage.title} key={index}>{stage.title}</option>
+                          ))
+                      )}
                     </Form.Select>
                   </div>
                 </Form.Group>
+
 
                 {/* Quantity */}
                 <Form.Group className="mb-4 row">

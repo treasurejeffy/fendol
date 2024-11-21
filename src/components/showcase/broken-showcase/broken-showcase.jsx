@@ -166,7 +166,7 @@ const fetchTableData = async () => {
                     nextLinkClassName={"page-link"}
                     breakClassName={"page-item disabled"}
                     breakLinkClassName={"page-link"}
-                    activeClassName={"active"}
+                    activeClassName={"active-light"}
                 />
                 </div>
               </div>

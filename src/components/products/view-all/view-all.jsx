@@ -30,7 +30,7 @@ export default function ViewAllProducts() {
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [currentPage, setCurrentPage] = useState(0); // State for current page
-  const itemsPerPage = 5; // Define how many items per page
+  const itemsPerPage = 10; // Define how many items per page
   const [activeDropdown, setActiveDropdown] = useState(null); // State to track active dropdown
 
   // Fetch data from API

@@ -9,6 +9,7 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import Logo from '../../../assests/logo.png';
 import { LOGIN_USER } from "../reduxForProtectingRoute/actions/types";
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -100,7 +101,9 @@ export default function LogIn() {
                 <div className="d-flex justify-content-center align-items-center vh-100">
                     <div className={`${styles.form_box} rounded-5`}>
                         <Form className={styles.form} onSubmit={handleSubmit}>
-                            <h2 className="fw-bold text-center py-4">FENDOL</h2>                           
+                            <div className="text-center mb-4">
+                                <img src={Logo} alt="logo" />
+                            </div>                          
 
                             <Form.Label className="fw-semibold">Email</Form.Label>
                             <Form.Control
@@ -133,7 +136,7 @@ export default function LogIn() {
                                 </InputGroup.Text>
                             </InputGroup>
 
-                            <a href="" className="text-white border-0 fw-semibold">Forgot Password?</a>
+                            <a href="#pasword" className="text-white border-0 fw-semibold">Forgot Password?</a>
                             <Button type="submit" className={`w-100 ${styles.btn} shadow-sm btn-dark py-2 fs-5 mt-5 fw-semibold`} disabled={loader}>
                                 {loader ? 'Logging In' : "Log in"}
                             </Button>

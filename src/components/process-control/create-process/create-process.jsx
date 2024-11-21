@@ -170,7 +170,6 @@ export default function CreateProcess() {
     };
     
 
-
     return (
         <section className={`d-none d-lg-block ${styles.body}`}>
             <div className="sticky-top">
@@ -265,9 +264,9 @@ export default function CreateProcess() {
                                 required
                                 >
                                 <option value="" disabled>Select Process</option>
-                                    <option value="washing">Washing</option>
-                                    <option value="smoking">Smoking</option>
-                                    <option value="drying">Drying</option>
+                                    <option value="Washing">Washing</option>
+                                    <option value="Smoking">Smoking</option>
+                                    <option value="Drying">Drying</option>
                                 </Form.Select>
 
                                 <Form.Label className="fw-semibold fs-6 mt-4">Description</Form.Label>

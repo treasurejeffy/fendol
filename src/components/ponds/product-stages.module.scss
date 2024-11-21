@@ -170,3 +170,10 @@
     background-color: #512728; // Background color when the button is clicked (active)
   }
 }
+
+.delete {
+  &:hover {
+    padding: 15px; /* Increase padding */
+    font-size: 1.2rem; /* Increase font size */
+  }
+}

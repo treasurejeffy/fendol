@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../product-stages.module.scss';
-import { Spinner, Alert, Row, Col } from 'react-bootstrap';
+import { Spinner, Alert } from 'react-bootstrap';
 import { FaExclamationTriangle } from "react-icons/fa";
 import Api from "../../shared/api/apiLink";
 import ReactPaginate from 'react-paginate'; // Import ReactPaginate
 
 export default function ViewAddFishHistory() {
-  const [fishStages, setFishStages] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [loadingStages, setLoadingStages] = useState(true);
   const [loadingTable, setLoadingTable] = useState(true);
-  const [errorStages, setErrorStages] = useState('');
   const [errorTable, setErrorTable] = useState('');
   const [currentPage, setCurrentPage] = useState(0); // Current page state
   const itemsPerPage = 10; // Number of items per page

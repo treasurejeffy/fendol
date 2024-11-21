@@ -76,34 +76,49 @@ export default function MoveFish() {
     };
     
     const getQuantity = async (stageId_from) => {
-        console.log(stageId_from)                    
-        if (stageId_from) {        
+        console.log(stageId_from);
+        if (stageId_from) {
             try {
                 const response = await Api.get(`/fish-quantity/?stageId=${stageId_from}`);
-                setSelectedQuantity(response.data.data.quantity);  // Assuming quantity is in response data
+                setSelectedQuantity(response.data.quantity ); // Update with the fetched quantity
             } catch (error) {
                 console.error('Failed to fetch quantity:', error);
+                setSelectedQuantity('Error getting quantity or empty pond'); // Update with an error message
             }
         } else {
             console.error('Stage ID from is required.');
+            setSelectedQuantity('Stage ID is required'); // Handle missing ID case
         }
     };
     
+    
 
     
-      // Get the names of the selected stages
-      const selectedStageNames = stages
-        .filter((stage) => moveFishData.stageId_from.includes(stage.id))
-        .map((stage) => stage.title)
-        .join(', ') || 'Select Stages'; // Default text if no stages are selected   
-        console.log(moveFishData.stageId_from)
+    // Get the names of the selected stages
+    const selectedStageNames = stages
+    .filter((stage) => moveFishData.stageId_from.includes(stage.id))
+    .map((stage) => stage.title)
+    .join(', ') || 'Select Stages'; // Default text if no stages are selected   
+    console.log(moveFishData.stageId_from)
+
     const handleMoveFishes = async (e) => {
         e.preventDefault();
+
+        // Display confirmation dialog
+        const isConfirmed = window.confirm(
+            `Are you sure you want to move ${moveFishData.actual_quantity} fish from ${selectedStageNames} to ${selectedTitle}?`
+        );
+
+        if (!isConfirmed) {
+            return; // If the user cancels, stop the process
+        }
+
         setLoader(true);
         const loadingToast = toast.loading("Moving fish...");
-    
+
         try {
             const response = await Api.post('/move-fish', moveFishData);
+
             // Reset the form data
             setMoveFishData({
                 stageId_from: '',
@@ -118,8 +133,7 @@ export default function MoveFish() {
                 type: "success",
                 isLoading: false,
                 autoClose: 3000,
-            });           
-            
+            });
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error moving fish. Please try again.",
@@ -161,9 +175,10 @@ export default function MoveFish() {
                                             stages
                                             .filter((stage) => !['damages','damage', 'loss','harvest', 'harvests'].includes(stage.title.toLowerCase())) // Exclude unwanted stages
                                             .map((stage, index) => (
-                                                <option value={stage.id} key={index} data-title={stage.title}>
-                                                {stage.title}
+                                                <option value={stage.id} key={index} data-title={stage.title}>                                                                                
+                                                    {stage.title} {moveFishData.stageId_from === stage.id ? `-(${selectedQuantity || 'loading...'})` : ''}
                                                 </option>
+                                                
                                             ))
                                         ) : (
                                             <option>No stages available</option>
@@ -186,7 +201,7 @@ export default function MoveFish() {
                                                 <option>No data available</option>
                                             ) : (
                                                 stages.map((stage, index) => (
-                                                    <option value={stage.id} key={index} data-title={stage.title} >{stage.title}{selectedQuantity ? `-(${selectedQuantity})` : ''}</option>
+                                                    <option value={stage.id} key={index} data-title={stage.title} >{stage.title}</option>
                                                 ))
                                             )}
                                         </Form.Select>

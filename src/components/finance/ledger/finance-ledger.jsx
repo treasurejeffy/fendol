@@ -13,7 +13,7 @@ const FinanceLedger = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 5; // Adjust this number as needed
+  const itemsPerPage = 10; // Adjust this number as needed
   const [balance, setBalance] = useState(0);
   const [selectedDate, setSelectedDate] = useState(""); // State for date filter
 
@@ -159,8 +159,8 @@ const FinanceLedger = () => {
                         <td>{record.productName}</td>
                         <td>
                           {record.description
-                            ? record.description.slice(0, 60) +
-                              (record.description.length > 60 ? "..." : "-")
+                            ? record.description.slice(0, 40) +
+                              (record.description.length > 40 ? "..." : "-")
                             : ""}
                         </td>
                         <td>{record.quantity}</td>

@@ -76,38 +76,45 @@ const AddFish = () => {
         });
     };
 
-
     const handleAddFish = async (e) => {
         e.preventDefault();
+    
+        // Show confirmation prompt
+        const userConfirmed = window.confirm("Are you sure you want to add this fish?");
+        if (!userConfirmed) {
+            return; // Exit if the user cancels
+        }
+    
         setLoader(true);
-        const loadingToast = toast.loading("Adding fish...",{
-            className: 'dark-toast'});
-
+        const loadingToast = toast.loading("Adding fish...", {
+            className: 'dark-toast'
+        });
+    
         try {
             const response = await Api.post('/fish', formData);
-
-               // Reset form or handle success as needed
+    
+            // Reset form or handle success as needed
             setFormData({
                 stageId: '',
-                quantity: '',        
+                quantity: '',
                 speciesId: ''
             });
-
+    
             // After a successful API call
             toast.update(loadingToast, {
                 render: "Fish added successfully!",
-                type: "success", // Use string for type
+                type: "success",
                 isLoading: false,
                 autoClose: 5000,
                 className: 'dark-toast'
             });
-            
+    
             navigate('/ponds/view-add-fish-history');
-
+    
         } catch (error) {
             toast.update(loadingToast, {
-                render: error.response?.data?.message ||  "Error adding fish. Please try again.",
-                type: "error", // Use string for type
+                render: error.response?.data?.message || "Error adding fish. Please try again.",
+                type: "error",
                 isLoading: false,
                 autoClose: 3000,
                 className: 'dark-toast'
@@ -116,6 +123,7 @@ const AddFish = () => {
             setLoader(false);
         }
     };
+    
 
     return (
         <section className={`d-none d-lg-block ${styles.body}`}>

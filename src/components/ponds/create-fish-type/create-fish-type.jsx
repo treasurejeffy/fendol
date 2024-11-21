@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header';
 import Api from '../../shared/api/apiLink';
+import { FaTrashAlt } from "react-icons/fa";
 import styles from '../product-stages.module.scss'; // Adjust the import as needed
 
 const AddSpecies = () => {
@@ -115,6 +116,36 @@ const AddSpecies = () => {
         }
     };
 
+    // delete specie or fish type
+    const handleDelete = async (stageId) => {
+        const loadingToast = toast.loading("Deleting Fish Type...", {
+            className: 'dark-toast'
+        });
+    
+        if (window.confirm("Are you sure you want to delete this Fish Type?")) {
+            try {
+                await Api.delete(`/specie/${stageId}`);
+                toast.update(loadingToast, {
+                    render: "Fish Type deleted successfully!",
+                    type: "success", // Success type
+                    isLoading: false,
+                    autoClose: 3000,
+                    className: 'dark-toast'
+                });
+                fetchStages(); // Refresh the data after deletion
+            } catch (error) {
+                toast.update(loadingToast, {
+                    render: "Failed to delete Fish Type. Please try again.",
+                    type: "error", // Error type
+                    isLoading: false,
+                    autoClose: 3000,
+                    className: 'dark-toast'
+                });
+            }
+        }
+    };
+    
+
     return (
         <section className={`d-none d-lg-block ${styles.body}`}>
             <div className="sticky-top">
@@ -175,10 +206,23 @@ const AddSpecies = () => {
                                                 >
                                                     <td>{formatDate(stage.createdAt)}</td>
                                                     <td>{stage.speciesName}</td>
-                                                    <td>
-                                                        {stage.description.length > 40
+                                                    <td className="d-flex justify-content-between"> 
+                                                        <span >
+                                                            {stage.description.length > 40
                                                             ? `${stage.description.slice(0, 40)}...`
                                                             : stage.description}
+                                                        </span>
+                                                        <span className={`p-2 bg-light rounded-circle shadow-sm ${styles.delete}`} onClick={(e) => {
+                                                                e.stopPropagation(); // Prevent triggering `handleEdit` when clicking the delete icon
+                                                                handleDelete(stage.id);
+                                                            
+                                                        }} title="Delete Process">
+                                                        <FaTrashAlt
+                                                            
+                                                            style={{ cursor: "pointer", color: "red" }}
+                                                            title="Delete Process"
+                                                        />
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             ))}

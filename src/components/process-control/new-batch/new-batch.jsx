@@ -11,12 +11,13 @@ import { MdOutlineRefresh } from "react-icons/md";
 export default function NewBatchFish() {
     const [stages, setStages] = useState({ harvest: null, washing: null });
     const [fishType, setFishType] = useState([]);
+    const [selectedQuantity, setSelectedQuantity] = useState(true);
     const [checkStages, setCheckStages] = useState([]);
     const [moveFishData, setMoveFishData] = useState({
         stageId_from: '',
         stageId_to: '',
         speciesId: '',
-        actual_quantity: '',
+        actual_quantity: null,
         remarks: '',
     });
     const [showSuccessOverlay, setShowSuccessOverlay] = useState(() => {
@@ -85,7 +86,14 @@ export default function NewBatchFish() {
             }
         };
         fetchFishType();
+        
     }, []);
+
+    useEffect(()=>{
+        if (stages.harvest?.id) {
+            getQuantity(stages.harvest.id);
+        }
+    },[stages.harvest])
 
     const handleInputChangeMoveFish = (e) => {
         const { name, value } = e.target;
@@ -94,6 +102,27 @@ export default function NewBatchFish() {
             [name]: name === 'actual_quantity' ? parseFloat(value) : value,
         });
     };
+
+    const getQuantity = async (id) => {
+        if (id) {
+            setSelectedQuantity(true); // Show "Loading..." during fetch
+            try {
+                const response = await Api.get(`/fish-quantity/?stageId=${id}`);
+                const quantity = response.data.quantity;
+                setMoveFishData((prevData) => ({
+                    ...prevData,
+                    actual_quantity: Number(quantity), // Ensure quantity is a number
+                }));
+            } catch (error) {
+                console.error('Failed to fetch quantity:', error);
+            } finally {
+                setSelectedQuantity(false); // Stop showing "Loading..." after fetch
+            }
+        } else {
+            console.error('Stage ID from is required.');
+        }
+    };
+    
 
     const handleMoveFishes = async (e) => {        
         e.preventDefault();
@@ -123,7 +152,7 @@ export default function NewBatchFish() {
             setLoader(false);
         }
     };
-
+        
     // process begins here 
     const [whole, setWhole] =useState();
     const [loading, setLoading] = useState(false);
@@ -203,7 +232,7 @@ export default function NewBatchFish() {
                 fetchQuantity(moveData.stageId_from, selectedStage.title);
             }
         }
-    }, [moveData.stageId_from]);
+    }, [moveData.stageId_from, orderedStages]);
     
     // Function to get the next stage based on the current stage ID
     const getNextStageId = (currentStageId) => {
@@ -326,7 +355,7 @@ export default function NewBatchFish() {
                                                 stages.harvest === null
                                                     ? 'Loading...'          // Show "Loading..." while initially loading
                                                     : stages.harvest?.title // Show title if available
-                                                    || 'No Value'            // Show "No data" if title or data is missing
+                                                    || 'No Harvest Pond Available'            // Show "No data" if title or data is missing
                                             }
                                             readOnly
                                             className={`py-2 bg-light-subtle text-muted shadow-none  border-1 ${styles.inputs}`}
@@ -334,21 +363,21 @@ export default function NewBatchFish() {
                                     <input
                                         type="hidden"
                                         name="stageId_from"
-                                        value={stages.harvest ? stages.harvest.id : 'pls wait...'}
+                                        value={stages.harvest ? stages.harvest?.id : 'pls wait...'}
                                         onChange={handleInputChangeMoveFish}
                                     />
                                 </Col>
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Process To</Form.Label>
                                     <Form.Control
-                                        value={stages.washing === null ? 'Loading...' : stages.washing.title || 'No Value'}
+                                        value={stages.washing === null ? 'Loading...' : stages.washing?.title || 'No Washing Process Available'}
                                         readOnly
                                         className={`py-2 bg-light-subtle text-muted shadow-none  border-1 ${styles.inputs}`}
                                     />
                                     <input
                                         type="hidden"
                                         name="stageId_to"
-                                        value={stages.washing ? stages.washing.id : ''}
+                                        value={stages.washing ? stages.washing?.id : ''}
                                         onChange={handleInputChangeMoveFish}
                                     />
                                 </Col>
@@ -374,16 +403,15 @@ export default function NewBatchFish() {
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Quantity</Form.Label>
                                     <Form.Control
-                                        placeholder="Enter quantity"
                                         type="number"
                                         name="actual_quantity"
-                                        value={moveFishData.actual_quantity || ''}
-                                        min="1"
-                                        required
-                                        onChange={handleInputChangeMoveFish}
-                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                                        placeholder='loading...'
+                                        value={selectedQuantity === false ? moveFishData.actual_quantity : 'loading...'}
+                                        readOnly
+                                        className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                                     />
                                 </Col>
+
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Remark</Form.Label>
                                     <Form.Control
@@ -470,7 +498,7 @@ export default function NewBatchFish() {
                                                     <Form.Control
                                                         readOnly
                                                         type='number'
-                                                        placeholder='It will not be visible'
+                                                        placeholder=''
                                                         value={moveData.brokenFishBefore} // Ensure this value is set correctly
                                                         className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} me-2`}
                                                     />
@@ -494,7 +522,7 @@ export default function NewBatchFish() {
                                                     <Form.Control
                                                         readOnly
                                                         type='number'
-                                                        placeholder='It will not be visible'
+                                                        placeholder=''
                                                         value={moveData.damageBefore} // Ensure this value is set correctly
                                                         className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                     />

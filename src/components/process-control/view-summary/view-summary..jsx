@@ -80,7 +80,7 @@ export default function ViewSummary() {
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
             <div className="d-flex justify-content-between mt-3 ">
-              <h4 className="mb-4">View Summary</h4>
+              <h4 className="mb-4">Batch History</h4>
               
               {/* Date Picker for filtering */}
               <div className="mb-4 d-flex gap-2">

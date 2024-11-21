@@ -8,7 +8,7 @@ import Api from '../../shared/api/apiLink';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Spinner, Alert, Modal, Button, Form, InputGroup } from 'react-bootstrap';
-import { FaArrowLeft, FaArrowRight, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaEye, FaEyeSlash, FaTrashAlt } from "react-icons/fa";
 
 export default function ViewAll() {
   const [admins, setAdmins] = useState([]);
@@ -90,6 +90,34 @@ export default function ViewAll() {
     setShowPassword(!showPassword);
   };
 
+  const handleDelete = async (stageId) => {
+    const loadingToast = toast.loading("Deleting Admin...", {
+        className: 'dark-toast'
+    });
+
+    if (window.confirm("Are you sure you want to delete this Admin?")) {
+        try {
+            await Api.delete(`/delete-admin/${stageId}`);
+            toast.update(loadingToast, {
+                render: "Admin deleted successfully!",
+                type: "success", // Success type
+                isLoading: false,
+                autoClose: 3000,
+                className: 'dark-toast'
+            });
+            fetchData(); // Refresh the data after deletion
+        } catch (error) {
+            toast.update(loadingToast, {
+                render: "Failed to delete Admin. Please try again.",
+                type: "error", // Error type
+                isLoading: false,
+                autoClose: 3000,
+                className: 'dark-toast'
+            });
+        }
+    }
+};
+
   const indexOfLastAdmin = currentPage * adminsPerPage;
   const indexOfFirstAdmin = indexOfLastAdmin - adminsPerPage;
   const currentAdmins = admins.slice(indexOfFirstAdmin, indexOfLastAdmin);
@@ -107,6 +135,7 @@ export default function ViewAll() {
 
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
+            <ToastContainer/>
             <h4 className="mt-3 mb-5">All Admins</h4>
             
             {loading && (
@@ -148,7 +177,16 @@ export default function ViewAll() {
                       <tr key={index} onClick={() => handleEdit(admin)}>
                         <td>{admin.fullName}</td>
                         <td>{admin.email}</td>
-                        <td>{admin.role}</td>
+                        <td className="d-flex justify-content-between"><span>{admin.role}</span> <span className={`p-2 bg-light rounded-circle shadow-sm ${styles.delete}`} onClick={(e) => {
+                                e.stopPropagation(); // Prevent triggering `handleEdit` when clicking the delete icon
+                                handleDelete(admin.id);                        
+                        }} title="Delete Admin">
+                        <FaTrashAlt
+                            
+                            style={{ cursor: "pointer", color: "red" }}
+                            title="Delete admin"
+                        />
+                        </span></td>
                       </tr>
                     ))}
                   </tbody>
@@ -245,10 +283,9 @@ export default function ViewAll() {
                       >
                         <option value="" disabled>
                           Select Role
-                        </option>
-                        <option value="Product Manager">Product Manager</option>
-                        <option value="Inventory Manager">Inventory Manager</option>
-                        <option value="Sales Manager">Sales Manager</option>
+                        </option>                                                      
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super Admin</option>
                       </Form.Select>
                     </div>
                   </Form.Group>

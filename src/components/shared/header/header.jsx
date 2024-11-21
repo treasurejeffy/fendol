@@ -1,8 +1,7 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { InputGroup, Form, Dropdown, ButtonGroup } from 'react-bootstrap';
+import {  Form, Dropdown, ButtonGroup } from 'react-bootstrap';
 import { FaSearch } from "react-icons/fa";
-import { GoQuestion } from "react-icons/go";
 import { IoMdNotifications } from "react-icons/io";
 import { FaRegUserCircle } from 'react-icons/fa';
 import {useNavigate} from 'react-router-dom';
@@ -41,7 +40,12 @@ export default function Header() {
                     <IoMdNotifications size={25} className={`me-3 ${styles.icons}`} />
                     <Dropdown as={ButtonGroup}>
                         <Dropdown.Toggle className="bg-transparent text-dark border-0" id="dropdown-basic">
-                            <FaRegUserCircle size={32} className={`me-1 ${styles.icons}`} /> <span>Admin</span>
+                            <FaRegUserCircle size={32} className={`me-1 ${styles.icons}`} /> <span>
+                                {sessionStorage.getItem('role')
+                                    ?.replace(/_/g, ' ') // Replace underscores with spaces
+                                    .replace(/\b\w/g, char => char.toUpperCase()) // Capitalize the first letter of each word
+                                }
+                                </span>
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="border border-secondary bg-light-subtle">

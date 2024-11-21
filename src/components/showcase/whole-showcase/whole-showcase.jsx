@@ -105,7 +105,7 @@ const fetchTableData = async () => {
                       <p className="text-start text-muted fw-semibold" style={{fontSize:'14px'}}>Total Quantity</p>
                       <div className="d-flex pb-3">
                           <h1>{brokenQuantity}</h1>
-                          <p className="mt-3 fw-semibold" style={{fontSize:'12px'}}>Kg</p>
+                          <p className="mt-3 fw-semibold" style={{fontSize:'12px'}}>piece</p>
                       </div>
                     </div>
                 </div>
@@ -170,7 +170,7 @@ const fetchTableData = async () => {
                     nextLinkClassName={"page-link"}
                     breakClassName={"page-item disabled"}
                     breakLinkClassName={"page-link"}
-                    activeClassName={"active"}
+                    activeClassName={"active-light"}
                 />
                 </div>
               </div>

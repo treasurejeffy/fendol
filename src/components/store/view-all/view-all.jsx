@@ -323,7 +323,7 @@ export default function UpdateStoreInventory() {
                     nextLinkClassName={"page-link"}
                     breakClassName={"page-item"}
                     breakLinkClassName={"page-link"}
-                    activeClassName={"dark"}
+                    activeClassName={"dark active-light"}
                   />
                 </div>
               </>
@@ -357,7 +357,7 @@ export default function UpdateStoreInventory() {
               <>
                 {/* Quantity */}
                 <Form.Group className="mb-3 row">
-                  <Form.Label className="col-4 fw-semibold">Quantity (kg)</Form.Label>
+                  <Form.Label className="col-4 fw-semibold">Quantity {`(${selectedProduct?.unit})`}</Form.Label>
                   <div className="col-8">
                     <Form.Control 
                       type="number" 
@@ -365,7 +365,7 @@ export default function UpdateStoreInventory() {
                       value={quantity ?? ''} // Shows empty string if quantity is null
                       onChange={(e) => setQuantity(Number(e.target.value) || null)} 
                       className={`py-2 shadow-none  border-1 ${styles.inputs}`} 
-                      placeholder="Quantity (kg)" 
+                      placeholder="Enter Quantity" 
                     />
                   </div>
                 </Form.Group>
@@ -396,33 +396,35 @@ export default function UpdateStoreInventory() {
             {modalType === 'remove' && (
               <>
                 {/* Product Stage */}
-                <Form.Group className="mb-3 row">
-                  <Form.Label className="col-4 fw-semibold">Pond</Form.Label>
-                  <div className="col-8">
-                    <Form.Select
-                      name="stage"
-                      required
-                      value={stage}
-                      onChange={(e) => setStage(e.target.value)}
-                      className={`py-2 shadow-none  border-1 ${styles.inputs}`}
-                    >
-                      <option value="" disabled>Choose Pond</option>
-                      {!stages ? (
-                          <option>Please wait...</option>
-                      ) : stages.length < 1 ? (
-                          <option>No data available</option>
-                      ) : (
-                          stages.map((stage, index) => (
-                              <option value={stage.title} key={index}>{stage.title}</option>
-                          ))
-                      )}
-                    </Form.Select>
-                  </div>
-                </Form.Group>
+              <Form.Group className="mb-3 row">
+                <Form.Label className="col-4 fw-semibold">Pond To</Form.Label>
+                <div className="col-8">
+                  <Form.Select
+                    name="stage"
+                    required
+                    value={stage}
+                    onChange={(e) => setStage(e.target.value)}
+                    className={`py-2 shadow-none border-1 ${styles.inputs}`}
+                  >
+                    <option value="" disabled>Choose Pond</option>
+                    {!stages ? (
+                      <option>Please wait...</option>
+                    ) : stages.length < 1 ? (
+                      <option>No data available</option>
+                    ) : (
+                      stages
+                        .filter(stage => !['damage', 'loss', 'damages'].includes(stage.title.toLowerCase())) // Correct filter logic to exclude specific titles
+                        .map((stage, index) => (
+                          <option value={stage.title} key={index}>{stage.title}</option>
+                        ))
+                    )}
+                  </Form.Select>
+                </div>
+              </Form.Group>
 
                 {/* Quantity */}
                 <Form.Group className="mb-4 row">
-                  <Form.Label className="col-4 fw-semibold">Quantity</Form.Label>
+                  <Form.Label className="col-4 fw-semibold">Quantity {`(${selectedProduct?.unit})`}</Form.Label>
                   <div className="col-8 d-flex align-items-center">
                     <Form.Control 
                       type="number" 

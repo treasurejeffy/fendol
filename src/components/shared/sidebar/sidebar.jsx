@@ -301,13 +301,13 @@ export default function SideBar() {
                                                 <FaRegCircle size={20} className="me-1" />New Batch
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="my-3">
+                                        <Nav.Item className="my-3" title="Batch history or view summary">
                                             <div
                                                 onClick={() => navigate('/process-control/view-summary')}
                                                 className={`${location.pathname === "/process-control/view-summary" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={20} className="me-1" /> View Summary
+                                                <FaRegCircle size={20} className="me-1" /> Batch History
                                             </div>
                                         </Nav.Item>                                        
                                     </Card.Body>
@@ -563,7 +563,7 @@ export default function SideBar() {
                                                 </div>
                                             </Nav.Item>
                                         )}
-                                        <Nav.Item className="mb-3" title="Financial Ledger">
+                                        {role === 'super_admin' && (<Nav.Item className="mb-3" title="Financial Ledger">
                                             <div 
                                                 onClick={() => navigate('/finance/ledger')} 
                                                 className={`${location.pathname === "/finance/ledger" ? styles.activeLink : styles.nonactiveLink}`}
@@ -571,7 +571,7 @@ export default function SideBar() {
                                             >
                                                 <FaRegCircle size={20} className="me-1" />Finance Ledger
                                             </div>
-                                        </Nav.Item>
+                                        </Nav.Item>)}
                                     </Card.Body>
                                 </div>
                             </Collapse>
