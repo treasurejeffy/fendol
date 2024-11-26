@@ -1,7 +1,7 @@
 // Variables
 $login-width-desktop: 48%;
 $bg-color: #833f0833; // Background color for the section and middle area
-$form-bg-color: #7c5a3d4d;
+$form-bg-color: #705B50;
 
 // Main Section
 .login_section {
@@ -44,7 +44,7 @@ section .bottom_img {
   z-index: 2; // Ensure it's above the background images
   position: relative; // For stacking context
   border: 3.39px solid;
-  border: 3px rgba(116, 73, 45, 0.568) solid;
+  border: 3px #93857F solid;
   border-radius: 20%;
 
 
@@ -67,7 +67,7 @@ section .bottom_img {
 }
 
 .inputs:focus {
-    background-color: #B0642633;
+    background-color: #705B50;
     color: #beb7b7 ;
     border: #9b7878 0.2px solid;
 }
@@ -80,8 +80,10 @@ a {
 
 .btn{
     background-color: #512728;
+    border: none;
     &:hover{
       background-color: #512728;
+      border: none;
     }
     &:active{
       background-color: #512728;

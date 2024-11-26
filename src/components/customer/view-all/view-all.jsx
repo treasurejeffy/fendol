@@ -7,11 +7,27 @@ import { BsExclamationTriangleFill } from "react-icons/bs";
 import Api from '../../shared/api/apiLink';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { BsThreeDotsVertical } from "react-icons/bs"; // Dropdown icon
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import { Spinner, Alert, Modal, Button, Form } from 'react-bootstrap';
+import { Spinner, Alert, Modal, Button, Form} from 'react-bootstrap';
 import ReactPaginate from 'react-paginate';
+import { useNavigate } from "react-router-dom";
+
+const DropdownMenu = ({ show, onClickOutside, onEditClick, onNavigate,  onRemoveClick}) => {
+  if (!show) return null;
+
+  return (
+    <div className={styles.dropdownMenu} onClick={onClickOutside}>
+      <ul className={styles.menuList}>
+        <li className={` mx-2 mt-2 rounded ${styles.menuItem}`} onClick={onEditClick}>Edit </li>
+        <li className={` mx-2 mb-2 rounded ${styles.menuItem}`} onClick={onNavigate}>View Ledger  </li>       
+      </ul>
+    </div>
+  );
+};
 
 export default function ViewAll() {
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,6 +37,8 @@ export default function ViewAll() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null); // State to track active dropdown
+
 
   const fetchData = async () => {
     try {
@@ -105,6 +123,19 @@ export default function ViewAll() {
     setCurrentPage(data.selected);
   };
 
+  // Handle Remove click
+  const handleNavigate = (customer) => {
+    console.log(customer)
+    navigate(`/customer/personal-ledger/?id=${customer}`)
+  };
+  
+
+  // Handle dropdown toggle
+  const handleDropdownToggle = (customerId) => {
+    setActiveDropdown(activeDropdown === customerId ? null : customerId); // Toggle active dropdown
+  };
+
+  const handleClickOutside = () => setActiveDropdown(null);
   return (
     <section className={`d-none d-lg-block ${styles.body}`}>
       <div className="sticky-top">
@@ -120,7 +151,6 @@ export default function ViewAll() {
             <div className="d-flex justify-content-between align-items-center">
               <h4 className="mt-3 mb-5">All Customers</h4>
               <div className="d-flex gap-2">
-                <p className="fw-semibold mt-2">Filter</p>
                 <Form.Select
                   onChange={handleCategoryChange}
                   value={selectedCategory}
@@ -153,7 +183,7 @@ export default function ViewAll() {
             {!loading && !error && filteredCustomers.length === 0 && (
               <div className="d-flex justify-content-center">
                 <Alert variant="info" className="text-center w-50 py-5">
-                  <BsExclamationTriangleFill size={40} /> <span className="fw-semibold">No available data</span>
+                  <BsExclamationTriangleFill size={40} /> <span className="fw-semibold">No available Customer!</span>
                 </Alert>
               </div>
             )}
@@ -172,12 +202,26 @@ export default function ViewAll() {
                   </thead>
                   <tbody>
                     {currentCustomers.map((customer, index) => (
-                      <tr key={index} onClick={() => handleEdit(customer)}>
+                      <tr key={index} className="text-start">
                         <td>{formatDate(customer.createdAt)}</td>
                         <td>{customer.fullName}</td>
                         <td>{customer.phone}</td>
                         <td>{customer.category}</td>
-                        <td>{customer.address}</td>
+                        <td className="d-flex justify-content-between"><span>{customer.address}</span>
+                          <div className="position-relative">
+                            <BsThreeDotsVertical
+                              className="me-3 cursor-pointer"
+                              style={{cursor: "pointer"}}
+                              onClick={() => handleDropdownToggle(customer.id)}
+                            />
+                            <DropdownMenu 
+                              show={activeDropdown === customer.id}                              
+                              onClickOutside={handleClickOutside} 
+                              onEditClick={() => handleEdit(customer)}
+                              onNavigate={() => handleNavigate(customer.id)}                     
+                            />
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

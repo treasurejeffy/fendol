@@ -76,7 +76,7 @@ export default function MoveFish() {
     };
     
     const getQuantity = async (stageId_from) => {
-        console.log(stageId_from);
+        setSelectedQuantity('loading...')
         if (stageId_from) {
             try {
                 const response = await Api.get(`/fish-quantity/?stageId=${stageId_from}`);
@@ -173,10 +173,10 @@ export default function MoveFish() {
                                         <option value="" disabled>Choose Pond</option>
                                         {stages && stages.length > 0 ? (
                                             stages
-                                            .filter((stage) => !['damages','damage', 'loss','harvest', 'harvests'].includes(stage.title.toLowerCase())) // Exclude unwanted stages
+                                            .filter((stage) => !['damages','Damage', 'loss','harvest', 'Harvests'].includes(stage.title.toLowerCase())) // Exclude unwanted stages
                                             .map((stage, index) => (
                                                 <option value={stage.id} key={index} data-title={stage.title}>                                                                                
-                                                    {stage.title} {moveFishData.stageId_from === stage.id ? `-(${selectedQuantity || 'loading...'})` : ''}
+                                                    {stage.title} {moveFishData.stageId_from === stage.id ? `-(${selectedQuantity || '0'})` : ''}
                                                 </option>
                                                 
                                             ))

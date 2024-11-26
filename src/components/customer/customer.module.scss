@@ -62,22 +62,24 @@
     font-family: Roboto Flex;
     font-size: 16px;
     font-weight: 500;
-    text-align: center;
+    text-align: left;
     line-height: 18.75px;
     letter-spacing: 0.04em;
     color: #2E3135;
+    cursor: auto;
   }
 }
 
 .dropdownMenu {
   position: absolute;
-  top: 100%;
+  top: 100%; // Position dropdown below the element
   right: 0;
-  background-color: #2E3135 ; // Background color
+  background-color: #2E3135; // Background color
   color: white; // Text color
   border-radius: 5px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000; // Ensure it is on top
+  z-index: 10000; // Ensure it is on top of the table
+  min-width: 150px; // Ensures a minimum width for the dropdown
 }
 
 .menuList {
@@ -142,9 +144,11 @@
   border-collapse: collapse;
   table-layout: auto; /* Remove fixed to allow for natural column sizing */
   
-  th, td {
-    padding: 12px;
+  td {
+    padding: 16px;
     text-align: left;
+    font-size: 15px;
+    font-weight: 500;
     border-bottom: 1px solid #ddd;
   }
 
@@ -152,23 +156,20 @@
     color: #2E3135;
     background-color: #D0D5DD;
     text-transform: uppercase;
+    font-size: 16px;
+    font-weight: 650;
   }
 
   tbody tr:hover {
     background-color: #f5f5f5;
-    cursor: pointer; /* Make sure it's clear that the rows are clickable */
+    cursor: auto; /* Make sure it's clear that the rows are clickable */
   }
 
-  tbody td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; /* Keeps text from overflowing */
-  }
 }
 
 .theaders {
   th {
-    padding: 16px;
+    padding: 12px;
     &:first-of-type {
       border-top-left-radius: 8px;
       border-bottom-left-radius: 8px;

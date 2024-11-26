@@ -85,7 +85,7 @@ const AddNew = () => {
     
 
     return (
-        <section className={`d-none d-lg-block ${styles.body}`}>
+        <section className={`d-none d-lg-block ${styles.body}`} >
             <div className="sticky-top">
                 <Header />
             </div>

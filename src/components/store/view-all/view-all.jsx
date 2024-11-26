@@ -16,7 +16,7 @@ const DropdownMenu = ({ show, onClickOutside, onAddClick, onRemoveClick, onEditC
   return (
     <div className={styles.dropdownMenu} onClick={onClickOutside}>
       <ul className={styles.menuList}>
-        <li className={` mx-2 mt-2 rounded ${styles.menuItem}`} onClick={onAddClick}>Top Up Feed </li>
+        <li className={` mx-2 mt-2 rounded ${styles.menuItem}`} onClick={onAddClick}>Top Up Store </li>
         <li className={` mx-2 rounded ${styles.menuItem}`} onClick={onRemoveClick}>Remove </li>
         <li className={` mx-2 mb-2 rounded ${styles.menuItem}`} onClick={onEditClick}>Edit</li>
       </ul>
@@ -335,7 +335,7 @@ export default function UpdateStoreInventory() {
         <Modal show={showModal} onHide={() => setShowModal(false)} className="rounded-0 ">
           <Modal.Header closeButton className="border-0">
             <Modal.Title className="fw-semibold mx-2">
-              {modalType === 'add' ? 'Top Up Feed' : modalType === 'remove' ? 'Remove' : 'Edit'}
+              {modalType === 'add' ? 'Top Up Store' : modalType === 'remove' ? 'Remove' : 'Edit'}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body className="mt-5 mx-2">

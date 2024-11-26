@@ -29,68 +29,68 @@ export default function LogIn() {
         setLoginData({ ...loginData, [name]: value });
     };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoader(true);
-      
+    
         // Show loading toast
         const loadingToast = toast.loading("Logging in...", { className: 'dark-toast' });
-      
+    
         try {
-          const response = await axios.post('https://dev-api.fendolgroup.com/api/v1/login', loginData);
-          const { token, role, success } = response.data; // Destructure response data
-      
-          if (success) {
-            // Login successful
-            console.log('Login successful');
-      
-            // Store token and role in sessionStorage
-            sessionStorage.setItem('authToken', token);
-            sessionStorage.setItem('role', role);
-      
-            // Dispatch token to Redux
-            dispatch({ type: LOGIN_USER, payload: token });
-
-             // Clear form data
-             setLoginData({ email: '', password: '' });
-      
-            // Update success toast
-            toast.update(loadingToast, {
-              render: "Logged in successfully!",
-              type: "success",
-              isLoading: false,
-              autoClose: 3000,
-              className: 'dark-toast',
-            });
-      
-      
-            // Navigate based on the role
-            setTimeout(() => {
-              if (role === 'super_admin') {
-                  navigate('/admin/add-new-admin');
-              } else {
-                  navigate('/customer/view-all');
-              }
-          }, 100);
-      
-          } else {
-            // Handle failed login
-            throw new Error("Login failed");
-          }
+            const response = await axios.post('https://dev-api.fendolgroup.com/api/v1/login', loginData);
+            const { token, role, success } = response.data; // Destructure response data
+    
+            if (success) {
+                // Login successful
+                console.log('Login successful');
+    
+                // Store token and role in sessionStorage
+                sessionStorage.setItem('authToken', token);
+                sessionStorage.setItem('role', role);
+    
+                // Clear form data
+                setLoginData({ email: '', password: '' });
+    
+                // Dispatch token to Redux (important for state updates)
+                dispatch({ type: LOGIN_USER, payload: token });
+    
+                // Update success toast
+                toast.update(loadingToast, {
+                    render: "Logged in successfully!",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 3000,
+                    className: 'dark-toast',
+                });
+    
+                // Navigate based on the role with a slight delay
+                setTimeout(() => {
+                    if (role === 'super_admin') {
+                        navigate('/admin/add-new-admin');
+                    } else {
+                        navigate('/customer/view-all');
+                    }
+                }, 500); // Delay to allow state updates (adjust if necessary)
+    
+            } else {
+                // Handle failed login
+                throw new Error("Login failed");
+            }
         } catch (error) {
-          // Show error toast
-          toast.update(loadingToast, {
-            render: error.response?.data?.message || "Error while logging in. Please try again.",
-            type: "error",
-            isLoading: false,
-            autoClose: 7000,
-            className: 'dark-toast',
-          });
+            // Show error toast
+            toast.update(loadingToast, {
+                render: error.response?.data?.message || "Error while logging in. Please try again.",
+                type: "error",
+                isLoading: false,
+                autoClose: 7000,
+                className: 'dark-toast',
+            });
         } finally {
-          setLoader(false); // Reset loader state
+            setLoader(false); // Reset loader state
         }
-      };
-      
+    };
+    
     
     return (
         <section className={styles.login_section}>

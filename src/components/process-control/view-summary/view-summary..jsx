@@ -83,8 +83,7 @@ export default function ViewSummary() {
               <h4 className="mb-4">Batch History</h4>
               
               {/* Date Picker for filtering */}
-              <div className="mb-4 d-flex gap-2">
-                <span className="fw-semibold fs-6 mt-1">Filter</span>
+              <div className="mb-4 d-flex gap-2">              
                 <input
                   type="date"
                   value={selectedDate}
@@ -122,7 +121,7 @@ export default function ViewSummary() {
                       <th>DATE CREATED</th>
                       <th>FISH TYPE</th>
                       <th>QUANTITY BEFORE</th>
-                      <th>QUANTITY AFTER <br /> (W,S,D)</th>
+                      <th>QUANTITY AFTER <br /> (W,B,D)</th>
                       <th>REMARK</th>
                     </tr>
                   </thead>
@@ -132,9 +131,9 @@ export default function ViewSummary() {
                       return (
                         <tr key={index}>
                           <td>{formattedDate}</td>
-                          <td>{history.fishType}</td>
+                          <td>{history.fishType || '-'}</td>
                           <td>{history.quantityBefore}</td>
-                          <td>{history.wholeQuantity}</td>
+                          <td>{`${history.wholeQuantity},${history.brokenQuantity},${history.damageLoss}`}</td>
                           <td>{history.remarks ? history.remarks.slice(0, 40) + (history.remarks.length > 40 ? '...' : '') : '-'}</td>
                         </tr>
                       );
@@ -159,7 +158,7 @@ export default function ViewSummary() {
                     nextLinkClassName={"page-link"}
                     breakClassName={"page-item"}
                     breakLinkClassName={"page-link"}
-                    activeClassName={"active"}
+                    activeClassName={"active-light"}
                   />
                 </div>
               </>

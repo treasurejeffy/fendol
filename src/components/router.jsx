@@ -22,7 +22,7 @@ export default function RouterSwitch() {
     if(role === null){
       setRole(sessionStorage.getItem('role'));    
     }
-  })
+  }, [role])
   return (
     <Provider store={store}>
       <Router>

@@ -50,7 +50,7 @@ export default function ViewMoveFishHistory() {
         {/* Content */}
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
-            <h4 className="mt-3 mb-5">View Stages</h4>
+            <h4 className="mt-3 mb-5">View Move Fish Histories</h4>
             
             {/* Table */}
             {loading ? (

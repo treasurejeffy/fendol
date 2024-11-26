@@ -100,7 +100,7 @@ const fetchTableData = async () => {
                 </div>
               ) : brokenQuantity ? (
                 <div className="w-50 ">
-                    <div className="w-50 px-3 shadow-sm">
+                    <div className="w-50 px-3 shadow">
                       <p className="text-end text-muted fw-semibold" style={{fontSize:'12px'}}>In Stock</p>
                       <p className="text-start text-muted fw-semibold" style={{fontSize:'14px'}}>Total Quantity</p>
                       <div className="d-flex pb-3">

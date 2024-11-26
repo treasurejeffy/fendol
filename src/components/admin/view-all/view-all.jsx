@@ -174,7 +174,7 @@ export default function ViewAll() {
                   </thead>
                   <tbody>
                     {currentAdmins.map((admin, index) => (
-                      <tr key={index} onClick={() => handleEdit(admin)}>
+                      <tr key={index} onClick={() => handleEdit(admin)} title="Edit Admin...">
                         <td>{admin.fullName}</td>
                         <td>{admin.email}</td>
                         <td className="d-flex justify-content-between"><span>{admin.role}</span> <span className={`p-2 bg-light rounded-circle shadow-sm ${styles.delete}`} onClick={(e) => {

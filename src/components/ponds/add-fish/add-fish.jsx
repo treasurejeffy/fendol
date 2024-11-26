@@ -109,8 +109,9 @@ const AddFish = () => {
                 className: 'dark-toast'
             });
     
-            navigate('/ponds/view-add-fish-history');
-    
+            setTimeout(()=>{
+                navigate('/ponds/view-add-fish-history');
+            },4000)
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error adding fish. Please try again.",

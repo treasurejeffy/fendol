@@ -153,7 +153,7 @@ export default function CreateProducts() {
                                     </Form.Select>
                                 </Col>
                                 <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Base Price</Form.Label>
+                                    <Form.Label className="fw-semibold">Base Price (₦)</Form.Label>
                                     <Form.Control
                                         placeholder="Enter base price"
                                         className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}

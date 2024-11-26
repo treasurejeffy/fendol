@@ -4,9 +4,11 @@ import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../product-stages.module.scss';
 import { BsExclamationTriangleFill } from "react-icons/bs";
-import { Spinner, Alert } from 'react-bootstrap';
+import { Form, Button, Spinner, Alert, Modal } from 'react-bootstrap';
 import Api from "../../shared/api/apiLink";
 import ReactPaginate from 'react-paginate';
+import { toast, ToastContainer } from 'react-toastify';
+
 
 const ViewAllStages = () => {
   const [stages, setStages] = useState([]);
@@ -15,10 +17,12 @@ const ViewAllStages = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState(''); // Add state for search term
   const itemsPerPage = 10;
+  const [showModal, setShowModal] = useState(false);
+  const [selectedStage, setSelectedStage] = useState(null);
 
   const fetchStages = async () => {
     try {
-      const response = await Api.get('/fishes');
+      const response = await Api.get('/fish-stages');
       if (Array.isArray(response.data.data)) {
         setStages(response.data.data);
       } else {
@@ -52,8 +56,38 @@ const ViewAllStages = () => {
 
   // Filter stages based on the search term
   const filteredStages = stages.filter(stage => 
-    stage.stageTitle.toLowerCase().includes(searchTerm.toLowerCase())
+    (stage.title?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
+
+  // Handle stage edit
+  const handleEditStage = (stage) => {
+      setSelectedStage(stage);
+      setShowModal(true);
+  };
+
+  const handleSave = async () => {
+      const saveToast = toast.loading('Saving changes...');
+      try {
+          await Api.put(`/fish-stage/${selectedStage.id}`, selectedStage);
+          toast.update(saveToast, {
+              render: 'Pond updated successfully!',
+              type: 'success',
+              isLoading: false,
+              autoClose: 3000,
+          });
+          fetchStages();
+          setShowModal(false);
+      } catch (error) {
+          toast.update(saveToast, {
+              render: 'Failed to update pond. Please try again.',
+              type: 'error',
+              isLoading: false,
+              autoClose: 3000,
+          });
+      } finally {
+      }
+  };
+
 
   // Get the stages to be displayed based on current page
   const displayedStages = filteredStages.slice(startIndex, endIndex);
@@ -76,7 +110,7 @@ const ViewAllStages = () => {
               <div className="w-50s">
               <input
                   type="text"
-                  className="form-control mb-3 shadow-none border-dark"
+                  className="form-control mb-3 shadow-none border-secondary"
                   placeholder="Search by Pond...."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)} // Update search term
@@ -115,19 +149,17 @@ const ViewAllStages = () => {
                     <tr>
                       <th>DATE CREATED</th>
                       <th>NAME</th>
-                      <th>FISH TYPE</th>
-                      <th>QUANTITY</th>                    
+                      <th>Description</th>                                     
                     </tr>
                   </thead>
                   <tbody>
                     {displayedStages.map((stage) => {
                       const formattedCreatedAt = formatDate(stage.createdAt);
                       return (
-                        <tr key={stage.id} className={styles.trow}>
+                        <tr key={stage.id} style={{cursor: 'pointer'}} onClick={()=>{handleEditStage(stage)}}>
                           <td>{formattedCreatedAt}</td>
-                          <td>{stage.stageTitle}</td>
-                          <td>{stage.speciesName}</td>
-                          <td>{stage.quantity}</td>                                            
+                          <td>{stage.title}</td>
+                          <td>{stage.description}</td>                                                             
                         </tr>
                       );
                     })}
@@ -152,7 +184,7 @@ const ViewAllStages = () => {
                     nextLinkClassName={"page-link"}
                     breakClassName={"page-item"}
                     breakLinkClassName={"page-link"}
-                    activeClassName={"dark"}
+                    activeClassName={"active-light"}
                   />
                 </div>
               </>
@@ -160,6 +192,41 @@ const ViewAllStages = () => {
           </main>
         </section>
       </div>
+      {/* Edit Modal */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton className='border-0 mb-4'>
+              <Modal.Title>Edit Pond</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+              {selectedStage && (
+                  <Form>
+                      <Form.Group className="mb-4">
+                          <Form.Label>Name</Form.Label>
+                          <Form.Control
+                              type="text"
+                              name="title"
+                              value={selectedStage.title}
+                              onChange={(e) => setSelectedStage({ ...selectedStage, title: e.target.value })}
+                          />
+                      </Form.Group>
+                      <Form.Group className="mb-5">
+                          <Form.Label>Description</Form.Label>
+                          <Form.Control
+                              as="textarea"
+                              name="description"
+                              value={selectedStage.description}
+                              onChange={(e) => setSelectedStage({ ...selectedStage, description: e.target.value })}
+                          />
+                      </Form.Group>
+                  </Form>
+              )}
+          </Modal.Body>
+          <Modal.Footer className='border-0'>                            
+              <Button variant="dark" onClick={handleSave} className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}>
+                  Save Changes
+              </Button>
+          </Modal.Footer>
+      </Modal>
     </section>
   );
 };

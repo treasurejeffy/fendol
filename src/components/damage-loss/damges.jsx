@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactPaginate from "react-paginate"; // Import React Paginate
 import SideBar from "../shared/sidebar/sidebar";
 import Header from "../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -13,6 +14,8 @@ export default function DamageLoss() {
   const [moveFishHistory, setMoveFishHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(0); // Current page
+  const itemsPerPage = 10; // Number of items per page
 
   useEffect(() => {
     const fetchMoveFishHistory = async () => {
@@ -36,8 +39,17 @@ export default function DamageLoss() {
     return `${day}/${month}/${year}`;
   };
 
+  // Calculate Paginated Data
+  const offset = currentPage * itemsPerPage;
+  const currentItems = moveFishHistory.slice(offset, offset + itemsPerPage);
+  const pageCount = Math.ceil(moveFishHistory.length / itemsPerPage);
+
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
   return (
-    <section className={`d-none d-lg-block ${styles.body}`} >
+    <section className={`d-none d-lg-block ${styles.body}`}>
       <div className="sticky-top">
         <Header />
       </div>
@@ -60,45 +72,69 @@ export default function DamageLoss() {
             ) : error ? (
               <div className="d-flex justify-content-center">
                 <Alert variant="danger" className="text-center w-50 py-5">
-                  <FaExclamationTriangle size={40}/><span className="fw-semibold">{error}</span>
+                  <FaExclamationTriangle size={40} /><span className="fw-semibold">{error}</span>
                 </Alert>
               </div>
             ) : moveFishHistory.length === 0 ? (
               <div className="d-flex justify-content-center">
                 <Alert variant="info" className="text-center w-50 py-5">
-                  <FaExclamationTriangle size={40}/><span className="fw-semibold">No data available.</span>
+                  <FaExclamationTriangle size={40} /><span className="fw-semibold">No available Damage or loss.</span>
                 </Alert>
               </div>
             ) : (
-              <table className={styles.styled_table}> 
-                <thead>
-                  <tr>
-                    <th>DATE CREATED</th>
-                    <th>POND FROM</th>
-                    <th>PROCESS FROM</th>
-                    <th>FISH TYPE</th>
-                    <th>QUANTITY</th>
-                    <th>REMARK</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {moveFishHistory.map((history, index) => {
-                    const formattedDate = formatDate(history.createdAt);
-                    return (
-                      <tr key={index}>
-                        <td>{formattedDate}</td>
-                        <td>{history.fromStageTitle}</td>
-                        <td>{history.stage_from}</td>
-                        <td>{history.speciesName}</td>
-                        <td>{history.quantity}</td>
-                        <td>{history.description ? history.description.slice(0, 60) + (history.description.length > 60 ? '...' : '') : ''}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <>
+                <table className={styles.styled_table}>
+                  <thead>
+                    <tr>
+                      <th>DATE CREATED</th>
+                      <th>POND FROM</th>
+                      <th>PROCESS FROM</th>
+                      <th>QUANTITY</th>
+                      <th>REMARK</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentItems.map((history, index) => {
+                      const formattedDate = formatDate(history.createdAt);
+                      return (
+                        <tr key={index}>
+                          <td>{formattedDate}</td>
+                          <td>{history.process_from === null ? history.stageTitle_from : '-'}</td>
+                          <td>{history.stageId_from === null ? history.stageTitle_from : '-'}</td>
+                          <td>{history.quantity}</td>
+                          <td>
+                            {history.stageId_from === null
+                              ? history.description.replace(
+                                  'Damage or loss recorded during movement from stage',
+                                  ''
+                                ).trim()
+                              : history.description}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {/* Pagination */}
+                <ReactPaginate
+                  previousLabel={"<"}
+                  nextLabel={">"}
+                  pageCount={pageCount}
+                  onPageChange={handlePageClick}
+                  containerClassName={"pagination justify-content-center mt-4"}
+                  pageClassName={"page-item"}
+                  pageLinkClassName={"page-link"}
+                  previousClassName={"page-item"}
+                  previousLinkClassName={"page-link"}
+                  nextClassName={"page-item"}
+                  nextLinkClassName={"page-link"}
+                  breakClassName={"page-item"}
+                  breakLinkClassName={"page-link"}
+                  activeClassName={"active-light"}
+                />
+              </>
             )}
-          </main>        
+          </main>
         </section>
       </div>
     </section>
