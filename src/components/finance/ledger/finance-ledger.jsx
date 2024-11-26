@@ -93,8 +93,7 @@ const FinanceLedger = () => {
             <div className="d-flex justify-content-between mt-3 mb-5 ">
               <h4 className="">Finance Ledger</h4>
               {/* Date Picker for filtering */}
-              <div className="d-flex gap-2">
-                <span className="fw-semibold fs-6 mt-1">Filter</span>
+              <div className="d-flex gap-2">                
                 <input
                   type="date"
                   value={selectedDate}
@@ -160,7 +159,7 @@ const FinanceLedger = () => {
                         <td>
                           {record.description
                             ? record.description.slice(0, 40) +
-                              (record.description.length > 40 ? "..." : "-")
+                              (record.description.length > 40 ? "..." : "")
                             : ""}
                         </td>
                         <td>{record.quantity}</td>
