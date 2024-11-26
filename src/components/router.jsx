@@ -17,12 +17,7 @@ import ShowcaseNavigations from "./showcase/showcaseRoute";
 import { ToastContainer } from 'react-toastify';
 
 export default function RouterSwitch() {
-  const [role, setRole]= useState(null);
-  useEffect(()=>{
-    if(role === null){
-      setRole(sessionStorage.getItem('role'));    
-    }
-  }, [role])
+  const [role, setRole] = useState(() => sessionStorage.getItem('role')); 
   return (
     <Provider store={store}>
       <Router>
