@@ -38,19 +38,8 @@ export default function RouterSwitch() {
                   <Dashboard/>
                 </ProtectedRoute>
               }
-            />
-          {role === "super_admin" && (
-            <>            
-              <Route
-              path="admin/*"
-              element={
-                <ProtectedRoute>
-                  <AdminNavigations />
-                </ProtectedRoute>
-              }
-            />
-            </>
-          )}
+          />         
+          
           <Route
             path="customer/*"
             element={
