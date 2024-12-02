@@ -16,7 +16,7 @@ export default function MoveFish() {
     const [moveFishData, setMoveFishData] = useState({
         stageId_from: '',
         stageId_to: '',
-        speciesId: '',
+        batch_no: '',
         actual_quantity: null,
         remarks: '',
     });
@@ -43,22 +43,6 @@ export default function MoveFish() {
         fetchStages();
     }, []);
 
-    useEffect(() => {
-        const fetchFishType = async () => {
-            try {
-                const response = await Api.get('/species');
-                if (Array.isArray(response.data.data)) {
-                    setFishType(response.data.data);
-                } else {
-                    throw new Error('Expected an array of species');
-                }
-            } catch (err) {
-                console.error(err.response?.data?.message || 'Failed to fetch data. Please try again.');
-            }
-        };
-        fetchFishType();
-    }, []);
-
     const handleInputChangeMoveFish = (e) => {
         const { name, value } = e.target;
         if (name === 'stageId_from') {
@@ -79,8 +63,8 @@ export default function MoveFish() {
         setSelectedQuantity('loading...')
         if (stageId_from) {
             try {
-                const response = await Api.get(`/fish-quantity/?stageId=${stageId_from}`);
-                setSelectedQuantity(response.data.quantity ); // Update with the fetched quantity
+                const response = await Api.get(`/active-batch?stageId=${stageId_from}`);
+                setFishType(response.data.data); // Update with the fetched quantity
             } catch (error) {
                 console.error('Failed to fetch quantity:', error);
                 setSelectedQuantity('Error getting quantity or empty pond'); // Update with an error message
@@ -123,9 +107,9 @@ export default function MoveFish() {
             setMoveFishData({
                 stageId_from: '',
                 stageId_to: '',
-                speciesId: '',
+                batch_no: '',
                 actual_quantity: '',
-                remarks: '',
+                remarks: ''
             });
 
             toast.update(loadingToast, {
@@ -172,17 +156,36 @@ export default function MoveFish() {
                                         >
                                         <option value="" disabled>Choose Pond</option>
                                         {stages && stages.length > 0 ? (
-                                            stages
-                                            .filter((stage) => !['damages','Damage', 'loss','harvest', 'Harvests'].includes(stage.title.toLowerCase())) // Exclude unwanted stages
-                                            .map((stage, index) => (
+                                            stages.map((stage, index) => (
                                                 <option value={stage.id} key={index} data-title={stage.title}>                                                                                
-                                                    {stage.title} {moveFishData.stageId_from === stage.id ? `-(${selectedQuantity || '0'})` : ''}
-                                                </option>
-                                                
+                                                    {stage.title}
+                                                    {/* {moveFishData.stageId_from === stage.id ? `-(${selectedQuantity || '0'})` : ''} */}
+                                                </option>                                                
                                             ))
                                         ) : (
                                             <option>No stages available</option>
                                         )}
+                                        </Form.Select>
+                                    </Col>
+                                    <Col className="mb-4">
+                                        <Form.Label className="fw-semibold">Fish Batch</Form.Label>
+                                        <Form.Select
+                                            name="batch_no"
+                                            value={moveFishData.batch_no}
+                                            onChange={handleInputChangeMoveFish}
+                                            required
+                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                                        >
+                                            <option value="" disabled>Choose Fish Batch</option>
+                                            {!fishType ? (
+                                                <option>Please wait...</option>
+                                            ) : fishType.length < 1 ? (
+                                                <option>No Active Batch</option>
+                                            ) : (
+                                                fishType.map((stage, index) => (
+                                                    <option value={stage.batch_no} key={index}>{stage.batch_no} {moveFishData.stageId_from === stage.stageId ? `-(${stage.quantity || '0'})` : ''}</option>
+                                                ))
+                                            )}
                                         </Form.Select>
                                     </Col>
                                     <Col className="mb-4">
@@ -205,28 +208,7 @@ export default function MoveFish() {
                                                 ))
                                             )}
                                         </Form.Select>
-                                    </Col>
-                                    <Col className="mb-4">
-                                        <Form.Label className="fw-semibold">Fish Type</Form.Label>
-                                        <Form.Select
-                                            name="speciesId"
-                                            value={moveFishData.speciesId}
-                                            onChange={handleInputChangeMoveFish}
-                                            required
-                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                                        >
-                                            <option value="" disabled>Choose Fish  Type</option>
-                                            {!fishType ? (
-                                                <option>Please wait...</option>
-                                            ) : fishType.length < 1 ? (
-                                                <option>No data available</option>
-                                            ) : (
-                                                fishType.map((stage, index) => (
-                                                    <option value={stage.id} key={index}>{stage.speciesName}</option>
-                                                ))
-                                            )}
-                                        </Form.Select>
-                                    </Col>
+                                    </Col>                                 
                                     <Col className="mb-4">
                                         <Form.Label className="fw-semibold">Quantity</Form.Label>
                                         <Form.Control

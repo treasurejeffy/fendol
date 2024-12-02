@@ -80,7 +80,7 @@ export default function ViewSummary() {
         <section className={`${styles.content}`}>
           <main className={styles.create_form}>
             <div className="d-flex justify-content-between mt-3 ">
-              <h4 className="mb-4">Batch History</h4>
+              <h4 className="mb-4">Process History</h4>
               
               {/* Date Picker for filtering */}
               <div className="mb-4 d-flex gap-2">              
@@ -121,7 +121,7 @@ export default function ViewSummary() {
                       <th>DATE CREATED</th>
                       <th>FISH TYPE</th>
                       <th>QUANTITY BEFORE</th>
-                      <th>QUANTITY AFTER <br /> (W,B,D)</th>
+                      <th>QUANTITY AFTER <br /> (W,S,D)</th>
                       <th>REMARK</th>
                     </tr>
                   </thead>

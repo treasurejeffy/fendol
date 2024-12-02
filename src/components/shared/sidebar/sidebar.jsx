@@ -7,28 +7,27 @@ import { LuClipboardCheck } from "react-icons/lu";
 import { FaRegCircle } from "react-icons/fa6";
 import styles from './siderbar.module.scss';
 import { useLocation, useNavigate,Link } from 'react-router-dom';
-import Api from "../api/apiLink";
 
 export default function SideBar() {
     const location = useLocation();
     const navigate = useNavigate();
     const [open, setOpen] = useState({});
     const [role, setRole] = useState(null);
-    const [showcase, setShowcase] = useState([]);
-    const [loading, setLoading] = useState(true);    
-    const [error, setError] = useState('');
 
+    // this is make the dropdown not to close after active
     useEffect(() => {        
         const path = location.pathname;
         if (path.includes('/admin')) {
             setOpen(prev => ({ ...prev, admin: true }));
         } else if (path.includes('/ponds')) {
             setOpen(prev => ({ ...prev, ponds: true }));
+        } else if (path.includes('/manage-fish')) {
+            setOpen(prev => ({ ...prev, manage_fish: true }));
         } else if (path.includes('/customer')) {
             setOpen(prev => ({ ...prev, customer: true }));
         } else if (path.includes('/process')) {
             setOpen(prev => ({ ...prev, process: true }));
-        } else if (path.includes('/products')) {
+        } else if (path.includes('/fish')) {
             setOpen(prev => ({ ...prev, products: true }));
         } else if (path.includes('/showcase')) {
             setOpen(prev => ({ ...prev, showcase: true }));
@@ -46,42 +45,21 @@ export default function SideBar() {
         if(role === null){
             setRole(sessionStorage.getItem('role'));    
         }        
-    }, [location.pathname]);
+    }, [location.pathname,role]);
 
     const handleToggle = (key) => {
         setOpen(prev => ({ ...prev, [key]: !prev[key] }));
     };
 
-    const fetchShowcase = async () => {
-        try {
-          const response = await Api.get('/show-glass');
-          if (Array.isArray(response.data.data)) {
-            setShowcase(response.data.data);
-            console.log(response.data.data)
-          } else {
-            throw new Error('Expected an array of stages');
-          }
-        } catch (err) {
-            setError("Error fetching showcases. Please try again.");
-        } finally {
-          setLoading(false);
-        }
-    };
-    
-    useEffect(() => {
-    fetchShowcase();
-    }, []);
-
-    
 
     return (
         <aside>
             <section className={`position-fixed d-none d-lg-block ${styles.sidebar}`}>
                 <Nav className={`flex-column ${styles.navs}`}>
-                    {role === 'super_admin' && (<Nav.Item className={`mt-3 ${location.pathname === "/damage-loss" ? 'mx-2' : ''}`}>
+                    {role === 'super_admin' && (<Nav.Item className={`mt-4 ${location.pathname === "/dashboard" ? 'mx-2' : ''}`}>
                         <Nav.Link
-                            onClick={() => navigate('#/dashboard')}
-                            className={`${location.pathname === "#/dashboard" ? styles.activeLink : styles.nonactiveLink}`}
+                            onClick={() => navigate('/dashboard')}
+                            className={`${location.pathname === "/dashboard" ? styles.activeLink : styles.nonactiveLink}`}
                         >
                             <IoGridOutline size={25} className="me-1 text-light" /> <span className={styles.title}>Dashboard</span>
                         </Nav.Link>
@@ -226,11 +204,37 @@ export default function SideBar() {
                                             >
                                                 <FaRegCircle size={16} className="me-1" /> View All Ponds
                                             </div>
-                                        </Nav.Item>
+                                        </Nav.Item>                                                                            
+                                    </Card.Body>
+                                </div>
+                            </Collapse>
+                        </Card>
+
+                         {/* Manage Fish navigation */}
+                         <Card className={styles.card}>
+                            <Card.Header
+                                onClick={() => handleToggle('manage_fish')}
+                                aria-controls="manage_fish-collapse-text"
+                                aria-expanded={open.manage_fish}
+                                className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <span className={`${styles.title}`}>
+                                    <LuClipboardCheck size={25} className="me-1" /> Manage Fish
+                                </span>
+                                
+                                <span >
+                                    {open.manage_fish ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
+                                </span>
+                            </Card.Header>
+
+                            <Collapse in={open.manage_fish} style={{ transitionDuration: "0s" }}>
+                                <div id="manage_fish-collapse-text" className="px-2">
+                                    <Card.Body className={styles.navigationLinks}>                                        
                                         <Nav.Item className="mb-3">
                                             <div
-                                                onClick={() => navigate('/ponds/create-fish-type')}
-                                                className={`${location.pathname === '/ponds/create-fish-type' ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/manage-fish/create-fish-type')}
+                                                className={`${location.pathname === '/manage-fish/create-fish-type' ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={16} className="me-1" /> Create Fish Type
@@ -238,8 +242,8 @@ export default function SideBar() {
                                         </Nav.Item>                                        
                                         <Nav.Item className="my-3">
                                             <div
-                                                onClick={() => navigate('/ponds/add-fish')}
-                                                className={`${location.pathname === "/ponds/add-fish" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/manage-fish/add-fish')}
+                                                className={`${location.pathname === "/manage-fish/add-fish" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={16} className="me-1" /> Add Fish
@@ -247,31 +251,40 @@ export default function SideBar() {
                                         </Nav.Item>
                                         <Nav.Item className="my-3">
                                             <div
-                                                onClick={() => navigate('/ponds/move-fish')}
-                                                className={`${location.pathname === "/ponds/move-fish" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/manage-fish/move-fish')}
+                                                className={`${location.pathname === "/manage-fish/move-fish" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
                                                 <FaRegCircle size={16} className="me-1" /> Move Fish
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="my-3" title="View Add Fish History">
+                                        <Nav.Item className="my-3">
                                             <div
-                                                onClick={() => navigate('/ponds/view-add-fish-history')}
-                                                className={`${location.pathname === "/ponds/view-add-fish-history" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/manage-fish/harvest-fish')}
+                                                className={`${location.pathname === "/manage-fish/harvest-fish" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={16} className="me-1" /> View Add Fish Hi...
+                                                <FaRegCircle size={16} className="me-1" /> Harvest Fish
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="my-3" title="View Move Fish History">
+                                        <Nav.Item className="my-3">
                                             <div
-                                                onClick={() => navigate('/ponds/view-move-fish-history')}
-                                                className={`${location.pathname === "/ponds/view-move-fish-history" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/manage-fish/damage-fish')}
+                                                className={`${location.pathname === "/manage-fish/damage-fish" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={16} className="me-1" /> View Move Fish...
+                                                <FaRegCircle size={16} className="me-1" /> Damage Fish
                                             </div>
                                         </Nav.Item>
+                                        <Nav.Item className="my-3" title="View All Histories">
+                                            <div
+                                                onClick={() => navigate('/manage-fish/view-all-histories')}
+                                                className={`${location.pathname === "/manage-fish/view-all-histories" ? styles.activeLink : styles.nonactiveLink}`}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <FaRegCircle size={16} className="me-1" /> View All Histories
+                                            </div>
+                                        </Nav.Item>                                      
                                     </Card.Body>
                                 </div>
                             </Collapse>
@@ -287,7 +300,7 @@ export default function SideBar() {
                                 className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
                             >
                                 <span className={`${styles.title}`}>
-                                    <LuClipboardCheck size={25} className="me-1" /> Process Control
+                                    <LuClipboardCheck size={25} className="me-1" /> Fish Processing
                                 </span>
                                 <span>
                                     {open.process ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
@@ -296,32 +309,23 @@ export default function SideBar() {
 
                             <Collapse in={open.process} style={{ transitionDuration: "0s" }}>
                                 <div id="process-collapse-text" className="px-2">
-                                    <Card.Body className={styles.navigationLinks}>
+                                    <Card.Body className={styles.navigationLinks}>                                        
                                         <Nav.Item className="mb-3">
                                             <div
-                                                onClick={() => navigate('/process-control/create-process')}
-                                                className={`${location.pathname === "/process-control/create-process" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/fish-processes/process-fish')}
+                                                className={`${location.pathname === "/fish-processes/process-fish" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={16} className="me-1" />Create Process
+                                                <FaRegCircle size={16} className="me-1" />Process Fish
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="mb-3">
+                                        <Nav.Item className="my-3" title="Process History">
                                             <div
-                                                onClick={() => navigate('/process-control/new-batch')}
-                                                className={`${location.pathname === "/process-control/new-batch" ? styles.activeLink : styles.nonactiveLink}`}
+                                                onClick={() => navigate('/fish-processes/view-summary')}
+                                                className={`${location.pathname === "/fish-processes/view-summary" ? styles.activeLink : styles.nonactiveLink}`}
                                                 style={{ cursor: 'pointer' }}
                                             >
-                                                <FaRegCircle size={16} className="me-1" />New Batch
-                                            </div>
-                                        </Nav.Item>
-                                        <Nav.Item className="my-3" title="Batch history or view summary">
-                                            <div
-                                                onClick={() => navigate('/process-control/view-summary')}
-                                                className={`${location.pathname === "/process-control/view-summary" ? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={16} className="me-1" /> Batch History
+                                                <FaRegCircle size={16} className="me-1" /> Process History
                                             </div>
                                         </Nav.Item>                                        
                                     </Card.Body>
@@ -392,58 +396,28 @@ export default function SideBar() {
                             <Collapse in={open.showcase} style={{ transitionDuration: "0s" }}>
                                 <div id="showcase-collapse-text" className="px-2">
                                     <Card.Body className={styles.navigationLinks}>
-                                        <Nav.Item className="mb-3">
-                                            <div 
-                                                onClick={() => navigate('/showcase/add-new')} 
-                                                className={`${location.pathname === "/showcase/add-new"? styles.activeLink : styles.nonactiveLink}`}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                <FaRegCircle size={16} className="me-1" /> Add New
-                                            </div>
-                                        </Nav.Item>
-                                        <div className={styles.showcaseContainer}>
-                                            {loading ? (
-                                                <div className="text-center my-5">
-                                                    Loading...
+                                        <div className={styles.showcaseContainer}>                                            
+                                            <Nav>                                                
+                                                <Nav.Item className="mb-3">
+                                                <div
+                                                    onClick={() => navigate("/showcase/broken-showcase")}
+                                                    className={`${location.pathname === "/showcase/broken-showcase" ? styles.activeLink : styles.nonactiveLink}`}
+                                                    style={{ cursor: "pointer" }}
+                                                >
+                                                    <FaRegCircle size={16} className="me-1" /> Broken Showcase
                                                 </div>
-                                            ) : error ? (
-                                                <div className="text-center my-5">
-                                                    {error}
+                                                </Nav.Item>
+                                        
+                                                <Nav.Item className="mb-3">
+                                                <div
+                                                    onClick={() => navigate("/showcase/whole-showcase")}
+                                                    className={`${location.pathname === "/showcase/whole-showcase" ? styles.activeLink : styles.nonactiveLink}`}
+                                                    style={{ cursor: "pointer" }}
+                                                >
+                                                    <FaRegCircle size={16} className="me-1" /> Whole Showcase
                                                 </div>
-                                            ) : showcase.length > 0 ? (
-                                                <Nav>
-                                                {showcase.map((data, index) => (
-                                                    <div key={index}>
-                                                    {data.type === "broken" && (
-                                                        <Nav.Item className="mb-3">
-                                                        <div
-                                                            onClick={() => navigate("/showcase/broken-showcase")}
-                                                            className={`${location.pathname === "/showcase/broken-showcase" ? styles.activeLink : styles.nonactiveLink}`}
-                                                            style={{ cursor: "pointer" }}
-                                                        >
-                                                            <FaRegCircle size={16} className="me-1" /> Broken Showcase
-                                                        </div>
-                                                        </Nav.Item>
-                                                    )}
-                                                    {data.type === "whole" && (
-                                                        <Nav.Item className="mb-3">
-                                                        <div
-                                                            onClick={() => navigate("/showcase/whole-showcase")}
-                                                            className={`${location.pathname === "/showcase/whole-showcase" ? styles.activeLink : styles.nonactiveLink}`}
-                                                            style={{ cursor: "pointer" }}
-                                                        >
-                                                            <FaRegCircle size={16} className="me-1" /> Whole Showcase
-                                                        </div>
-                                                        </Nav.Item>
-                                                    )}
-                                                    </div>
-                                                ))}
-                                                </Nav>
-                                            ) : (
-                                                <div className="text-center my-5">
-                                                    <h5>No showcase available</h5>
-                                                </div>
-                                            )}
+                                                </Nav.Item>                                                    
+                                            </Nav>                                            
                                             </div>                                    
                                     </Card.Body>
                                 </div>

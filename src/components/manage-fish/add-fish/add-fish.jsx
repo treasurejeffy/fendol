@@ -109,9 +109,6 @@ const AddFish = () => {
                 className: 'dark-toast'
             });
     
-            setTimeout(()=>{
-                navigate('/ponds/view-add-fish-history');
-            },4000)
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error adding fish. Please try again.",
@@ -150,7 +147,7 @@ const AddFish = () => {
                                         required
                                         className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                                     >
-                                        <option value="" disabled>Choose Stage</option>
+                                        <option value="" disabled>Choose Pond</option>
                                         {!stages ? (
                                             <option>Please wait...</option>
                                         ) : stages.length < 1 ? (

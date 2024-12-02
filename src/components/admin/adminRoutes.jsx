@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route} from 'react-router-dom';
-import AddNew from './add-new-admin/add-new';
 import ViewAll from './view-all/view-all';
+import AddNew from './add-new-admin/add-new';
 
 const AdminNavigations = () => {
     

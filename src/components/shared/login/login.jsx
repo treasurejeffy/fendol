@@ -41,10 +41,7 @@ export default function LogIn() {
             const response = await axios.post('https://dev-api.fendolgroup.com/api/v1/login', loginData);
             const { token, role, success } = response.data; // Destructure response data
     
-            if (success) {
-                // Login successful
-                console.log('Login successful');
-    
+            if (success) {               
                 // Store token and role in sessionStorage
                 sessionStorage.setItem('authToken', token);
                 sessionStorage.setItem('role', role);
@@ -64,14 +61,11 @@ export default function LogIn() {
                     className: 'dark-toast',
                 });
     
-                // Navigate based on the role with a slight delay
-                setTimeout(() => {
-                    if (role === 'super_admin') {
-                        navigate('/admin/add-new-admin');
-                    } else {
-                        navigate('/customer/view-all');
-                    }
-                }, 500); // Delay to allow state updates (adjust if necessary)
+                if (role === 'super_admin') {
+                    navigate("/dashboard");
+                } else {
+                    navigate('/customer/view-all');
+                }
     
             } else {
                 // Handle failed login

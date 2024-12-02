@@ -181,7 +181,7 @@ const FreshForm = ({ customers, stages, products}) => {
 
                {/* Stage From */}
                 <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Stage From</Form.Label>
+                    <Form.Label className="fw-semibold">Pond From</Form.Label>
                     <Form.Select
                         name="stageId_from"
                         required
@@ -189,9 +189,8 @@ const FreshForm = ({ customers, stages, products}) => {
                         onChange={handleInputChange}
                         className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                     >
-                        <option value="" disabled>Select Stage</option>
-                        {stages
-                            .filter(stage => !/(harvest|fingerlings|damage)/i.test(stage.title))
+                        <option value="" disabled>Select Pond</option>
+                        {stages                          
                             .map((stage, index) => (
                                 <option key={index} value={stage.id}>
                                     {stage.title || 'No Data Yet'}

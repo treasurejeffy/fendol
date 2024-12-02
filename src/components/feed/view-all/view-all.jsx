@@ -442,8 +442,7 @@ export default function UpdateFeedInventory() {
                       ) : stages.length < 1 ? (
                         <option>No data available</option>
                       ) : (
-                        stages
-                          .filter(stage => !["harvest", "damage", "loss", 'damages', 'harvests'].includes(stage.title.toLowerCase())) // Filter out unwanted options
+                        stages                        
                           .map((stage, index) => (
                             <option value={stage.title} key={index}>{stage.title}</option>
                           ))

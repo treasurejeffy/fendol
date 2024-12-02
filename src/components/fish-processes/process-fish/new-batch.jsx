@@ -10,16 +10,20 @@ import { debounce } from "lodash";
 
 
 export default function NewBatchFish() {
-    const [stages, setStages] = useState({ harvest: null, washing: null });
+    const [stages, setStages] = useState({ washing: null });
     const [fishType, setFishType] = useState([]);
     const [selectedQuantity, setSelectedQuantity] = useState(true);
     const [checkStages, setCheckStages] = useState([]);
-    const [moveFishData, setMoveFishData] = useState({
-        stageId_from: '',
+    const [moveFishData, setMoveFishData] = useState({        
         stageId_to: '',
-        speciesId: '',
+        batch_no: '',
         actual_quantity: null,
         remarks: '',
+    });
+    const [quantity, setQuantity] = useState({      
+        wholeFish: 0,
+        brokenFish: 0,
+        damage: 0,
     });
     const [showSuccessOverlay, setShowSuccessOverlay] = useState(() => {
         const savedValue = sessionStorage.getItem('showSuccessOverlay');
@@ -51,32 +55,13 @@ export default function NewBatchFish() {
       }, [showSuccessOverlay]);
 
     useEffect(() => {
-        const fetchHarvestStage = async () => {
-            try {
-                const response = await Api.get('/fish-stages');
-                if (Array.isArray(response.data.data)) {
-                    const harvestStage = response.data.data.find(stage => stage.title === "Harvest");
-                    setStages(prevStages => ({ ...prevStages, harvest: harvestStage }));
-                    setMoveFishData(prevData => ({
-                        ...prevData,
-                        stageId_from: harvestStage ? harvestStage.id : '',
-                    }));
-                } else {
-                    throw new Error('Expected an array of stages for Harvest');
-                }
-            } catch (err) {
-                console.error(err.response?.data?.message || 'Failed to fetch harvest stage. Please try again.');
-            }
-        };
-
-        fetchHarvestStage();
         fetchWashingStage();
     }, []);
 
     useEffect(() => {
         const fetchFishType = async () => {
             try {
-                const response = await Api.get('/species');
+                const response = await Api.get('/active-batches');
                 if (Array.isArray(response.data.data)) {
                     setFishType(response.data.data);
                 } else {
@@ -90,11 +75,6 @@ export default function NewBatchFish() {
         
     }, []);
 
-    useEffect(()=>{
-        if (stages.harvest?.id) {
-            getQuantity(stages.harvest.id);
-        }
-    },[stages.harvest])
 
     const handleInputChangeMoveFish = (e) => {
         const { name, value } = e.target;
@@ -102,28 +82,7 @@ export default function NewBatchFish() {
             ...moveFishData,
             [name]: name === 'actual_quantity' ? parseFloat(value) : value,
         });
-    };
-
-    const getQuantity = async (id) => {
-        if (id) {
-            setSelectedQuantity(true); // Show "Loading..." during fetch
-            try {
-                const response = await Api.get(`/fish-quantity/?stageId=${id}`);
-                const quantity = response.data.quantity;
-                setMoveFishData((prevData) => ({
-                    ...prevData,
-                    actual_quantity: Number(quantity), // Ensure quantity is a number
-                }));
-            } catch (error) {
-                console.error('Failed to fetch quantity:', error);
-            } finally {
-                setSelectedQuantity(false); // Stop showing "Loading..." after fetch
-            }
-        } else {
-            console.error('Stage ID from is required.');
-        }
-    };
-    
+    };  
 
     const handleMoveFishes = async (e) => {        
         e.preventDefault();
@@ -138,10 +97,24 @@ export default function NewBatchFish() {
                 type: "success",
                 isLoading: false,
                 autoClose: 3000,
-            });            
+            });     
+            
+            setQuantity({
+                wholeFish: response.data.data.actual_quantity,
+                damage: 0,
+                brokenFish: 0
+            })
 
+            // Reset form state
+            setMoveFishData({
+                speciesId: '',       // Clear selected batch
+                actual_quantity: '', // Clear quantity
+                stageId_to: '',      // Clear stage
+                remarks: '',         // Clear remarks
+            });
+    
             const newSuccessOverlay = !showSuccessOverlay;
-            setShowSuccessOverlay(newSuccessOverlay || true); // Update the state            
+            setShowSuccessOverlay(newSuccessOverlay || true); // Update the success overlay state   
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error moving fish. Please try again.",
@@ -153,6 +126,7 @@ export default function NewBatchFish() {
             setLoader(false);
         }
     };
+    
         
     // process begins here 
     const [whole, setWhole] =useState();
@@ -291,8 +265,20 @@ export default function NewBatchFish() {
             
             // Post data to the determined endpoint
             if (endpoint) {
-                await Api.post(endpoint, moveData);
+               const response= await Api.post(endpoint, moveData);
+                const {wholeFishQuantity,brokenFishQuantity,damageOrLoss} = response.data.data;
 
+                setQuantity({
+                    wholeFish: wholeFishQuantity ,
+                    brokenFish: brokenFishQuantity,
+                    damage: damageOrLoss
+                })
+
+                setMoveData({                                    
+                    wholeFishQuantity: '',
+                    brokenFishQuantity: '',
+                    damageOrLoss: ''
+                });
                 // If the current stage is the last stage ("Drying"), hide the overlay
                 setMessage("Fish moved successfully!");
                 if (currentStage.title === "Drying") {
@@ -352,56 +338,30 @@ export default function NewBatchFish() {
                     <main className={styles.create_form}>
                         <ToastContainer/>
                         <Form onSubmit={handleMoveFishes}>
-                            <h4 className="my-5">Create Batch</h4>
+                            <h4 className="my-5">Process Fish</h4>
                             <Row xxl={2} xl={2} lg={2}>
                                 <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Import From</Form.Label>
-                                    <Form.Control
-                                            value={
-                                                stages.harvest === null
-                                                    ? 'Loading...'          // Show "Loading..." while initially loading
-                                                    : stages.harvest?.title // Show title if available
-                                                    || 'No Harvest Pond Available'            // Show "No data" if title or data is missing
-                                            }
-                                            readOnly
-                                            className={`py-2 bg-light-subtle text-muted shadow-none  border-1 ${styles.inputs}`}
-                                        />
-                                    <input
-                                        type="hidden"
-                                        name="stageId_from"
-                                        value={stages.harvest ? stages.harvest?.id : 'pls wait...'}
-                                        onChange={handleInputChangeMoveFish}
-                                    />
-                                </Col>
-                                <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Process To</Form.Label>
-                                    <Form.Control
-                                        value={stages.washing === null ? 'Loading...' : stages.washing?.title || 'No Washing Process Available'}
-                                        readOnly
-                                        className={`py-2 bg-light-subtle text-muted shadow-none  border-1 ${styles.inputs}`}
-                                    />
-                                    <input
-                                        type="hidden"
-                                        name="stageId_to"
-                                        value={stages.washing ? stages.washing?.id : ''}
-                                        onChange={handleInputChangeMoveFish}
-                                    />
-                                </Col>
-                                <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Fish Type</Form.Label>
+                                    <Form.Label className="fw-semibold">Import Fish Batch</Form.Label>
                                     <Form.Select
-                                        name="speciesId"
-                                        value={moveFishData.speciesId}
-                                        onChange={handleInputChangeMoveFish}
+                                        name="batch_no"
+                                        value={moveFishData.batch_no}
+                                        onChange={(e) => {
+                                            const selectedBatch = fishType.find(batch => batch.batch_no === e.target.value);
+                                            handleInputChangeMoveFish(e);
+                                            setMoveFishData(prev => ({
+                                                ...prev,
+                                                actual_quantity: selectedBatch ? selectedBatch.quantity : null,
+                                            }));
+                                        }}
                                         required
-                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                                     >
-                                        <option value="" disabled>Choose Fish Type</option>
+                                        <option value="" disabled>Choose Fish Batch</option>
                                         {fishType.length < 1 ? (
                                             <option>No data available</option>
                                         ) : (
                                             fishType.map((species, index) => (
-                                                <option value={species.id} key={index}>{species.speciesName}</option>
+                                                <option value={species.batch_no} key={index}>{species.batch_no}</option>
                                             ))
                                         )}
                                     </Form.Select>
@@ -411,13 +371,26 @@ export default function NewBatchFish() {
                                     <Form.Control
                                         type="number"
                                         name="actual_quantity"
-                                        placeholder='loading...'
-                                        value={selectedQuantity === false ? moveFishData.actual_quantity : 'loading...'}
+                                        placeholder='Get Quantity'
+                                        value={moveFishData.actual_quantity ?? 'loading...'}
                                         readOnly
                                         className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                                     />
                                 </Col>
-
+                                <Col className="mb-4">
+                                    <Form.Label className="fw-semibold">Process To</Form.Label>
+                                    <Form.Control
+                                        value={stages.washing === null ? 'Loading...' : stages.washing?.title || 'No Washing Process Available'}
+                                        readOnly
+                                        className={`py-2 bg-light-subtle text-muted shadow-none border-1 ${styles.inputs}`}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="stageId_to"
+                                        value={stages.washing ? stages.washing?.id : ''}
+                                        onChange={handleInputChangeMoveFish}
+                                    />
+                                </Col>
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Remark</Form.Label>
                                     <Form.Control
@@ -426,16 +399,17 @@ export default function NewBatchFish() {
                                         name="remarks"
                                         value={moveFishData.remarks}
                                         onChange={handleInputChangeMoveFish}
-                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                                        className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                                     />
                                 </Col>
                             </Row>
                             <div className="d-flex justify-content-end my-4">
-                                <Button  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} disabled={loader} type="submit">
-                                    {loader ? 'Creating' : "Create"}
+                                <Button className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} disabled={loader} type="submit">
+                                    {loader ? 'Processing' : "Process"}
                                 </Button>
                             </div>
-                        </Form>  
+                        </Form>
+
                         {showSuccessOverlay && (
                             <div className={`${styles.successOverlay}`}>
                                 <div className={`${styles.successBox}`}>                                     
@@ -458,6 +432,7 @@ export default function NewBatchFish() {
                                                         className="text-muted fw-semibold text-uppercase"
                                                         name="stageId_from"
                                                         checked={moveData.stageId_from === stage.id}
+                                                         disabled={moveData.stageId_from && moveData.stageId_from !== stage.id} // Disable if another stage is selected
                                                         onChange={handleCheckboxChange}
                                                     />
                                                 ))
@@ -477,7 +452,7 @@ export default function NewBatchFish() {
                                                         <Form.Control
                                                             readOnly
                                                             type='text'  // Use 'text' to handle both numbers and the 'Loading...' text
-                                                            value={whole !== null && whole !== undefined ? whole : 'Loading...'}
+                                                            value={quantity.wholeFish}                                                    
                                                             className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                         />
                                                     </Form.Group>
@@ -488,6 +463,7 @@ export default function NewBatchFish() {
                                                             value={moveData.wholeFishQuantity}
                                                             onChange={handleMoveFish}
                                                             type='number'
+                                                            placeholder='Enter Quantity of Whole Fish on the process checked'
                                                             required
                                                             className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                         />
@@ -504,12 +480,13 @@ export default function NewBatchFish() {
                                                     <Form.Control
                                                         readOnly
                                                         type='number'
-                                                        placeholder=''
-                                                        value={moveData.brokenFishBefore} // Ensure this value is set correctly
+                                                        placeholder='Quantity before'
+                                                        value={quantity.brokenFish} // Ensure this value is set correctly
                                                         className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} me-2`}
                                                     />
                                                     <Form.Control
                                                         type='number'
+                                                        placeholder='Enter  Quantity of Broken Fish on the process checked'
                                                         name="brokenFishQuantity"
                                                         value={moveData.brokenFishQuantity}
                                                         onChange={handleMoveFish}
@@ -529,11 +506,12 @@ export default function NewBatchFish() {
                                                         readOnly
                                                         type='number'
                                                         placeholder=''
-                                                        value={moveData.damageBefore} // Ensure this value is set correctly
+                                                        value={quantity.damage} // Ensure this value is set correctly
                                                         className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                     />
                                                     <Form.Control
                                                         required
+                                                        placeholder='Enter Quantity of Damageed Fish on the process checked'
                                                         type='number'
                                                         name="damageOrLoss"
                                                         value={moveData.damageOrLoss}
@@ -543,7 +521,7 @@ export default function NewBatchFish() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className='d-flex justify-content-end'>
+                                        <div className='d-flex justify-content-end'>                                                                
                                             <Button onClick={handleNext} disabled={loading}  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}>
                                                 Next
                                             </Button>

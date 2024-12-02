@@ -148,9 +148,7 @@ export default function UpdateStoreInventory() {
           
           if (Array.isArray(response.data.data)) {
               // Filter out "washing", "smoking", and "drying"
-              const filteredStages = response.data.data.filter(stage => 
-                  !["washing", "smoking", "drying"].includes(stage.title.toLowerCase())
-              );
+              const filteredStages = response.data.data
               setStages(filteredStages); // Set the filtered stages to state
           } else {
               throw new Error('Expected an array of stages');
