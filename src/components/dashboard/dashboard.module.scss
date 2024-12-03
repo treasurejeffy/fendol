@@ -16,11 +16,15 @@
   overflow: auto;
 
   h4 {
-    font-size: 20px;
+    font-size: 25px;
     font-weight: 500;
     line-height: 30px;
     color: #2E3135;
   }
+}
+
+.board{
+  height: 300px;
 }
 
 @media (max-width: 992px) {

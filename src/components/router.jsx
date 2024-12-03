@@ -19,11 +19,6 @@ import { ToastContainer } from "react-toastify";
 import Dashboard from "./dashboard/dashbord";
 
 export default function RouterSwitch() {
-  const [role, setRole] = useState('');
-  useEffect(() => {
-      const storedRole = sessionStorage.getItem("role");
-      setRole(storedRole);
-  }, []);
 
   return (
     <Provider store={store}>
@@ -38,7 +33,15 @@ export default function RouterSwitch() {
                   <Dashboard/>
                 </ProtectedRoute>
               }
-          />         
+          />   
+          <Route
+              path="admin/*"
+              element={
+                <ProtectedRoute>
+                  <AdminNavigations/>
+                </ProtectedRoute>
+              }
+          />        
           
           <Route
             path="customer/*"
