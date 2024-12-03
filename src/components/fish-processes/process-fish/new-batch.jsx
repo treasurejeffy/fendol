@@ -234,6 +234,7 @@ export default function NewBatchFish() {
                     brokenFish: brokenFishQuantity,
                     damage: damageOrLoss
                 })
+            
 
                 setMoveData({                                    
                     wholeFishQuantity: '',
