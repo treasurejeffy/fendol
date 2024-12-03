@@ -28,8 +28,7 @@ const NavTab = styled.div`
       color: #b06426;
       border-bottom: 3px solid #b06426;
     }
-  }
-`;
+  }`
 
 export default function ViewAllHistory() {
   const [activeTab, setActiveTab] = useState("#add-histories");
@@ -59,19 +58,19 @@ export default function ViewAllHistory() {
       label: "Move Fish",
       endpoint: "fish-movements",
       headers: ["Date", "Pond From", "Fish Batch", "Pond To", "Quantity", "Remark"],
-      dataKeys: ["createdAt", "fromStageTitle", "batch_no", "toStageTitle", "actual_quantity", "remarks"],
+      dataKeys: ["createdAt", "sourcePond", "batch_no", "destinationPond", "actual_quantity", "remarks"],
     },
     "#harvest-fish": {
       label: "Harvest Fish",
-      endpoint: "get-all-harvest-histories",
+      endpoint: "harvested-fish",
       headers: ["Date", "Pond From", "Quantity", "Fish Batch", "Remark"],
-      dataKeys: ["createdAt", "pondName", "actual_quantity", "batch_no", "remarks"],
+      dataKeys: ["createdAt", "FishStage", "quantity", "batch_no", "remarks"],
     },
     "#damage-fish": {
       label: "Damage Fish",
       endpoint: "damaged-fish",
       headers: ["Date", "Pond From", "Quantity", "Fish Batch", "Remark"],
-      dataKeys: ["createdAt", "pondName", "quantity", "batch_no", "remarks"],
+      dataKeys: ["createdAt", "FishStage", "quantity", "batch_no", "remarks"],
     },
   };
 
@@ -82,19 +81,22 @@ export default function ViewAllHistory() {
     try {
       const response = await Api.get(endpoint);
       const { data } = response.data;
-  
+
+      // If it's the "harvest-fish" tab, use 'harvested' instead of 'data'
+      const responseData = activeTab === "#harvest-fish" ? response.data.harvested : data;
+
       // Perform local pagination
       const ITEMS_PER_PAGE = 10;
       const offset = currentPage * ITEMS_PER_PAGE;
-      const paginatedData = data.slice(offset, offset + ITEMS_PER_PAGE);
-  
-      setData(data); // Save all data for filtering purposes
+      const paginatedData = responseData.slice(offset, offset + ITEMS_PER_PAGE);
+
+      setData(responseData); // Save all data for filtering purposes
       setFilteredData(paginatedData); // Set initial filtered data based on pagination
       setPagination((prev) => ({
         ...prev,
         [activeTab]: {
           currentPage,
-          totalPages: Math.ceil(data.length / ITEMS_PER_PAGE),
+          totalPages: Math.ceil(responseData.length / ITEMS_PER_PAGE),
         },
       }));
     } catch (err) {
@@ -103,6 +105,7 @@ export default function ViewAllHistory() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     const currentConfig = tabConfig[activeTab];
@@ -160,6 +163,12 @@ export default function ViewAllHistory() {
                   <td key={idx}>
                     {key === "createdAt"
                       ? formatDate(item[key])
+                      : key === "destinationPond" && item.destinationPond?.title
+                      ? item.destinationPond.title
+                      : key === "sourcePond" && item.sourcePond?.title
+                      ? item.sourcePond.title
+                      : key === "FishStage" && item.FishStage?.title
+                      ? item.FishStage.title
                       : item[key] !== null && item[key] !== undefined
                       ? item[key]
                       : "-"}
@@ -172,6 +181,8 @@ export default function ViewAllHistory() {
       </table>
     );
   };
+
+
 
   return (
     <section className={`d-none d-lg-block ${styles.body}`}>

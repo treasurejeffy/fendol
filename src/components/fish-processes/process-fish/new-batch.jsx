@@ -61,7 +61,7 @@ export default function NewBatchFish() {
     useEffect(() => {
         const fetchFishType = async () => {
             try {
-                const response = await Api.get('/active-batches');
+                const response = await Api.get('/get-all-active-harvest-batch');
                 if (Array.isArray(response.data.data)) {
                     setFishType(response.data.data);
                 } else {
@@ -128,8 +128,7 @@ export default function NewBatchFish() {
     };
     
         
-    // process begins here 
-    const [whole, setWhole] =useState();
+    // process begins here     
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [moveData, setMoveData] = useState({
@@ -152,36 +151,6 @@ export default function NewBatchFish() {
         }));
     };
 
-    const debouncedFetchQuantity = useMemo(
-        () =>
-            debounce(async (id, stageTitle) => {
-                let endpoint;
-                switch (stageTitle) {
-                    case "Washing":
-                        endpoint = `/wash-quantity/${id}`;
-                        break;
-                    case "Smoking":
-                        endpoint = `/smoke-quantity/${id}`;
-                        break;
-                    case "Drying":
-                        endpoint = `/dry-quantity/${id}`;
-                        break;
-                    default:
-                        console.error("Invalid stage title");
-                        return;
-                }
-    
-                try {
-                    const response = await Api.get(endpoint);
-                    setWhole(response.data.data);
-                } catch (error) {
-                    console.error("Error fetching data:", error);
-                    setWhole("Error getting quantity");
-                }
-            }, 300),
-        []
-    );
-    
     // Define ordered stages
     const orderedStages = useMemo(() => {
         return checkStages.sort((a, b) => {
@@ -207,10 +176,7 @@ export default function NewBatchFish() {
     // Fetch quantity when stageId_from changes
     useEffect(() => {
         if (moveData.stageId_from && orderedStages.length > 0) {
-            const selectedStage = orderedStages.find((stage) => stage.id === moveData.stageId_from);
-            if (selectedStage) {
-                debouncedFetchQuantity(moveData.stageId_from, selectedStage.title);
-            }
+            const selectedStage = orderedStages.find((stage) => stage.id === moveData.stageId_from);          
         }
     }, [moveData.stageId_from, orderedStages]);    
     
@@ -231,12 +197,7 @@ export default function NewBatchFish() {
             ...prevData,
             stageId_from: checked ? value : '',
             stageId_to: checked ? getNextStageId(value) : '', // Update stageId_to based on selected stage
-        }));
-    
-        // Fetch quantity if the checkbox is checked and stageTitle is available
-        if (checked && selectedStage) {
-            await debouncedFetchQuantity(value, selectedStage.title);
-        }
+        }));    
     };
     
     // Function to get the endpoint based on the current stage title
@@ -281,7 +242,7 @@ export default function NewBatchFish() {
                 });
                 // If the current stage is the last stage ("Drying"), hide the overlay
                 setMessage("Fish moved successfully!");
-                if (currentStage.title === "Drying") {
+                if (currentStage.title === "Smoking") {
                     setShowSuccessOverlay(false);
                 }else {
                     // Advance to the next stage in the order
@@ -295,8 +256,7 @@ export default function NewBatchFish() {
                             brokenFishQuantity: '',
                             damageOrLoss: ''
                         }));
-                        setCurrentAccordion(nextStageId); // Open the next accordion section
-                        await debouncedFetchQuantity(nextStageId, orderedStages.find(stage => stage.id === nextStageId)?.title);
+                        setCurrentAccordion(nextStageId); // Open the next accordion section                        
                     }    
                 }       
             } else {
@@ -311,8 +271,7 @@ export default function NewBatchFish() {
     };
 
     const handleRefresh = () => {
-        fetchWashingStage();
-        debouncedFetchQuantity();
+        fetchWashingStage();        
     }
 
     useEffect(() => {
