@@ -9,6 +9,7 @@ import Api from '../../shared/api/apiLink';
 import { useNavigate } from 'react-router-dom';
 
 const HarvestFish = () => {
+    const navigate = useNavigate();
     // States for storing data
     const [stages, setStages] = useState([]);
     const [fishType, setFishType] = useState([]);
@@ -111,6 +112,9 @@ const HarvestFish = () => {
                 autoClose: 5000,
                 className: 'dark-toast',
             });
+            setTimeout(()=>{
+                navigate('/fish-processes/process-fish');
+            }, 3000)
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || 'Error harvesting fish. Please try again.',
