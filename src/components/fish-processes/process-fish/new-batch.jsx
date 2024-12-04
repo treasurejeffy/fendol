@@ -6,7 +6,7 @@ import SideBar from '../../shared/sidebar/sidebar';
 import Header from '../../shared/header/header'; 
 import Api from '../../shared/api/apiLink';
 import { MdOutlineRefresh } from "react-icons/md";
-import { debounce } from "lodash";
+import { useNavigate } from 'react-router-dom';
 
 
 export default function NewBatchFish() {
@@ -20,6 +20,7 @@ export default function NewBatchFish() {
         actual_quantity: null,
         remarks: '',
     });
+    const navigate = useNavigate();
     const [quantity, setQuantity] = useState({      
         wholeFish: 0,
         brokenFish: 0,
@@ -227,7 +228,7 @@ export default function NewBatchFish() {
             // Post data to the determined endpoint
             if (endpoint) {
                const response= await Api.post(endpoint, moveData);
-                const {wholeFishQuantity,brokenFishQuantity,damageOrLoss} = response.data.data;
+                const {wholeFishQuantity,brokenFishQuantity,damageOrLoss} = response.data.data  || response.data.newProcess;
 
                 setQuantity({
                     wholeFish: wholeFishQuantity ,
@@ -245,6 +246,9 @@ export default function NewBatchFish() {
                 setMessage("Fish moved successfully!");
                 if (currentStage.title === "Drying") {
                     setShowSuccessOverlay(false);
+                    setTimeout(()=>{
+                        navigate('/showcase/whole-showcase');
+                    }, 2500)
                 }else {
                     // Advance to the next stage in the order
                     const nextStageId = getNextStageId(moveData.stageId_from);
@@ -469,21 +473,25 @@ export default function NewBatchFish() {
                                                         value={quantity.damage} // Ensure this value is set correctly
                                                         className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                                                     />
-                                                    <Form.Control
-                                                        required
-                                                        placeholder='Enter Quantity of Damageed Fish on the process checked'
-                                                        type='number'
-                                                        name="damageOrLoss"
-                                                        value={moveData.damageOrLoss}
-                                                        onChange={handleMoveFish}
-                                                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                                                    />
+                                                    {moveData.stageId_from && 
+                                                        orderedStages.find((stage) => stage.id === moveData.stageId_from)?.title !== "Drying" && (
+                                                        <Form.Control
+                                                            required
+                                                            placeholder='Enter Quantity of Damageed Fish on the process checked'
+                                                            type='number'
+                                                            name="damageOrLoss"
+                                                            value={moveData.damageOrLoss}
+                                                            onChange={handleMoveFish}
+                                                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                                                        />)}
                                                 </div>
                                             </div>
                                         </div>
                                         <div className='d-flex justify-content-end'>                                                                
                                             <Button onClick={handleNext} disabled={loading}  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}>
-                                                Next
+                                                {moveData.stageId_from && 
+                                                orderedStages.find((stage) => stage.id === moveData.stageId_from)?.title !== "Drying" ? ('Next'): ( 'Move To Showcase')
+                                                }
                                             </Button>
                                         </div>
                                     </Form>                                       

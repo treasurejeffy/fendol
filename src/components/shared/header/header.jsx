@@ -45,7 +45,7 @@ export default function Header() {
                         <Dropdown as={ButtonGroup}>
                             <Dropdown.Toggle className="bg-transparent text-dark border-0" id="dropdown-basic">
                                 <FaRegUserCircle size={32} className={`me-1 ${styles.icons}`} />
-                                <span className="d-none d-lg-inline">
+                                <span className="d-none d-lg-inline fw-semibold">
                                     {sessionStorage.getItem('role')
                                         ?.replace(/_/g, ' ') // Replace underscores with spaces
                                         .replace(/\b\w/g, char => char.toUpperCase()) // Capitalize first letters
