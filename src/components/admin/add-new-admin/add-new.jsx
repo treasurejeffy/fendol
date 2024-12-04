@@ -62,7 +62,9 @@ const AddNew = () => {
                 className: 'dark-toast'
             });
 
-            navigate('/admin/view-all');
+            setTimeout(()=>{
+                navigate('/admin/view-all');
+            }, 4500)
                 
         } catch (error) {
             // Log the error response for debugging

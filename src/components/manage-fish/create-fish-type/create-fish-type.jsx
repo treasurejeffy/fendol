@@ -72,7 +72,9 @@ const AddSpecies = () => {
                 className: 'dark-toast',
             });
             fetchStages();
-            setView(false);
+            setTimeout(()=>{
+                setView(!view);
+            }, 4500)
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error adding fish Type. Please try again.",

@@ -25,9 +25,9 @@ export default function SideBar() {
             setOpen(prev => ({ ...prev, manage_fish: true }));
         } else if (path.includes('/customer')) {
             setOpen(prev => ({ ...prev, customer: true }));
-        } else if (path.includes('/process')) {
-            setOpen(prev => ({ ...prev, process: true }));
-        } else if (path.includes('/fish')) {
+        } else if (path.includes('/fish-processes')) {
+            setOpen(prev => ({ ...prev, fish_processes: true }));
+        } else if (path.includes('/products')) {
             setOpen(prev => ({ ...prev, products: true }));
         } else if (path.includes('/showcase')) {
             setOpen(prev => ({ ...prev, showcase: true }));
@@ -293,9 +293,9 @@ export default function SideBar() {
                         {/* Process navigation */}
                         <Card className={styles.card}>
                             <Card.Header
-                                onClick={() => handleToggle('process')}
-                                aria-controls="process-collapse-text"
-                                aria-expanded={open.process}
+                                onClick={() => handleToggle('fish_processes')}
+                                aria-controls="fish_processes-collapse-text"
+                                aria-expanded={open.fish_processes}
                                 style={{ cursor: 'pointer' }}
                                 className={`border-0 d-flex justify-content-between align-items-center ${styles.cardHeader}`}
                             >
@@ -303,12 +303,12 @@ export default function SideBar() {
                                     <LuClipboardCheck size={25} className="me-1" /> Fish Processing
                                 </span>
                                 <span>
-                                    {open.process ? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
+                                    {open.fish_processes? <FaCaretUp className='text-light'/> : <FaCaretDown className='text-light'/>}
                                 </span>
                             </Card.Header>
 
-                            <Collapse in={open.process} style={{ transitionDuration: "0s" }}>
-                                <div id="process-collapse-text" className="px-2">
+                            <Collapse in={open.fish_processes} style={{ transitionDuration: "0s" }}>
+                                <div id="fish_processes-collapse-text" className="px-2">
                                     <Card.Body className={styles.navigationLinks}>                                        
                                         <Nav.Item className="mb-3">
                                             <div
