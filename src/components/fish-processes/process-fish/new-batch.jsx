@@ -243,7 +243,7 @@ export default function NewBatchFish() {
                 });
                 // If the current stage is the last stage ("Drying"), hide the overlay
                 setMessage("Fish moved successfully!");
-                if (currentStage.title === "Smoking") {
+                if (currentStage.title === "Drying") {
                     setShowSuccessOverlay(false);
                 }else {
                     // Advance to the next stage in the order
