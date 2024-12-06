@@ -16,7 +16,7 @@ const isTokenExpired = (token) => {
 
 // Request interceptor to add Authorization header and handle token expiration
 const Api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'https://dev-api.fendolgroup.com/api/v1',
+    baseURL: process.env.REACT_APP_API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
