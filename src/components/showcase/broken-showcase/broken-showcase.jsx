@@ -7,7 +7,6 @@ import { Spinner, Alert } from 'react-bootstrap';
 import { FaExclamationTriangle } from "react-icons/fa";
 import ReactPaginate from 'react-paginate'; 
 import Api from "../../shared/api/apiLink";
-import { format } from 'date-fns';
 
 export default function ViewBrokenHistory() {
   const [brokenQuantity, setBrokenQuantity] = useState(null);
@@ -25,13 +24,17 @@ export default function ViewBrokenHistory() {
     setCurrentPage(selectedPage.selected);
   };
 
-// Function to fetch table data
-const fetchTableData = async () => {
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString("en-GB", { timeZone: 'UTC' }) ; // Format the date to DD/MM/YYYY
+  };
+
+  // Function to fetch table data
+  const fetchTableData = async () => {
     setLoadingTable(true);
     try {
       const response = await Api.get('/show-glass/broken');
       if (response.data && response.data.data) {
-        // Assuming response.data.data is an object containing the details you need
         setTableData([response.data.data]); // Wrap in array if it's a single object
         setPageCount(Math.ceil(1 / itemsPerPage)); // Adjust pagination for a single item
       } else {
@@ -50,7 +53,6 @@ const fetchTableData = async () => {
     setLoadingStages(true);
     try {
       const response = await Api.get('/show-glass/total-broken');   
-      // setBrokenQuantity(response); 
       setBrokenQuantity(response.data.data.totalBrokenQuantity);
     } catch (error) {
       console.error(error);
@@ -66,7 +68,6 @@ const fetchTableData = async () => {
   }, []);
 
   const paginatedData = tableData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
-  console.log(brokenQuantity);
   
   return (
     <section className={`d-none d-lg-block ${styles.body}`}>
@@ -128,15 +129,15 @@ const fetchTableData = async () => {
                     <tr>
                       <th>DATE CREATED</th>
                       <th>QUANTITY</th>
-                      <th>TYPE</th> 
+                      <th>FISH BATCH</th> 
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedData.length > 0 ? (
                       paginatedData.map((data, index) => (
                         <tr key={index}>
-                          <td>{format(new Date(data.createdAt), 'MM/dd/yyyy')}</td>
-                          <td>{data.fishQuantity}</td>
+                          <td>{formatDate(data.updatedAt)}</td>
+                          <td>{data.brokenFishQuantity}</td>
                           <td>{data.type}</td>                        
                         </tr>
                       ))
@@ -178,4 +179,3 @@ const fetchTableData = async () => {
     </section>
   );
 }
-

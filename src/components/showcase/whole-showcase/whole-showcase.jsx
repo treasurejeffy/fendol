@@ -7,7 +7,6 @@ import { Spinner, Alert } from 'react-bootstrap';
 import { FaExclamationTriangle } from "react-icons/fa";
 import ReactPaginate from 'react-paginate'; 
 import Api from "../../shared/api/apiLink";
-import { format } from 'date-fns';
 
 export default function ViewWholeHistory() {
   const [brokenQuantity, setBrokenQuantity] = useState(null);
@@ -67,6 +66,13 @@ const fetchTableData = async () => {
     fetchQuantityData();
     fetchTableData();
   }, []);
+
+  // format Date
+  const formatDate = (isoDate) => { 
+    const date = new Date(isoDate);
+    return date.toLocaleDateString("en-GB", { timeZone: 'UTC' }); // Format the date to DD/MM/YYYY 
+  };
+  
 
   const paginatedData = tableData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
   console.log(tableData);
@@ -132,15 +138,15 @@ const fetchTableData = async () => {
                     <tr>
                       <th>DATE CREATED</th>
                       <th>QUANTITY</th>
-                      <th>TYPE</th> 
+                      <th>FISH BATCH</th> 
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedData.length > 0 ? (
                       paginatedData.map((data, index) => (
                         <tr key={index}>
-                          <td>{format(new Date(data.createdAt), 'MM/dd/yyyy')}</td>
-                          <td>{data.fishQuantity}</td>
+                          <td>{formatDate(data.updatedAt)}</td>
+                          <td>{data.wholeFishQuantity}</td>
                           <td>{data.type}</td>                        
                         </tr>
                       ))
