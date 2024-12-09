@@ -169,7 +169,7 @@ export default function ViewAll() {
                   </thead>
                   <tbody>
                     {displayAdmins.map((admin) => (
-                      <tr key={admin.id} onClick={() => handleEdit(admin)} title="Edit Admin">
+                      <tr key={admin.id} onClick={() => {handleEdit(admin)}} title="Edit Admin">
                         <td>{admin.fullName}</td>
                         <td>{admin.email}</td>
                         <td className="d-flex justify-content-between">
