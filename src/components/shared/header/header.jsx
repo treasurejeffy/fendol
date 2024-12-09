@@ -21,7 +21,7 @@ export default function Header() {
                     </Col>
 
                     {/* Search Section */}
-                    <Col lg={7} className={`d-none d-lg-block ${styles.search}`}>
+                    <Col lg={7} className={`d-none d-lg-block px-4 ${styles.search}`}>
                         <Form className="d-flex align-items-center">
                             <div className="position-relative w-100">
                                 <Form.Control

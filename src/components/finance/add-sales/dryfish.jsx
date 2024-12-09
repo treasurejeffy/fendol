@@ -182,35 +182,6 @@ const SalesForm = ({ customers, stages, products}) => {
                         }
                     </Form.Select>
                 </Col>
-
-                {/* Quantity Input */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Quantity</Form.Label>
-                    <Form.Control
-                        placeholder="Enter quantity"
-                        type="number"
-                        name="quantity"
-                        value={dryData.quantity || ''}
-                        required
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
-
-                {/* Quantity Used to Pack */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Quantity Used to Pack</Form.Label>
-                    <Form.Control
-                        placeholder="Enter quantity used to pack"
-                        type="number"
-                        name="quantityUsedToPack"
-                        value={dryData.quantityUsedToPack || ''}
-                        min="0"
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
-
                 {/* Product Weight (Readonly) */}
                 <Col className="mb-4">
                     <Form.Label className="fw-semibold">Product Weight(Kg)</Form.Label>
@@ -271,6 +242,34 @@ const SalesForm = ({ customers, stages, products}) => {
                             )}
                         </div>
                     </Form.Group>
+                </Col>
+
+                {/* Quantity Input */}
+                <Col className="mb-4">
+                    <Form.Label className="fw-semibold">Quantity</Form.Label>
+                    <Form.Control
+                        placeholder="Enter quantity"
+                        type="number"
+                        name="quantity"
+                        value={dryData.quantity || ''}
+                        required
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                    />
+                </Col>
+
+                {/* Quantity Used to Pack */}
+                <Col className="mb-4">
+                    <Form.Label className="fw-semibold">Quantity Used to Pack</Form.Label>
+                    <Form.Control
+                        placeholder="Enter quantity used to pack"
+                        type="number"
+                        name="quantityUsedToPack"
+                        value={dryData.quantityUsedToPack || ''}
+                        min="0"
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                    />
                 </Col>
 
                 {/* Discount Input */}

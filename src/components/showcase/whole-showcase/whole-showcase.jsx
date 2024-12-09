@@ -70,7 +70,7 @@ const fetchTableData = async () => {
   // format Date
   const formatDate = (isoDate) => { 
     const date = new Date(isoDate);
-    return date.toLocaleDateString("en-GB", { timeZone: 'UTC' }); // Format the date to DD/MM/YYYY 
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
   };
   
 
@@ -137,8 +137,8 @@ const fetchTableData = async () => {
                   <thead className={`rounded-2 ${styles.theader}`}>
                     <tr>
                       <th>DATE CREATED</th>
-                      <th>QUANTITY</th>
                       <th>FISH BATCH</th> 
+                      <th>QUANTITY</th>                      
                     </tr>
                   </thead>
                   <tbody>
@@ -146,8 +146,8 @@ const fetchTableData = async () => {
                       paginatedData.map((data, index) => (
                         <tr key={index}>
                           <td>{formatDate(data.updatedAt)}</td>
-                          <td>{data.wholeFishQuantity}</td>
-                          <td>{data.type}</td>                        
+                          <td>{data.batch_no}</td>      
+                          <td>{data.wholeFishQuantity}</td>                                            
                         </tr>
                       ))
                     ) : (

@@ -13,6 +13,7 @@ const FreshForm = ({ customers, stages, products}) => {
         category: '',
         fullName: '',
         discount: 0,
+        batch_no: '',
         stageId_from: "",
         paymentType:''
     })
@@ -22,7 +23,9 @@ const FreshForm = ({ customers, stages, products}) => {
     const [filteredCustomer, setFilteredCustomer] = useState([]);
     const [productDetails, setProductDetails] = useState(null);
     const [unit, setUnit] = useState('');
+    const [selectedQuantity, setSelectedQuantity] = useState('');
     const [stage, setStage] = useState([]);
+    const [fishType, setFishType] = useState([]);
     const [customer, setCustomer] = useState([]);
 
     // Fetch products
@@ -70,6 +73,10 @@ const FreshForm = ({ customers, stages, products}) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         const numericValue = name === 'productWeight' || name === 'discount' ? parseFloat(value) || 0 : value;
+        if (name === 'stageId_from') {
+            setFreshData({ ...freshData, stageId_from: value });
+            getQuantity(value);  // Pass stageId_from to getQuantity
+        }
 
         setFreshData(prevData => {
             const quantity = name === 'productWeight' ? numericValue : prevData.productWeight || 1;
@@ -83,6 +90,23 @@ const FreshForm = ({ customers, stages, products}) => {
                 totalPrice: Math.max(totalPrice, 0),
             };
         });
+    };
+
+    // get batches available
+    const getQuantity = async (stageId_from) => {
+        setSelectedQuantity('loading...')
+        if (stageId_from) {
+            try {
+                const response = await Api.get(`/active-batch?stageId=${stageId_from}`);
+                setFishType(response.data.data); // Update with the fetched quantity
+            } catch (error) {
+                console.error('Failed to fetch quantity:', error);
+                setSelectedQuantity('Error getting quantity or empty pond'); // Update with an error message
+            }
+        } else {
+            console.error('Stage ID from is required.');
+            setSelectedQuantity('Stage ID is required'); // Handle missing ID case
+        }
     };
 
     const handleSearchChange = (e) => {
@@ -157,6 +181,49 @@ const FreshForm = ({ customers, stages, products}) => {
     return (
         <Form onSubmit={handleAddSales}>
             <Row xxl={2} xl={2} lg={2}>  
+               {/* Stage From */}
+                <Col className="mb-4">
+                    <Form.Label className="fw-semibold">Pond From</Form.Label>
+                    <Form.Select
+                        name="stageId_from"
+                        required
+                        value={freshData.stageId_from || ''}
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                    >
+                        <option value="" disabled>Select Pond</option>
+                        {stages                          
+                            .map((stage, index) => (
+                                <option key={index} value={stage.id}>
+                                    {stage.title || 'No Data Yet'}
+                                </option>
+                            ))}
+                    </Form.Select>
+                </Col> 
+
+                {/* Fish Batch */}
+                <Col className="mb-4">
+                    <Form.Label className="fw-semibold">Fish Batch</Form.Label>
+                    <Form.Select
+                        name="batch_no"
+                        value={freshData.batch_no}
+                        onChange={handleInputChange}
+                        required
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                    >
+                        <option value="" disabled>Choose Fish Batch</option>
+                        {!fishType ? (
+                            <option>Please wait...</option>
+                        ) : fishType.length < 1 ? (
+                            <option>No Active Batch</option>
+                        ) : (
+                            fishType.map((stage, index) => (
+                                <option value={stage.batch_no} key={index}>{stage.batch_no} {freshData.stageId_from === stage.stageId ? `-(${stage.quantity || '0'})` : ''}</option>
+                            ))
+                        )}
+                    </Form.Select>
+                </Col>
+
                 {/* Product Name */}
                 <Col className="mb-4">
                     <Form.Label className="fw-semibold">Product Name</Form.Label>                                        
@@ -177,28 +244,7 @@ const FreshForm = ({ customers, stages, products}) => {
                         ))
                     }
                     </Form.Select>
-                </Col>
-
-               {/* Stage From */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Pond From</Form.Label>
-                    <Form.Select
-                        name="stageId_from"
-                        required
-                        value={freshData.stageId_from || ''}
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    >
-                        <option value="" disabled>Select Pond</option>
-                        {stages                          
-                            .map((stage, index) => (
-                                <option key={index} value={stage.id}>
-                                    {stage.title || 'No Data Yet'}
-                                </option>
-                            ))}
-                    </Form.Select>
-                </Col>
-                             
+                </Col>                   
 
                 {/* Total Product Weight */}
                 <Col className="mb-4">
@@ -208,20 +254,6 @@ const FreshForm = ({ customers, stages, products}) => {
                     type="number"
                     name="productWeight"
                     value={freshData.productWeight || ''}
-                    required
-                    onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
-
-                {/* Quantity */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Quantity</Form.Label>
-                    <Form.Control
-                    placeholder="Enter quantity"
-                    type="number"
-                    name="quantity"
-                    value={freshData.quantity || ''}                                            
                     required
                     onChange={handleInputChange}
                     className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
@@ -275,6 +307,20 @@ const FreshForm = ({ customers, stages, products}) => {
                         )}
                     </div>
                     </Form.Group>
+                </Col>
+
+                {/* Quantity */}
+                <Col className="mb-4">
+                    <Form.Label className="fw-semibold">Quantity</Form.Label>
+                    <Form.Control
+                    placeholder="Enter quantity"
+                    type="number"
+                    name="quantity"
+                    value={freshData.quantity || ''}                                            
+                    required
+                    onChange={handleInputChange}
+                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                    />
                 </Col>
 
                 {/* Discount */}

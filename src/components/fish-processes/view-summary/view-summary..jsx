@@ -119,7 +119,7 @@ export default function ViewSummary() {
                   <thead>
                     <tr>
                       <th>DATE CREATED</th>
-                      <th>FISH TYPE</th>
+                      <th>FISH BATCH</th>
                       <th>QUANTITY BEFORE</th>
                       <th>QUANTITY AFTER <br /> (W,S,D)</th>
                       <th>REMARK</th>
@@ -131,7 +131,7 @@ export default function ViewSummary() {
                       return (
                         <tr key={index}>
                           <td>{formattedDate}</td>
-                          <td>{history.fishType || '-'}</td>
+                          <td>{history.batch_no || '-'}</td>
                           <td>{history.quantityBefore}</td>
                           <td>{`${history.wholeQuantity},${history.brokenQuantity},${history.damageLoss}`}</td>
                           <td>{history.remarks ? history.remarks.slice(0, 40) + (history.remarks.length > 40 ? '...' : '') : '-'}</td>

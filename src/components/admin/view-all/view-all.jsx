@@ -48,6 +48,14 @@ export default function ViewAll() {
     setShowModal(true);
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSelectedAdmin({
+      ...selectedAdmin,
+      [name]: value,
+    });
+  };
+
   const handleSave = async () => {
     const loadingToast = toast.loading("Saving Admin...", {
       className: 'dark-toast'
@@ -73,6 +81,10 @@ export default function ViewAll() {
         className: 'dark-toast'
       });
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleDelete = async (adminId) => {
@@ -161,7 +173,8 @@ export default function ViewAll() {
                         <td>{admin.fullName}</td>
                         <td>{admin.email}</td>
                         <td className="d-flex justify-content-between">
-                          <span>{admin.role}</span>
+                          <span>{admin.role?.replace(/_/g, ' ') // Replace underscores with spaces
+                                        .replace(/\b\w/g, char => char.toUpperCase()) }</span>
                           <FaTrashAlt
                             style={{ cursor: "pointer", color: "red" }}
                             onClick={(e) => {
@@ -198,7 +211,92 @@ export default function ViewAll() {
                 </div>
               </div>
             )}
-          </main>
+          </main>        
+          <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal.Header closeButton className="border-0">
+              <Modal.Title className="fw-semibold">Edit Admin</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="border-0 pt-5">
+              {selectedAdmin && (
+                <Form>
+                  <Form.Group className="mb-3 row">
+                    <Form.Label className="col-4 fw-semibold">Full Name</Form.Label>
+                    <div className="col-8">
+                      <Form.Control
+                        type="text"
+                        name="fullName"
+                        value={selectedAdmin.fullName}
+                        onChange={handleInputChange}
+                        className="py-2 shadow-none border-secondary-subtle border-1"
+                      />
+                    </div>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3 row">
+                    <Form.Label className="col-4 fw-semibold">Email</Form.Label>
+                    <div className="col-8">
+                      <Form.Control
+                        type="email"
+                        name="email"
+                        value={selectedAdmin.email}
+                        onChange={handleInputChange}
+                        className="py-2 shadow-none border-secondary-subtle border-1"
+                      />
+                    </div>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3 row">
+                    <Form.Label className="col-4 fw-semibold">Password</Form.Label>
+                    <div className="col-8">
+                      <InputGroup>
+                        <Form.Control
+                          type={showPassword ? "text" : "password"}
+                          name="password"
+                          placeholder="Enter new password"
+                          onChange={handleInputChange}
+                          className={`py-2 shadow-none border-secondary-subtle border-1 border-end-0 ${styles.fadedPlaceholder}`}
+                        />
+                        <InputGroup.Text
+                          onClick={togglePasswordVisibility}
+                          className="bg-light-subtle shadow-none border-secondary-subtle border-1 border-start-0"
+                          style={{ cursor: "pointer" }}
+                        >
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </InputGroup.Text>
+                      </InputGroup>
+                    </div>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3 row">
+                    <Form.Label className="col-4 fw-semibold">Role</Form.Label>
+                    <div className="col-8">
+                      <Form.Select
+                        name="role"
+                        value={
+                          ["admin", "super_admin"].includes(selectedAdmin.role)
+                            ? selectedAdmin.role
+                            : ""
+                        }
+                        onChange={handleInputChange}
+                        className="py-2 shadow-none border-secondary-subtle border-1"
+                      >
+                        <option value="" disabled>
+                          Select Role
+                        </option>                                                      
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super Admin</option>
+                      </Form.Select>
+                    </div>
+                  </Form.Group>
+                </Form>
+              )}
+            </Modal.Body>
+            <Modal.Footer className="border-0 mt-5" style={{height: '200px'}} >
+              <Button variant="dark"  className={`border-0 btn-dark shadow py-2 px-5 fs-6 fw-semibold ${styles.submit}`} onClick={handleSave}>
+                Save
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </section>
       </div>
     </section>

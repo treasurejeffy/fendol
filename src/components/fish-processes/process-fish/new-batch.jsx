@@ -227,15 +227,24 @@ export default function NewBatchFish() {
             
             // Post data to the determined endpoint
             if (endpoint) {
-               const response= await Api.post(endpoint, moveData);
-                const {wholeFishQuantity,brokenFishQuantity,damageOrLoss} = response.data.data  || response.data.newProcess;
+                const response = await Api.post(endpoint, moveData);
 
+                // Extract data from response with a fallback for safety
+                const data = response.data.data || response.data.newProcess;
+                
+                // Destructure with default values to avoid undefined
+                const {
+                  wholeFishQuantity = 0,
+                  brokenFishQuantity = 0,
+                  damageOrLoss = 0,
+                } = data;
+                
+                // Update state with destructured values
                 setQuantity({
-                    wholeFish: wholeFishQuantity ,
-                    brokenFish: brokenFishQuantity,
-                    damage: damageOrLoss
-                })
-            
+                  wholeFish: wholeFishQuantity,
+                  brokenFish: brokenFishQuantity,
+                  damage: damageOrLoss,
+                });
 
                 setMoveData({                                    
                     wholeFishQuantity: '',
@@ -314,7 +323,7 @@ export default function NewBatchFish() {
                                             handleInputChangeMoveFish(e);
                                             setMoveFishData(prev => ({
                                                 ...prev,
-                                                actual_quantity: selectedBatch ? selectedBatch.quantity : null,
+                                                actual_quantity: selectedBatch ? selectedBatch.accumulatedQuantity : null,
                                             }));
                                         }}
                                         required
@@ -322,7 +331,7 @@ export default function NewBatchFish() {
                                     >
                                         <option value="" disabled>Choose Fish Batch</option>
                                         {fishType.length < 1 ? (
-                                            <option>No data available</option>
+                                            <option>No Batch available</option>
                                         ) : (
                                             fishType.map((species, index) => (
                                                 <option value={species.batch_no} key={index}>{species.batch_no}</option>
