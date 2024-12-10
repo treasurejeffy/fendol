@@ -171,9 +171,27 @@
   }
 }
 
-.delete {
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* Adjust size as needed */
+  height: 40px; /* Ensure a perfect circle */
+  margin: 0 5px; /* Add spacing between icons */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+  cursor: pointer;
+
   &:hover {
-    padding: 15px; /* Increase padding */
-    font-size: 1.2rem; /* Increase font size */
+    background-color: rgba(0, 0, 0, 0.1); /* Light hover background */
+    transform: scale(1.1); /* Slight zoom effect */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Enhance shadow on hover */
+  }
+
+  /* Icon Styling */
+  .text-center {
+    font-size: 18px;
   }
 }
+
+

@@ -77,20 +77,24 @@ export default function ViewBrokenHistory() {
     fetchTableData();
   }, []);
 
-  // convert the quantity of broken
+  // Convert the quantity of broken
   const handleSave = async () => {
+    const userConfirmed = window.confirm("Are you sure you want to convert this to KG?");
+    if (!userConfirmed) return; // Exit if user cancels
+
     const loadingToast = toast.loading("Converting to KG...");
-    const formData ={
+    const formData = {
       updatedAt: selectedBroken.updatedAt,
-      brokenQuantityInKg: convert
-    }
+      brokenQuantityInKg: convert,
+    };
+
     try {
       await Api.post(`/convert-broken-to-kg`, formData);
       toast.update(loadingToast, {
         render: "Converted successfully!",
         type: "success",
         isLoading: false,
-        autoClose: 3000
+        autoClose: 3000,
       });
       fetchTableData();
       setShowModal(false);
@@ -101,10 +105,11 @@ export default function ViewBrokenHistory() {
         render: "Failed to convert. Please try again.",
         type: "error",
         isLoading: false,
-        autoClose: 6000
+        autoClose: 6000,
       });
     }
   };
+
 
   const paginatedData = tableData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
   
@@ -179,7 +184,7 @@ export default function ViewBrokenHistory() {
                           <td>{formatDate(data.updatedAt)}</td>
                           <td>{data.batch_no}</td>
                           <td>{data.brokenFishQuantity}</td>
-                          <td className='d-flex justify-content-between align-items-center'> <span>{data.quantity || '0'}</span> <button className={`border-0 btn-dark text-light rounded-4 py-1 px-3 ${styles.submit}`} onClick={() => handleConvert(data)}>Convert to kg</button></td>                        
+                          <td className='d-flex justify-content-between align-items-center'> <span>{data.brokenQuantityInKg || '0'}</span> {data.brokenQuantityInKg === null && <button className={`border-0 btn-dark text-light rounded-4 py-1 px-3 ${styles.submit}`} onClick={() => handleConvert(data)}>Convert to kg</button>}</td>
                         </tr>
                       ))
                     ) : (

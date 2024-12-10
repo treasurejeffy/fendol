@@ -31,6 +31,8 @@ export default function NewBatchFish() {
         return savedValue ? JSON.parse(savedValue) : false;
       });
     const [loader, setLoader] = useState(false);
+    const [cumulativeBrokenFishQuantity, setCumulativeBrokenFishQuantity] = useState(0);
+    const [cumulativeDamageOrLoss, setCumulativeDamageOrLoss] = useState(0);
 
     const fetchWashingStage = async () => {
         try {
@@ -75,7 +77,6 @@ export default function NewBatchFish() {
         fetchFishType();
         
     }, []);
-
 
     const handleInputChangeMoveFish = (e) => {
         const { name, value } = e.target;
@@ -126,8 +127,7 @@ export default function NewBatchFish() {
         } finally {
             setLoader(false);
         }
-    };
-    
+    }; 
         
     // process begins here     
     const [loading, setLoading] = useState(false);
@@ -159,8 +159,7 @@ export default function NewBatchFish() {
             return stageOrder.indexOf(a.title) - stageOrder.indexOf(b.title);
         });
     }, [checkStages]);
-    
-    
+        
     // Set the default checked stage on mount
     useEffect(() => {
         if (orderedStages.length > 0) {
@@ -228,22 +227,26 @@ export default function NewBatchFish() {
             // Post data to the determined endpoint
             if (endpoint) {
                 const response = await Api.post(endpoint, moveData);
-
+                                    
                 // Extract data from response with a fallback for safety
                 const data = response.data.data || response.data.newProcess;
-                
+
                 // Destructure with default values to avoid undefined
-                const {
-                  wholeFishQuantity = 0,
-                  brokenFishQuantity = 0,
-                  damageOrLoss = 0,
+                let {
+                wholeFishQuantity = 0,
+                brokenFishQuantity = 0,
+                damageOrLoss = 0,
                 } = data;
-                
-                // Update state with destructured values
+
+                // Update cumulative brokenFishQuantity and damageOrLoss by adding the new values
+                setCumulativeBrokenFishQuantity(prev => prev + brokenFishQuantity);
+                setCumulativeDamageOrLoss(prev => prev + damageOrLoss);
+
+                // Update state with the new values
                 setQuantity({
-                  wholeFish: wholeFishQuantity,
-                  brokenFish: brokenFishQuantity,
-                  damage: damageOrLoss,
+                wholeFish: wholeFishQuantity,
+                brokenFish: cumulativeBrokenFishQuantity + brokenFishQuantity, // Add the cumulative value to the current one
+                damage: cumulativeDamageOrLoss + damageOrLoss, // Add the cumulative damageOrLoss to the current one
                 });
 
                 setMoveData({                                    

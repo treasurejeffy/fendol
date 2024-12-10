@@ -84,7 +84,9 @@ export default function CreateProducts() {
                 className: 'dark-toast'
             });
 
-            navigate('/products/view-all');
+            setTimeout(()=>{
+                navigate('/products/view-all');
+            }, 2500)
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response?.data?.message || "Error creating product. Please try again.",

@@ -163,7 +163,8 @@ const FreshForm = ({ customers, stages, products}) => {
                 fullName: '',
                 discount: 0,
                 stageId_from: "",
-                paymentType: ''
+                paymentType: '',
+                batch_no: ''
             });
         } catch (error) {
             toast.update(loadingToast, {
@@ -311,7 +312,7 @@ const FreshForm = ({ customers, stages, products}) => {
 
                 {/* Quantity */}
                 <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Quantity</Form.Label>
+                    <Form.Label className="fw-semibold">Quantity Of Fresh Fish</Form.Label>
                     <Form.Control
                     placeholder="Enter quantity"
                     type="number"
