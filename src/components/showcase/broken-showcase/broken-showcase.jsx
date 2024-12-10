@@ -184,7 +184,7 @@ export default function ViewBrokenHistory() {
                           <td>{formatDate(data.updatedAt)}</td>
                           <td>{data.batch_no}</td>
                           <td>{data.brokenFishQuantity}</td>
-                          <td className='d-flex justify-content-between align-items-center'> <span>{data.brokenQuantityInKg || '0'}</span> {data.brokenQuantityInKg === null && <button className={`border-0 btn-dark text-light rounded-4 py-1 px-3 ${styles.submit}`} onClick={() => handleConvert(data)}>Convert to kg</button>}</td>
+                          <td className='d-flex justify-content-between align-items-center'> <span>{data.brokenQuantityInKg || '0'}</span> {data.brokenQuantityInKg === 0 && <button className={`border-0 btn-dark text-light rounded-4 py-1 px-3 ${styles.submit}`} onClick={() => handleConvert(data)}>Convert to kg</button>}</td>
                         </tr>
                       ))
                     ) : (
