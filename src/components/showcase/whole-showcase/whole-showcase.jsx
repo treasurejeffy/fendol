@@ -31,7 +31,7 @@ const fetchTableData = async () => {
       const response = await Api.get('/show-glass/whole');
       if (response.data && response.data.data) {
         // Assuming response.data.data is an object containing the details you need
-        setTableData([response.data.data]); // Wrap in array if it's a single object
+        setTableData(response.data.data); // Wrap in array if it's a single object
         setPageCount(Math.ceil(1 / itemsPerPage)); // Adjust pagination for a single item
       } else {
         throw new Error('Expected an object with the data property');
