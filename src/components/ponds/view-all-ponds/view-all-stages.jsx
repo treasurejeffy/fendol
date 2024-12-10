@@ -454,7 +454,7 @@ const ViewAllStages = () => {
       </Modal>
 
       {/* Add Note Modal */}
-      <Modal show={showMdModal} onHide={() => setShowMdModal(false)}>
+      <Modal show={showMdModal} className="border-0" onHide={() => setShowMdModal(false)}>
         <Modal.Header closeButton className="border-0">
           <Modal.Title className="fw-semibold">Add Note</Modal.Title>
         </Modal.Header>
