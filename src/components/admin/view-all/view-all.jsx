@@ -173,7 +173,7 @@ export default function ViewAll() {
                         <td>{admin.fullName}</td>
                         <td>{admin.email}</td>
                         <td className="d-flex justify-content-between">
-                          <span>{admin.role?.replace(/_/g, ' ') // Replace underscores with spaces
+                          <span className="text-center bg-light p-2 shadow">{admin.role?.replace(/_/g, ' ') // Replace underscores with spaces
                                         .replace(/\b\w/g, char => char.toUpperCase()) }</span>
                           <FaTrashAlt
                             style={{ cursor: "pointer", color: "red" }}
