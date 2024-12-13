@@ -70,7 +70,7 @@ export default function ViewAllHistory() {
       label: "Damaged Fish",
       endpoint: "damaged-fish",
       headers: ["Date", "Pond From", "Quantity", "Fish Batch", "Remark"],
-      dataKeys: ["createdAt", "FishStage", "quantity", "batch_no", "remarks"],
+      dataKeys: ["createdAt", "StageTitle", "quantity", "batch_no", "remarks"],
     },
   };
 
