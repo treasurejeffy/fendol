@@ -9,6 +9,7 @@ const FinanceNavigations = () => {
     <Routes>
       <Route path='add-sales' element={<AddSales/>}/>
       <Route path='add-expenses' element={<AddExpense/>}/>
+      <Route path='ledger' element={<FinanceLedger/>}/>
     </Routes>
   );
 };
