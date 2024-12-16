@@ -173,15 +173,36 @@ export default function ViewAll() {
                         <td>{admin.fullName}</td>
                         <td>{admin.email}</td>
                         <td className="d-flex justify-content-between">
-                          <span className="text-center bg-light p-2 shadow">{admin.role?.replace(/_/g, ' ') // Replace underscores with spaces
-                                        .replace(/\b\w/g, char => char.toUpperCase()) }</span>
-                          <FaTrashAlt
-                            style={{ cursor: "pointer", color: "red" }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(admin.id);
+                          <span>{admin.role?.replace(/_/g, ' ') // Replace underscores with spaces
+                            .replace(/\b\w/g, char => char.toUpperCase()) }</span>
+                           <span
+                            style={{
+                              display: "inline-block",
+                              textAlign: "center",
+                              backgroundColor: "#f8f9fa", // Light background
+                              padding: "0.5rem",
+                              borderRadius: "50%",
+                              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                              transition: "transform 0.2s ease, box-shadow 0.2s ease",
                             }}
-                          />
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = "translateY(-5px)";
+                              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.2)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = "translateY(0)";
+                              e.currentTarget.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.1)";
+                            }}                        
+                          >
+                            <FaTrashAlt
+                              style={{ cursor: "pointer", color: "red" }}
+                              title="Delete Admin"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(admin.id);
+                              }}
+                            />
+                          </span>                        
                         </td>
                       </tr>
                     ))}
