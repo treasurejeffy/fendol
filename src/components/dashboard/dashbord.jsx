@@ -4,32 +4,35 @@ import styles from './dashboard.module.scss'; // Adjust the import as needed
 import SideBar from '../shared/sidebar/sidebar';
 import Header from '../shared/header/header';
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement, // Add this for Line chart
-    LineElement,  // Add this for Line chart
-    BarElement,
-    ArcElement, // Add this for Doughnut chart
-    Title,
-    Tooltip,
-    Legend,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler, // Import Filler plugin
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2'; // Ensure imports are at the top
 import { Value } from 'sass'; // Ensure this is moved to the top
 
 // Register necessary components
 ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    ArcElement,
-    Title,
-    Tooltip,
-    Legend
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler // Register this plugin for 'fill'
 );
+
 
 export default function Dashboard() {
     const [dataLine, setDataLine] = useState(() => {

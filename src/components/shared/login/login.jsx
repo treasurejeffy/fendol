@@ -5,7 +5,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import styles from './login.module.scss';
 import top from '../../../assests/top.png';
 import bottom from '../../../assests/bottom.png';
-import axios from 'axios';
+import Api from "../../shared/api/apiLink";
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -38,7 +38,7 @@ export default function LogIn() {
         const loadingToast = toast.loading("Logging in...", { className: 'dark-toast' });
     
         try {
-            const response = await axios.post('https://dev-api.fendolgroup.com/api/v1/login', loginData);
+            const response = await Api.post('/login', loginData);
             const { token, role, success } = response.data; // Destructure response data
     
             if (success) {               
