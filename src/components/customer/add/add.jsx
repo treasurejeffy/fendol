@@ -101,8 +101,7 @@ const AddCustomer = () => {
                                         type="tel"
                                         name="phone"
                                         value={formData.phone}
-                                        onChange={handleInputChange}
-                                        required
+                                        onChange={handleInputChange}                                     
                                     />
                                 </Col>
                                 <Col className="mb-4">

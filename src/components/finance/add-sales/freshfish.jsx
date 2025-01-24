@@ -196,32 +196,9 @@ const FreshForm = ({ customers, stages, products}) => {
                         {stages                          
                             .map((stage, index) => (
                                 <option key={index} value={stage.id}>
-                                    {stage.title || 'No Data Yet'}
+                                    {stage.title || 'No Data Yet'} {freshData.stageId_from === stage.id ? `- (${stage.quantity || '0'})` : ''}
                                 </option>
                             ))}
-                    </Form.Select>
-                </Col> 
-
-                {/* Fish Batch */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Fish Batch</Form.Label>
-                    <Form.Select
-                        name="batch_no"
-                        value={freshData.batch_no}
-                        onChange={handleInputChange}
-                        required
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    >
-                        <option value="" disabled>Choose Fish Batch</option>
-                        {!fishType ? (
-                            <option>Please wait...</option>
-                        ) : fishType.length < 1 ? (
-                            <option>No Active Batch</option>
-                        ) : (
-                            fishType.map((stage, index) => (
-                                <option value={stage.batch_no} key={index}>{stage.batch_no} {freshData.stageId_from === stage.stageId ? `-(${stage.quantity || '0'})` : ''}</option>
-                            ))
-                        )}
                     </Form.Select>
                 </Col>
 

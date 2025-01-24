@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from "react";
 import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import styles from '../showcase.module.scss';
-import { Spinner, Alert } from 'react-bootstrap'; 
+import "bootstrap/dist/css/bootstrap.min.css";
+import styles from "../showcase.module.scss";
+import { Spinner, Alert, Button, Modal, Form, Dropdown } from "react-bootstrap";
 import { FaExclamationTriangle } from "react-icons/fa";
-import ReactPaginate from 'react-paginate'; 
+import { BsThreeDotsVertical} from "react-icons/bs"; // Dropdown icon
+import ReactPaginate from "react-paginate";
 import Api from "../../shared/api/apiLink";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ViewWholeHistory() {
   const [brokenQuantity, setBrokenQuantity] = useState(null);
   const [tableData, setTableData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0); 
-  const [pageCount, setPageCount] = useState(0); 
-  const [loadingStages, setLoadingStages] = useState(true); 
-  const [loadingTable, setLoadingTable] = useState(true); 
-  const [errorStages, setErrorStages] = useState(''); 
-  const [errorTable, setErrorTable] = useState(''); 
+  const [currentPage, setCurrentPage] = useState(0);
+  const [loadingStages, setLoadingStages] = useState(true);
+  const [loadingTable, setLoadingTable] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [errorStages, setErrorStages] = useState("");
+  const [errorTable, setErrorTable] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState(""); // 'damage' or 'broken'
+  const [quantity, setQuantity] = useState("");
+  const [remark, setRemark] = useState("");
 
   const itemsPerPage = 10;
 
@@ -24,17 +31,14 @@ export default function ViewWholeHistory() {
     setCurrentPage(selectedPage.selected);
   };
 
-// Function to fetch table data
-const fetchTableData = async () => {
+  const fetchTableData = async () => {
     setLoadingTable(true);
     try {
-      const response = await Api.get('/show-glass/whole');
+      const response = await Api.get("/show-glass/whole");
       if (response.data && response.data.data) {
-        // Assuming response.data.data is an object containing the details you need
-        setTableData(response.data.data); // Wrap in array if it's a single object
-        setPageCount(Math.ceil(1 / itemsPerPage)); // Adjust pagination for a single item
+        setTableData(response.data.data);
       } else {
-        throw new Error('Expected an object with the data property');
+        throw new Error("Expected an object with the data property");
       }
     } catch (error) {
       console.error(error);
@@ -43,16 +47,15 @@ const fetchTableData = async () => {
       setLoadingTable(false);
     }
   };
-  
-  // Function to fetch broken quantity data
+
   const fetchQuantityData = async () => {
     setLoadingStages(true);
     try {
-      const response = await Api.get('/show-glass/total-whole');
+      const response = await Api.get("/show-glass/total-whole");
       if (response.data && typeof response.data.data.totalWholeQuantity === "number") {
-        setBrokenQuantity(response.data.data.totalWholeQuantity); // Use the numeric value
+        setBrokenQuantity(response.data.data.totalWholeQuantity);
       } else {
-        throw new Error('Expected totalWholeQuantity to be a number');
+        throw new Error("Expected totalWholeQuantity to be a number");
       }
     } catch (error) {
       console.error(error);
@@ -61,22 +64,74 @@ const fetchTableData = async () => {
       setLoadingStages(false);
     }
   };
-  
+
   useEffect(() => {
     fetchQuantityData();
     fetchTableData();
   }, []);
 
-  // format Date
-  const formatDate = (isoDate) => { 
-    const date = new Date(isoDate);
-    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+  const handleShowModal = (type) => {
+    setModalType(type);
+    setQuantity("");
+    setRemark("");
+    setShowModal(true);
   };
-  
 
-  const paginatedData = tableData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
-  console.log(tableData);
-  
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    const loadingToast = toast.loading("Processing...");
+    if (!quantity || !remark) {
+      toast.update(loadingToast, {
+        render: 'Please fill in all fields.',
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+        className: 'dark-toast'
+      });
+      return;
+    }
+    try {
+      const endpoint =
+        modalType === "damage" ? "/move-damage" : "/move-broken";
+      const payload = { quantity, remark };
+
+      const response = await Api.post(endpoint, payload);
+      toast.update(loadingToast, {
+        render: "OPERATION SUCCESSFULL!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+        className: 'dark-toast'
+      });
+      fetchTableData(); // Refresh table data after successful submission
+      handleCloseModal();
+    } catch (error) {
+        toast.update(loadingToast, {
+          render: error.response ? error.response.data.message : 'An error occurred while performing the action.',
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+          className: 'dark-toast'
+        });
+    }
+  };
+
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}/${date.getFullYear()}`;
+  };
+
+  const paginatedData = tableData.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+
   return (
     <section className={`d-none d-lg-block ${styles.body}`}>
       <div className="sticky-top">
@@ -91,11 +146,10 @@ const fetchTableData = async () => {
           <main className={styles.create_form}>
             <h4 className="mt-3 mb-5">View Whole Fish History</h4>
 
-    
             <div className={`d-flex mb-5`}>
               {loadingStages ? (
-                <div className="text-start w-25 shadow py-5 px-3">                
-                    <span className="text-muted">Loading...</span>                
+                <div className="text-start w-25 shadow py-5 px-3">
+                  <span className="text-muted">Loading...</span>
                 </div>
               ) : errorStages ? (
                 <div className="w-100">
@@ -104,18 +158,45 @@ const fetchTableData = async () => {
                     <span className="fw-semibold">{errorStages}</span>
                   </Alert>
                 </div>
-              ) : brokenQuantity ? (
-                <div className="w-50 ">
+              ) : (
+                brokenQuantity && (
+                  <div className="w-50">
                     <div className="w-50 px-3 shadow">
-                      <p className="text-end text-muted fw-semibold" style={{fontSize:'12px'}}>In Stock</p>
-                      <p className="text-start text-muted fw-semibold" style={{fontSize:'14px'}}>Total Quantity</p>
+                      <div className="d-flex justify-content-between pt-2">
+                        <p className="text-muted fw-semibold" style={{ fontSize: "12px" }}>
+                          In Stock
+                        </p>
+                        <Dropdown>
+                          <Dropdown.Toggle as="span" id="dropdown-custom-components">
+                            <BsThreeDotsVertical
+                              className="m-1 cursor-pointer"
+                              style={{ cursor: "pointer" }}
+                            />
+                          </Dropdown.Toggle>
+
+                          <Dropdown.Menu>
+                            <Dropdown.Item  variant='light' onClick={() => handleShowModal("damage")}>
+                              Move to Damage
+                            </Dropdown.Item>
+                            <Dropdown.Item variant='light' onClick={() => handleShowModal("broken")}>
+                              Move to Broken
+                            </Dropdown.Item>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </div>
+                      <p className="text-start text-muted fw-semibold" style={{ fontSize: "14px" }}>
+                        Total Quantity
+                      </p>
                       <div className="d-flex pb-3">
-                          <h1>{brokenQuantity}</h1>
-                          <p className="mt-3 fw-semibold" style={{fontSize:'12px'}}>piece</p>
+                        <h1>{brokenQuantity}</h1>
+                        <p className="mt-3 fw-semibold" style={{ fontSize: "12px" }}>
+                          piece
+                        </p>
                       </div>
                     </div>
-                </div>
-              ) : null}
+                  </div>
+                )
+              )}
             </div>
 
             {loadingTable ? (
@@ -137,8 +218,7 @@ const fetchTableData = async () => {
                   <thead className={`rounded-2 ${styles.theader}`}>
                     <tr>
                       <th>DATE CREATED</th>
-                      <th>FISH BATCH</th> 
-                      <th>QUANTITY</th>                      
+                      <th className="text-end pe-4">QUANTITY</th>                     
                     </tr>
                   </thead>
                   <tbody>
@@ -146,13 +226,14 @@ const fetchTableData = async () => {
                       paginatedData.map((data, index) => (
                         <tr key={index}>
                           <td>{formatDate(data.updatedAt)}</td>
-                          <td>{data.batch_no}</td>      
-                          <td>{data.wholeFishQuantity}</td>                                            
+                          <td className="text-end pe-4">{data.wholeFishQuantity}</td>                          
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="5" className="text-center">No data available</td>
+                        <td colSpan="3" className="text-center">
+                          No data available
+                        </td>
                       </tr>
                     )}
                   </tbody>
@@ -163,7 +244,7 @@ const fetchTableData = async () => {
                     previousLabel={"<"}
                     nextLabel={">"}
                     breakLabel={"..."}
-                    pageCount={Math.ceil(tableData.length / itemsPerPage)} // Use tableData instead of ledgerData
+                    pageCount={Math.ceil(tableData.length / itemsPerPage)}
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={3}
                     onPageChange={handlePageChange}
@@ -177,15 +258,50 @@ const fetchTableData = async () => {
                     breakClassName={"page-item disabled"}
                     breakLinkClassName={"page-link"}
                     activeClassName={"active-light"}
-                />
+                  />
                 </div>
               </div>
             )}
           </main>
         </section>
 
+        <Modal show={showModal} onHide={handleCloseModal}>
+          <Modal.Header closeButton  className='border-0'>
+            <Modal.Title>
+              {modalType === "damage" ? "Move to Damage" : "Move to Broken"}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body className='border-0'>
+            <h5 className="text-end fw-semibold"><span className='fs-6 fw-semibold'>Total Quatity: </span>{brokenQuantity}</h5>
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Quantity</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  className="py-2 shadow-none border-secondary-subtle border-1"
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Remark</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={remark}
+                  onChange={(e) => setRemark(e.target.value)}
+                  className="py-2 shadow-none border-secondary-subtle border-1"
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="dark" className={`border-0 btn-dark shadow py-2 px-3 fs-6 fw-semibold ${styles.submit}`} onClick={handleSubmit} disabled={loading}>
+              Move
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </section>
   );
 }
-

@@ -51,26 +51,26 @@ export default function ViewAllHistory() {
     "#add-histories": {
       label: "Added Fish",
       endpoint: "fishes",
-      headers: ["Date", "Pond", "Quantity", "Fish Type", "Fish Batch"],
-      dataKeys: ["createdAt", "stageTitle", "quantity", "speciesName", "batch_no"],
+      headers: ["Date", "Pond", "Quantity", "Fish Type"],
+      dataKeys: ["createdAt", "stageTitle", "quantity", "speciesName", ],
     },
     "#move-fish": {
       label: "Moved Fish",
       endpoint: "fish-movements",
-      headers: ["Date", "Pond From", "Fish Batch", "Pond To", "Quantity", "Remark"],
-      dataKeys: ["createdAt", "sourcePond", "batch_no", "destinationPond", "actual_quantity", "remarks"],
+      headers: ["Date", "Pond From", "Pond To", "Quantity", "Remark"],
+      dataKeys: ["createdAt", "sourcePond", "destinationPond", "actual_quantity", "remarks"],
     },
     "#harvest-fish": {
       label: "Harvested Fish",
       endpoint: "harvested-fish",
-      headers: ["Date", "Pond From", "Quantity", "Fish Batch", "Remark"],
-      dataKeys: ["createdAt", "FishStage", "quantity", "batch_no", "remarks"],
+      headers: ["Date", "Pond From", "Quantity", "Remark"],
+      dataKeys: ["createdAt", "FishStage", "quantity", "remarks"],
     },
     "#damage-fish": {
       label: "Damaged Fish",
       endpoint: "damaged-fish",
-      headers: ["Date", "Pond From", "Quantity", "Fish Batch", "Remark"],
-      dataKeys: ["createdAt", "sourcePond", "quantity", "batch_no", "remarks"],
+      headers: ["Date", "Pond From", "Quantity", "Remark"],
+      dataKeys: ["createdAt", "sourcePond", "quantity", "remarks"],
     },
   };
 

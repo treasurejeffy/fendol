@@ -16,7 +16,6 @@ const HarvestFish = () => {
     const [formData, setFormData] = useState({
         stageId_from: '',
         actual_quantity: null,
-        batch_no: '',
         remarks: '',
     });
     const [selectedQuantity, setSelectedQuantity] = useState('');
@@ -69,21 +68,32 @@ const HarvestFish = () => {
 
     // get the actual_quantity of the pond 
     const getQuantity = async (stageId_from) => {
-        setSelectedQuantity('loading...')
-        if (stageId_from) {
-            try {
-                const response = await Api.get(`/active-batch?stageId=${stageId_from}`);
-                setFishType(response.data.data ); // Update with the fetched actual_quantity
-            } catch (error) {
-                console.error('Failed to fetch actual_quantity:', error);
-                setSelectedQuantity('Error getting actual_quantity or empty pond'); // Update with an error message
-            }
-        } else {
-            console.error('Stage ID from is required.');
-            setSelectedQuantity('Stage ID is required'); // Handle missing ID case
+        setFishType('loading...');
+      
+        if (!stageId_from) {    
+          setSelectedQuantity('Stage ID is required');
+          return;
+        }
+      
+        try {
+          const response = await Api.get(`/active-batch?stageId=${stageId_from}`);
+          const responseData = response.data;
+      
+          if (response.status === 404 || !responseData.success || responseData.data.length === 0) {
+            setFishType('No Fish Type');
+          } else {
+            setFishType(responseData.data[0].species.speciesName);
+          }
+        } catch (error) {
+          if (error.response && error.response.status === 404) {
+            setFishType('No Fish Type');
+          } else {
+            console.error('Failed to fetch quantity:', error);
+            setSelectedQuantity('Error getting quantity or empty pond');
+          }
         }
     };
-
+      
     // Submit form data to harvest fish
     const handleAddFish = async (e) => {
         e.preventDefault();
@@ -101,9 +111,10 @@ const HarvestFish = () => {
             setFormData({
                 stageId_from: '',
                 actual_quantity: '',
-                batch_no: '',
                 remarks: '',
             });
+
+            setFishType('');
 
             toast.update(loadingToast, {
                 render: 'Fish harvested successfully!',
@@ -162,7 +173,7 @@ const HarvestFish = () => {
                                         {stages.length > 0 ? (
                                             stages.map((stage, index) => (
                                                 <option value={stage.id} key={index}>
-                                                    {stage.title}
+                                                    {stage.title}  {formData.stageId_from === stage.id ? `- (${stage.quantity || '0'})` : ''}
                                                 </option>
                                             ))
                                         ) : (
@@ -173,28 +184,14 @@ const HarvestFish = () => {
 
                                 {/* Fish Batch */}
                                 <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Fish Batch</Form.Label>
-                                    <Form.Select
-                                        name="batch_no"
-                                        value={formData.batch_no}
-                                        onChange={handleInputChange}
+                                    <Form.Label className="fw-semibold">Fish Type</Form.Label>
+                                    <Form.Control
                                         required
-                                        className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
-                                    >
-                                        <option value="" disabled>Choose Fish Batch</option>
-                                        {fishType.length > 0 ? (
-                                            fishType.map((batch, index) => (
-                                                <option
-                                                    value={batch.batch_no}
-                                                    key={index}
-                                                >
-                                                    {batch.batch_no} {formData.stageId_from === batch.stageId ? `- (${batch.quantity || '0'})` : ''}
-                                                </option>
-                                            ))
-                                        ) : (
-                                            <option>No Active Batch available</option>
-                                        )}
-                                    </Form.Select>
+                                        placeholder='Select Pond to Show fish Type'
+                                        value={fishType}
+                                        readOnly
+                                        className={`py-2 bg-light-subtle text-secondary shadow-none border-1 ${styles.inputs}`}
+                                    />
                                 </Col>
 
                                 {/* Quantity */}

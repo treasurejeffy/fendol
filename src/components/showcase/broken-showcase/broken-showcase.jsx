@@ -3,11 +3,11 @@ import SideBar from "../../shared/sidebar/sidebar";
 import Header from "../../shared/header/header";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../showcase.module.scss';
-import { Spinner, Alert, Form, Modal, Button } from 'react-bootstrap'; 
+import { Spinner, Alert } from 'react-bootstrap'; 
 import { FaExclamationTriangle } from "react-icons/fa";
 import ReactPaginate from 'react-paginate'; 
 import Api from "../../shared/api/apiLink";
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function ViewBrokenHistory() {
@@ -18,10 +18,7 @@ export default function ViewBrokenHistory() {
   const [loadingStages, setLoadingStages] = useState(true); 
   const [loadingTable, setLoadingTable] = useState(true); 
   const [errorStages, setErrorStages] = useState('');
-  const [convert, setConvert] = useState('');
   const [errorTable, setErrorTable] = useState('');
-  const [selectedBroken, setSelectedBroken] = useState(null);
-  const [showModal, setShowModal] = useState(false);
 
   const itemsPerPage = 10;
 
@@ -66,49 +63,10 @@ export default function ViewBrokenHistory() {
     }
   };
 
-  const handleConvert = (convert) => {
-    setSelectedBroken(convert);
-    setShowModal(true);
-  };
-  
   useEffect(() => {
     fetchQuantityData();
     fetchTableData();
   }, []);
-
-  // Convert the quantity of broken
-  const handleSave = async () => {
-    const userConfirmed = window.confirm("Are you sure you want to convert this to KG?");
-    if (!userConfirmed) return; // Exit if user cancels
-
-    const loadingToast = toast.loading("Converting to KG...");
-    const formData = {
-      updatedAt: selectedBroken.updatedAt,
-      brokenQuantityInKg: convert,
-    };
-
-    try {
-      await Api.post(`/convert-broken-to-kg`, formData);
-      toast.update(loadingToast, {
-        render: "Converted successfully!",
-        type: "success",
-        isLoading: false,
-        autoClose: 3000,
-      });
-      fetchTableData();
-      setShowModal(false);
-      setSelectedBroken(null);
-    } catch (error) {
-      console.error("Failed to convert:", error);
-      toast.update(loadingToast, {
-        render: "Failed to convert. Please try again.",
-        type: "error",
-        isLoading: false,
-        autoClose: 6000,
-      });
-    }
-  };
-
 
   const paginatedData = tableData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
   
@@ -171,9 +129,8 @@ export default function ViewBrokenHistory() {
                   <thead className={`rounded-2 ${styles.theader}`}>
                     <tr>
                       <th>DATE CREATED</th>
-                      <th>FISH BATCH</th> 
-                      <th>QUANTITY</th>
-                      <th>QUANTITY IN KG</th> 
+                      <th>FISH TYPE</th> 
+                      <th>QUANTITY</th>                    
                     </tr>
                   </thead>
                   <tbody>
@@ -181,9 +138,8 @@ export default function ViewBrokenHistory() {
                       paginatedData.map((data, index) => (
                         <tr key={index}>
                           <td>{formatDate(data.updatedAt)}</td>
-                          <td>{data.batch_no}</td>
-                          <td>{data.brokenFishQuantity}</td>
-                          <td className='d-flex justify-content-between align-items-center'> <span>{data.brokenQuantityInKg || '0'}</span> {data.brokenQuantityInKg === 0 && <button className={`border-0 btn-dark text-light rounded-4 py-1 px-3 ${styles.submit}`} onClick={() => handleConvert(data)}>Convert to kg</button>}</td>
+                          <td>{data.speciesName}</td>
+                          <td>{data.brokenFishQuantity}</td>                         
                         </tr>
                       ))
                     ) : (
@@ -220,48 +176,6 @@ export default function ViewBrokenHistory() {
           </main>
         </section>
         <ToastContainer/>
-        <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton className="border-0">
-          <Modal.Title className="fw-semibold">Convert to KG</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="border-0 pt-5">
-          {selectedBroken && (
-            <Form>
-              <Form.Group className="mb-3 row">
-                <Form.Label className="col-4 fw-semibold">  Quantity</Form.Label>
-                <div className="col-8">
-                  <Form.Control
-                    type="number"
-                    name="phone"
-                    value={selectedBroken.brokenFishQuantity}
-                    readOnly              
-                    className="py-2 shadow-none border-secondary-subtle border-1"
-                  />
-                </div>
-              </Form.Group>
-
-              <Form.Group className="mb-3 row">
-                <Form.Label className="col-4 fw-semibold">Quantity in (KG)</Form.Label>
-                <div className="col-8">                    
-                    <Form.Control
-                      type='number'
-                      placeholder="Enter quantity converted"
-                      value={convert}
-                      onChange={(e)=>{setConvert(e.target.value)}}
-                      required                  
-                      className="py-2 shadow-none border-secondary-subtle border-1"
-                    />                      
-                </div>
-              </Form.Group>
-            </Form>
-          )}
-        </Modal.Body>
-        <Modal.Footer className="border-0 d-flex justify-content-end mt-5">
-          <Button variant="dark"  className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`} onClick={handleSave}>
-            Convert
-          </Button>
-        </Modal.Footer>
-      </Modal>
       </div>
     </section>
   );

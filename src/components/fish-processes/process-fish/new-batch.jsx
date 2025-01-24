@@ -66,7 +66,14 @@ export default function NewBatchFish() {
             try {
                 const response = await Api.get('/get-all-active-harvest-batch');
                 if (Array.isArray(response.data.data)) {
-                    setFishType(response.data.data);
+                    const fishData = response.data.data;
+                    setFishType(fishData);
+                    if (fishData.length > 0) {
+                        setMoveFishData(prev => ({
+                            ...prev,
+                            actual_quantity: fishData[0].accumulatedQuantity
+                        }));
+                    }
                 } else {
                     throw new Error('Expected an array of species');
                 }
@@ -317,38 +324,21 @@ export default function NewBatchFish() {
                             <h4 className="my-5">Process Fish</h4>
                             <Row xxl={2} xl={2} lg={2}>
                                 <Col className="mb-4">
-                                    <Form.Label className="fw-semibold">Import Fish Batch</Form.Label>
-                                    <Form.Select
+                                    <Form.Label className="fw-semibold">Import Harvest</Form.Label>
+                                    <Form.Control
+                                        type="text"
                                         name="batch_no"
-                                        value={moveFishData.batch_no}
-                                        onChange={(e) => {
-                                            const selectedBatch = fishType.find(batch => batch.batch_no === e.target.value);
-                                            handleInputChangeMoveFish(e);
-                                            setMoveFishData(prev => ({
-                                                ...prev,
-                                                actual_quantity: selectedBatch ? selectedBatch.accumulatedQuantity : null,
-                                            }));
-                                        }}
-                                        required
+                                        value="Harvest"
+                                        readOnly
                                         className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
-                                    >
-                                        <option value="" disabled>Choose Fish Batch</option>
-                                        {fishType.length < 1 ? (
-                                            <option>No Batch available</option>
-                                        ) : (
-                                            fishType.map((species, index) => (
-                                                <option value={species.batch_no} key={index}>{species.batch_no}</option>
-                                            ))
-                                        )}
-                                    </Form.Select>
+                                    />
                                 </Col>
                                 <Col className="mb-4">
                                     <Form.Label className="fw-semibold">Quantity</Form.Label>
                                     <Form.Control
                                         type="number"
                                         name="actual_quantity"
-                                        placeholder='Get Quantity'
-                                        value={moveFishData.actual_quantity ?? 'loading...'}
+                                        value={moveFishData.actual_quantity || ''}
                                         readOnly
                                         className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                                     />
