@@ -217,7 +217,7 @@ const SalesForm = ({ customers, stages, products }) => {
                                                     label={product.productName}
                                                     value={product.productName}
                                                     data-id={product.id}
-                                                    className='text-uppercase py-2'
+                                                    className='border text-uppercase py-2'
                                                     onChange={(e) => handleCheckChange(e, product.productName)}
                                                     checked={checkedProducts[product.productName] || false}
                                                 />
