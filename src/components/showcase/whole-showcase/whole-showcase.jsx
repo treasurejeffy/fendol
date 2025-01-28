@@ -22,8 +22,8 @@ export default function ViewWholeHistory() {
   const [errorTable, setErrorTable] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState(""); // 'damage' or 'broken'
-  const [quantity, setQuantity] = useState("");
-  const [remark, setRemark] = useState("");
+  const [brokenFishQuantity, setBrokenFishQuantity] = useState("");
+  const [remarks, setRemarks] = useState("");
 
   const itemsPerPage = 10;
 
@@ -72,8 +72,8 @@ export default function ViewWholeHistory() {
 
   const handleShowModal = (type) => {
     setModalType(type);
-    setQuantity("");
-    setRemark("");
+    setBrokenFishQuantity("");
+    setRemarks("");
     setShowModal(true);
   };
 
@@ -84,7 +84,7 @@ export default function ViewWholeHistory() {
   const handleSubmit = async () => {
     setLoading(true);
     const loadingToast = toast.loading("Processing...");
-    if (!quantity || !remark) {
+    if (!brokenFishQuantity || !remarks) {
       toast.update(loadingToast, {
         render: 'Please fill in all fields.',
         type: "error",
@@ -97,7 +97,7 @@ export default function ViewWholeHistory() {
     try {
       const endpoint =
         modalType === "damage" ? "/move-damage" : "/move-broken";
-      const payload = { quantity, remark };
+      const payload = { brokenFishQuantity, remarks };
 
       const response = await Api.post(endpoint, payload);
       toast.update(loadingToast, {
@@ -278,18 +278,18 @@ export default function ViewWholeHistory() {
                 <Form.Label>Quantity</Form.Label>
                 <Form.Control
                   type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  value={brokenFishQuantity}
+                  onChange={(e) => setBrokenFishQuantity(e.target.value)}
                   className="py-2 shadow-none border-secondary-subtle border-1"
                 />
               </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Remark</Form.Label>
+              <Form.Group className="mb3">
+                <Form.Label>Remarks</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
-                  value={remark}
-                  onChange={(e) => setRemark(e.target.value)}
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
                   className="py-2 shadow-none border-secondary-subtle border-1"
                 />
               </Form.Group>

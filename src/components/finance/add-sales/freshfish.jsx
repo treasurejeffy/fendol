@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { Form, Row, Col, Button, Dropdown } from 'react-bootstrap';
 import Api from '../../shared/api/apiLink'; // Adjust based on your API import path
 import styles from '../finance.module.scss'; // Adjust the import as needed
+import ReceiptModal from './receipt';
 
 const FreshForm = ({ customers, stages, products}) => {
     const [freshData, setFreshData] = useState({        
@@ -17,6 +18,9 @@ const FreshForm = ({ customers, stages, products}) => {
         stageId_from: "",
         paymentType:''
     })
+
+    const [receiptData, setReceiptData] = useState(null); // Store receipt details
+    const [showReceipt, setShowReceipt] = useState(false);
 
     const [loader, setLoader] = useState(false);
     const [product, setProduct] = useState([]);
@@ -145,7 +149,9 @@ const FreshForm = ({ customers, stages, products}) => {
     
         try {
             const response = await Api.post('/sales-fresh-fish', freshData);
-            
+            // Update UI with receipt info
+            setReceiptData(response.data);
+        
             toast.update(loadingToast, {
                 render: "Sale added successfully!",
                 type: "success",
@@ -166,6 +172,12 @@ const FreshForm = ({ customers, stages, products}) => {
                 paymentType: '',
                 batch_no: ''
             });
+
+            // Show receipt after 3 seconds
+            setTimeout(() => {
+                setShowReceipt(true); // Display the receipt modal
+            }, 2000);
+            
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response ? error.response.data.message : 'Something went wrong',
@@ -180,197 +192,202 @@ const FreshForm = ({ customers, stages, products}) => {
     };
     
     return (
-        <Form onSubmit={handleAddSales}>
-            <Row xxl={2} xl={2} lg={2}>  
-               {/* Stage From */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Pond From</Form.Label>
-                    <Form.Select
-                        name="stageId_from"
-                        required
-                        value={freshData.stageId_from || ''}
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    >
-                        <option value="" disabled>Select Pond</option>
-                        {stages                          
-                            .map((stage, index) => (
-                                <option key={index} value={stage.id}>
-                                    {stage.title || 'No Data Yet'} {freshData.stageId_from === stage.id ? `- (${stage.quantity || '0'})` : ''}
-                                </option>
-                            ))}
-                    </Form.Select>
-                </Col>
+        <div>
+            <Form onSubmit={handleAddSales}>
+                <Row xxl={2} xl={2} lg={2}>  
+                {/* Stage From */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Pond From</Form.Label>
+                        <Form.Select
+                            name="stageId_from"
+                            required
+                            value={freshData.stageId_from || ''}
+                            onChange={handleInputChange}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        >
+                            <option value="" disabled>Select Pond</option>
+                            {stages                          
+                                .map((stage, index) => (
+                                    <option key={index} value={stage.id}>
+                                        {stage.title || 'No Data Yet'} {freshData.stageId_from === stage.id ? `- (${stage.quantity || '0'})` : ''}
+                                    </option>
+                                ))}
+                        </Form.Select>
+                    </Col>
 
-                {/* Product Name */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Product Name</Form.Label>                                        
-                    <Form.Select
-                    name="productName"
-                    required
-                    value={freshData.productName || ''}
-                    onChange={handleProductSelect}
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    >
-                    <option value="" disabled>Select Fresh Fish Product</option>
-                    {products
-                        .filter(product => product.productName && product.productName.toLowerCase().includes('fresh'))
-                        .map((product, index) => (
-                        <option key={index} value={product.productName} data-id={product.id}>
-                            {product.productName ? `${product.productName} - (₦ ${new Intl.NumberFormat().format(product.basePrice)})` : 'No Data Yet'}
-                        </option>
-                        ))
-                    }
-                    </Form.Select>
-                </Col>                   
-
-                {/* Total Product Weight */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Total Product Weight {`(${unit})`}</Form.Label>
-                    <Form.Control
-                    placeholder="Enter product weight"
-                    type="number"
-                    name="productWeight"
-                    value={freshData.productWeight || ''}
-                    required
-                    onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
-
-                {/* Buyer Category */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Buyer Category</Form.Label>
-                    <Form.Select
-                        name="category"
-                        value={freshData.category || ''}
-                        onChange={handleInputChange}
-                        required
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
-                    >
-                        <option value="" disabled>Select Category</option>
-                        <option value="Marketer">Marketer</option>
-                        <option value="Customer">Customer</option>
-                    </Form.Select>
-                </Col>
-
-                {/* Name of Customer */}
-                <Col className="mb-4">
-                    <Form.Group controlId="searchCustomer">
-                    <Form.Label className="fw-semibold">Name</Form.Label>
-                    <div style={{ position: 'relative', width: '100%' }}>
+                    {/* Product Name */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Product Name</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Search Name..."
-                            name="fullName"
-                            value={freshData.fullName || ''}
-                            onChange={handleSearchChange}
-                            style={{ width: '100%' }}
+                            name="productName"
+                            required
+                            value={
+                                products.length === 0
+                                    ? 'Loading...'
+                                    : freshData.productName
+                                    ? `${freshData.productName} - (₦ ${new Intl.NumberFormat().format(
+                                        products.find(product => product.productName === freshData.productName)?.basePrice || 0
+                                    )})`
+                                    : 'No Fresh Fish Product'
+                            }
+                            className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
+                            readOnly
+                            placeholder="Wait for Fresh Fish"
+                        />
+                    </Col>                 
+
+                    {/* Total Product Weight */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Total Product Weight {`(${unit})`}</Form.Label>
+                        <Form.Control
+                        placeholder="Enter product weight"
+                        type="number"
+                        name="productWeight"
+                        value={freshData.productWeight || ''}
+                        required
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        />
+                    </Col>
+
+                    {/* Buyer Category */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Buyer Category</Form.Label>
+                        <Form.Select
+                            name="category"
+                            value={freshData.category || ''}
+                            onChange={handleInputChange}
+                            required
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
+                        >
+                            <option value="" disabled>Select Category</option>
+                            <option value="Marketer">Marketer</option>
+                            <option value="Customer">Customer</option>
+                        </Form.Select>
+                    </Col>
+
+                    {/* Name of Customer */}
+                    <Col className="mb-4">
+                        <Form.Group controlId="searchCustomer">
+                        <Form.Label className="fw-semibold">Name</Form.Label>
+                        <div style={{ position: 'relative', width: '100%' }}>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search Name..."
+                                name="fullName"
+                                value={freshData.fullName || ''}
+                                onChange={handleSearchChange}
+                                style={{ width: '100%' }}
+                                className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
+                            />
+                            {freshData.fullName && filteredCustomer.length > 0 && (
+                            <div className={`${styles.suggestions_box}`}>
+                                <ul>
+                                {filteredCustomer.map((customer, index) => (
+                                    <li
+                                    key={index}
+                                    onClick={() => handleSelectCustomer(customer.fullName)}
+                                    style={{ cursor: 'pointer' }}
+                                    >
+                                    {customer.fullName}
+                                    </li>
+                                ))}
+                                </ul>
+                            </div>
+                            )}
+                        </div>
+                        </Form.Group>
+                    </Col>
+
+                    {/* Quantity */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Quantity Of Fresh Fish</Form.Label>
+                        <Form.Control
+                        placeholder="Enter quantity"
+                        type="number"
+                        name="quantity"
+                        value={freshData.quantity || ''}                                            
+                        required
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        />
+                    </Col>
+
+                    {/* Discount */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Discount</Form.Label>
+                        <div className={`${styles.inputContainer} position-relative`}>
+                        <Form.Control
+                            placeholder="Enter discount"
+                            type="text"
+                            name="discount"                                            
+                            value={freshData.discount ? (new Intl.NumberFormat().format(freshData.discount)) : '' }                                                            
+                            onChange={handleInputChange}
                             className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
                         />
-                        {freshData.fullName && filteredCustomer.length > 0 && (
-                        <div className={`${styles.suggestions_box}`}>
-                            <ul>
-                            {filteredCustomer.map((customer, index) => (
-                                <li
-                                key={index}
-                                onClick={() => handleSelectCustomer(customer.fullName)}
-                                style={{ cursor: 'pointer' }}
-                                >
-                                {customer.fullName}
-                                </li>
-                            ))}
-                            </ul>
+                        <span className={`${styles.nairaSign} position-absolute end-0 top-50 translate-middle-y pe-2`}>₦</span>
                         </div>
-                        )}
-                    </div>
-                    </Form.Group>
-                </Col>
+                    </Col>
 
-                {/* Quantity */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Quantity Of Fresh Fish</Form.Label>
-                    <Form.Control
-                    placeholder="Enter quantity"
-                    type="number"
-                    name="quantity"
-                    value={freshData.quantity || ''}                                            
-                    required
-                    onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
-
-                {/* Discount */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Discount</Form.Label>
-                    <div className={`${styles.inputContainer} position-relative`}>
-                    <Form.Control
-                        placeholder="Enter discount"
-                        type="text"
-                        name="discount"                                            
-                        value={freshData.discount ? (new Intl.NumberFormat().format(freshData.discount)) : '' }                                                            
+                    {/* Description */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Description</Form.Label>
+                        <Form.Control
+                        placeholder="Enter description"
+                        as="textarea"
+                        name="description"
+                        value={freshData.description || ''}
                         onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
-                    />
-                    <span className={`${styles.nairaSign} position-absolute end-0 top-50 translate-middle-y pe-2`}>₦</span>
-                    </div>
-                </Col>
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        />
+                    </Col>
 
-                {/* Description */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Description</Form.Label>
-                    <Form.Control
-                    placeholder="Enter description"
-                    as="textarea"
-                    name="description"
-                    value={freshData.description || ''}
-                    onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
+                    {/* Payment Type */}
+                    <Col className='mb-4'>
+                        <Form.Label className="fw-semibold">Payment Type</Form.Label>
+                        <Form.Select
+                        name='paymentType'
+                        value={freshData.paymentType || ''}
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        >
+                        <option value="" disabled>Select Payment Type</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Credit">Credit</option>
+                        <option value="Transfer">Transfer</option>
+                        <option value="Pos">Pos</option>
+                        </Form.Select>
+                    </Col>  
 
-                {/* Payment Type */}
-                <Col className='mb-4'>
-                    <Form.Label className="fw-semibold">Payment Type</Form.Label>
-                    <Form.Select
-                    name='paymentType'
-                    value={freshData.paymentType || ''}
-                    onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                    {/* Total Price */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Total Price</Form.Label>
+                        <Form.Control
+                        placeholder="Total price"
+                        type="text"
+                        name="totalPrice"
+                        value={freshData.totalPrice ? `₦${new Intl.NumberFormat().format(freshData.totalPrice)}` : ''}
+                        readOnly
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        />
+                    </Col>
+                </Row>
+                <div className='text-end'>
+                    <Button
+                        variant='dark'
+                        disabled={loader}
+                        className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
+                        type='submit'
                     >
-                    <option value="" disabled>Select Payment Type</option>
-                    <option value="Cash">Cash</option>
-                    <option value="Credit">Credit</option>
-                    <option value="Transfer">Transfer</option>
-                    <option value="Pos">Pos</option>
-                    </Form.Select>
-                </Col>  
+                        {loader ? ' Adding Sale...' : 'Add Sale'}
+                    </Button>
+                </div>
+            </Form>
 
-                {/* Total Price */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Total Price</Form.Label>
-                    <Form.Control
-                    placeholder="Total price"
-                    type="text"
-                    name="totalPrice"
-                    value={freshData.totalPrice ? `₦${new Intl.NumberFormat().format(freshData.totalPrice)}` : ''}
-                    readOnly
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
-            </Row>
-            <div className='text-end'>
-                <Button
-                    variant='dark'
-                    disabled={loader}
-                    className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
-                    type='submit'
-                >
-                    {loader ? ' Adding Sale...' : 'Add Sale'}
-                </Button>
-            </div>
-        </Form>
+            {/* Receipt Modal */}
+            {showReceipt && <ReceiptModal receiptData={receiptData} onClose={() => setShowReceipt(false)} />}
+        </div>
     );
 };
 

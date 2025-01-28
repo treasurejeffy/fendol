@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Form, Row, Col, Button, Dropdown } from 'react-bootstrap';
 import Api from '../../shared/api/apiLink'; // Adjust based on your API import path
-import styles from '../finance.module.scss'; // Adjust the import as needed
+import styles from '../finance.module.scss'; // Adjust the import as neede
+import ReceiptModal from './receipt'; // Adjust the import as needed
 
 const FingerlingsForm = ({ customers, stages, products}) => {
     const [fingerlingsData, setFingerlingsData] = useState(
@@ -17,7 +18,8 @@ const FingerlingsForm = ({ customers, stages, products}) => {
             paymentType:''
         }
     )
-
+    const [receiptData, setReceiptData] = useState(null); // Store receipt details
+    const [showReceipt, setShowReceipt] = useState(false);
     const [loader, setLoader] = useState(false);
     const [product, setProduct] = useState([]);
     const [filteredCustomer, setFilteredCustomer] = useState([]);
@@ -155,181 +157,185 @@ const FingerlingsForm = ({ customers, stages, products}) => {
     
 
     return (
-        <Form onSubmit={handleAddSales}>
-            <Row xxl={2} xl={2} lg={2}>
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Product Name</Form.Label>
-                    <Form.Select
-                        name="productName"
-                        required
-                        value={fingerlingsData.productName || ''}
-                        onChange={handleProductSelect}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    >
-                        <option value="" disabled>Select Fingerlings Product</option>
-                        {products
-                            .filter(product => product.productName?.toLowerCase().includes('fingerlings'))
-                            .map((product) => (
-                                <option key={product.id} value={product.productName} data-id={product.id}>
-                                    {`${product.productName} - (₦${new Intl.NumberFormat().format(product.basePrice || 0)})`}
-                                </option>
-                            ))
-                        }
-                    </Form.Select>
-                </Col>
+        <div>
+            <Form onSubmit={handleAddSales}>
+                <Row xxl={2} xl={2} lg={2}>
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Product Name</Form.Label>
+                        <Form.Select
+                            name="productName"
+                            required
+                            value={fingerlingsData.productName || ''}
+                            onChange={handleProductSelect}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        >
+                            <option value="" disabled>Select Fingerlings Product</option>
+                            {products
+                                .filter(product => product.productName?.toLowerCase().includes('fingerlings'))
+                                .map((product) => (
+                                    <option key={product.id} value={product.productName} data-id={product.id}>
+                                        {`${product.productName} - (₦${new Intl.NumberFormat().format(product.basePrice || 0)})`}
+                                    </option>
+                                ))
+                            }
+                        </Form.Select>
+                    </Col>
 
-                {/* Stage From */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Pond From</Form.Label>
-                    <Form.Select
-                        name="stageId_from"
-                        required
-                        value={fingerlingsData.stageId_from || ''}
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    >
-                        <option value="" disabled>Select Pond</option>
-                        {stages
-                            .filter(stage => stage.title.toLowerCase().includes('fingerlings'))
-                            .map((stage, index) => (
-                                <option key={index} value={stage.id}>
-                                    {stage.title || 'No Data Yet'}
-                                </option>
-                            ))}
-                    </Form.Select>
-                </Col>
-
-                {/* Quantity */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Quantity</Form.Label>
-                    <Form.Control
-                        placeholder="Enter quantity"
-                        type="number"
-                        name="quantity"
-                        value={fingerlingsData.quantity || ''}
-                        min="0"
-                        required
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
-
-                {/* Discount */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Discount</Form.Label>
-                    <div className="position-relative">
-                        <Form.Control
-                            placeholder="Enter discount"
-                            type="text"
-                            name="discount"
-                            value={fingerlingsData.discount || ''}                
+                    {/* Stage From */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Pond From</Form.Label>
+                        <Form.Select
+                            name="stageId_from"
+                            required
+                            value={fingerlingsData.stageId_from || ''}
                             onChange={handleInputChange}
-                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`} 
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        >
+                            <option value="" disabled>Select Pond</option>
+                            {stages
+                                .filter(stage => stage.title.toLowerCase().includes('fingerlings'))
+                                .map((stage, index) => (
+                                    <option key={index} value={stage.id}>
+                                        {stage.title || 'No Data Yet'}
+                                    </option>
+                                ))}
+                        </Form.Select>
+                    </Col>
+
+                    {/* Quantity */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Quantity</Form.Label>
+                        <Form.Control
+                            placeholder="Enter quantity"
+                            type="number"
+                            name="quantity"
+                            value={fingerlingsData.quantity || ''}
+                            min="0"
+                            required
+                            onChange={handleInputChange}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                         />
-                        <span className="position-absolute end-0 top-50 translate-middle-y pe-2">₦</span>
-                    </div>
-                </Col>
+                    </Col>
 
-                {/* Buyer Category */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Buyer Category</Form.Label>
-                    <Form.Select
-                        name="category"
-                        value={fingerlingsData.category || ''}
-                        onChange={handleInputChange}
-                        required
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    >
-                        <option value="" disabled>Select Category</option>
-                        <option value="Marketer">Marketer</option>
-                        <option value="Customer">Customer</option>
-                    </Form.Select>
-                </Col>
-
-                {/* Name of Customer */}
-                <Col className="mb-4">
-                    <Form.Group controlId="searchCustomer">
-                        <Form.Label className="fw-semibold">Name</Form.Label>
-                        <div style={{ position: 'relative', width: '100%' }}>
+                    {/* Discount */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Discount</Form.Label>
+                        <div className="position-relative">
                             <Form.Control
+                                placeholder="Enter discount"
                                 type="text"
-                                placeholder="Search Name..."
-                                name="fullName"
-                                value={fingerlingsData.fullName || ''}
-                                onChange={handleSearchChange}
-                                style={{ width: '100%' }} 
-                                className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                                name="discount"
+                                value={fingerlingsData.discount || ''}                
+                                onChange={handleInputChange}
+                                className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`} 
                             />
-                            {fingerlingsData.fullName && filteredCustomer.length > 0 && (
-                                <div className={`${styles.suggestions_box}`}>
-                                    <ul>
-                                        {filteredCustomer.map((customer, index) => (
-                                            <li key={index} onClick={() => handleSelectCustomer(customer.fullName)}>
-                                                {customer.fullName}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
+                            <span className="position-absolute end-0 top-50 translate-middle-y pe-2">₦</span>
                         </div>
-                    </Form.Group>
-                </Col>
+                    </Col>
 
-                {/* Description */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Description</Form.Label>
-                    <Form.Control
-                    placeholder="Enter description"
-                    as="textarea"
-                    name="description"
-                    value={fingerlingsData.description || ''}
-                    onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
+                    {/* Buyer Category */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Buyer Category</Form.Label>
+                        <Form.Select
+                            name="category"
+                            value={fingerlingsData.category || ''}
+                            onChange={handleInputChange}
+                            required
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        >
+                            <option value="" disabled>Select Category</option>
+                            <option value="Marketer">Marketer</option>
+                            <option value="Customer">Customer</option>
+                        </Form.Select>
+                    </Col>
 
-                {/* Payment Type */}
-                <Col className='mb-4'>
-                    <Form.Label className="fw-semibold">Payment Type</Form.Label>
-                    <Form.Select
-                    name='paymentType'
-                    value={fingerlingsData.paymentType || ''}
-                    onChange={handleInputChange}
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                    {/* Name of Customer */}
+                    <Col className="mb-4">
+                        <Form.Group controlId="searchCustomer">
+                            <Form.Label className="fw-semibold">Name</Form.Label>
+                            <div style={{ position: 'relative', width: '100%' }}>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Search Name..."
+                                    name="fullName"
+                                    value={fingerlingsData.fullName || ''}
+                                    onChange={handleSearchChange}
+                                    style={{ width: '100%' }} 
+                                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                                />
+                                {fingerlingsData.fullName && filteredCustomer.length > 0 && (
+                                    <div className={`${styles.suggestions_box}`}>
+                                        <ul>
+                                            {filteredCustomer.map((customer, index) => (
+                                                <li key={index} onClick={() => handleSelectCustomer(customer.fullName)}>
+                                                    {customer.fullName}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        </Form.Group>
+                    </Col>
+
+                    {/* Description */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Description</Form.Label>
+                        <Form.Control
+                        placeholder="Enter description"
+                        as="textarea"
+                        name="description"
+                        value={fingerlingsData.description || ''}
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        />
+                    </Col>
+
+                    {/* Payment Type */}
+                    <Col className='mb-4'>
+                        <Form.Label className="fw-semibold">Payment Type</Form.Label>
+                        <Form.Select
+                        name='paymentType'
+                        value={fingerlingsData.paymentType || ''}
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        >
+                        <option value="" disabled>Select Payment Type</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Credit">Credit</option>
+                        <option value="Transfer">Transfer</option>
+                        <option value="Pos">Pos</option>
+                        </Form.Select>
+                    </Col>  
+
+                    {/* Total Price */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Total Price</Form.Label>
+                        <Form.Control
+                        placeholder="Total price"
+                        type="text"
+                        name="totalPrice"
+                        value={fingerlingsData.totalPrice ? `₦${new Intl.NumberFormat().format(fingerlingsData.totalPrice)}` : ''}
+                        readOnly
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        />
+                    </Col>
+
+                </Row>
+                <div className='text-end'>
+                    <Button
+                        variant='dark'
+                        disabled={loader}
+                        className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
+                        type='submit'
                     >
-                    <option value="" disabled>Select Payment Type</option>
-                    <option value="Cash">Cash</option>
-                    <option value="Credit">Credit</option>
-                    <option value="Transfer">Transfer</option>
-                    <option value="Pos">Pos</option>
-                    </Form.Select>
-                </Col>  
-
-                {/* Total Price */}
-                <Col className="mb-4">
-                    <Form.Label className="fw-semibold">Total Price</Form.Label>
-                    <Form.Control
-                    placeholder="Total price"
-                    type="text"
-                    name="totalPrice"
-                    value={fingerlingsData.totalPrice ? `₦${new Intl.NumberFormat().format(fingerlingsData.totalPrice)}` : ''}
-                    readOnly
-                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                    />
-                </Col>
-
-            </Row>
-            <div className='text-end'>
-                <Button
-                    variant='dark'
-                    disabled={loader}
-                    className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
-                    type='submit'
-                >
-                    {loader ? ' Adding Sale...' : 'Add Sale'}
-                </Button>
-            </div>
-        </Form>
+                        {loader ? ' Adding Sale...' : 'Add Sale'}
+                    </Button>
+                </div>
+            </Form>
+            {/* Receipt Modal */}
+            {showReceipt && <ReceiptModal receiptData={receiptData} onClose={() => setShowReceipt(false)} />}
+        </div>
     );
 };
 

@@ -4,6 +4,7 @@ import { Form, Row, Col, Button, Table, Alert } from 'react-bootstrap';
 import Api from '../../shared/api/apiLink'; // Adjust based on your API import path
 import styles from '../finance.module.scss'; // Adjust the import as needed
 import { BsExclamationTriangleFill } from 'react-icons/bs';
+import ReceiptModal from './receipt'; // Import the ReceiptModal component
 
 const SalesForm = ({ customers, stages, products }) => {
     const [dryData, setDryData] = useState({
@@ -15,6 +16,9 @@ const SalesForm = ({ customers, stages, products }) => {
         paymentType: '',
         amountPaid: null
     });
+
+    const [receiptData, setReceiptData] = useState(null); // Store receipt details
+    const [showReceipt, setShowReceipt] = useState(false);
     const [checkedProducts, setCheckedProducts] = useState({});
     const [currentStep, setCurrentStep] = useState(1);
     const [loader, setLoader] = useState(false);
@@ -135,7 +139,9 @@ const SalesForm = ({ customers, stages, products }) => {
 
         try {
             const response = await Api.post('/sales', dryData);
-
+               // Update UI with receipt info
+               setReceiptData(response.data);
+            
             toast.update(loadingToast, {
                 render: "Sale added successfully!",
                 type: "success",
@@ -156,6 +162,12 @@ const SalesForm = ({ customers, stages, products }) => {
             setCheckedProducts({});
             setCurrentStep(1);
             setFormSubmitted(false);
+
+            // Show receipt after 3 seconds
+            setTimeout(() => {            
+                setShowReceipt(true); // Display the receipt modal
+            }, 3000);
+
         } catch (error) {
             toast.update(loadingToast, {
                 render: error.response ? error.response.data.message : 'Something went wrong',
@@ -188,7 +200,7 @@ const SalesForm = ({ customers, stages, products }) => {
             {currentStep === 1 && (
                 products.length > 0 ? (
                     <>
-                        <Table className={`bg-light px-2 ${styles.styled_table}`}>
+                        <Table variant="light" className={`bg-light px-2 ${styles.styled_table}`}>
                             <thead className={`rounded-2 px-2`}>
                                 <tr>
                                     <th>PRODUCT</th>
@@ -211,13 +223,13 @@ const SalesForm = ({ customers, stages, products }) => {
                                     })
                                     .map((product, index) => (
                                         <tr key={index}>
-                                            <td>
+                                            <td className='ps-3'>
                                                 <Form.Check
                                                     type="checkbox"
                                                     label={product.productName}
                                                     value={product.productName}
                                                     data-id={product.id}
-                                                    className='border text-uppercase py-2'
+                                                    className=" text-uppercase fw-semibold"
                                                     onChange={(e) => handleCheckChange(e, product.productName)}
                                                     checked={checkedProducts[product.productName] || false}
                                                 />
@@ -441,6 +453,8 @@ const SalesForm = ({ customers, stages, products }) => {
                     </div>
                 </Form>
             )}
+             {/* Receipt Modal */}
+                {showReceipt && <ReceiptModal receiptData={receiptData} onClose={() => setShowReceipt(false)} />}
         </div>
     );
 };
