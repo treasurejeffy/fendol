@@ -169,7 +169,7 @@ export default function CreateProducts() {
                             </Row>
 
                             <div className="d-flex justify-content-end mt-5">
-                                <Button className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}  disabled={loader} type="submit">
+                                <Button className={ `border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}  disabled={loader} type="submit">
                                     {loader ? 'Creating...' : 'Create'}
                                 </Button>
                             </div>

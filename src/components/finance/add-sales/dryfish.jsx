@@ -345,7 +345,7 @@ const SalesForm = ({ customers, stages, products }) => {
 
                         {/* Discount Input */}
                         <Col className="mb-4">
-                            <Form.Label className="fw-semibold">Discount (₦)</Form.Label>
+                            <Form.Label className="fw-semibold">Discount</Form.Label>
                             <div className={`${styles.inputContainer} position-relative`}>
                                 <Form.Control
                                     placeholder="Enter discount"
