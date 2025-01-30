@@ -217,34 +217,49 @@ const FreshForm = ({ customers, stages, products}) => {
 
                     {/* Product Name */}
                     <Col className="mb-4">
-                        <Form.Label className="fw-semibold">Product Name</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="productName"
-                            required
-                            value={
-                                products.length === 0
-                                    ? 'Loading...'
-                                    : freshData.productName
-                                    ? `${freshData.productName} - (₦ ${new Intl.NumberFormat().format(
-                                        products.find(product => product.productName === freshData.productName)?.basePrice || 0
-                                    )})`
-                                    : 'No Fresh Fish Product'
-                            }
-                            className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
-                            readOnly
-                            placeholder="Wait for Fresh Fish"
-                        />
-                    </Col>                 
+                            <Form.Label className="fw-semibold">Product Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="productName"
+                                required
+                                value={
+                                    products.length === 0
+                                        ? 'Loading...'
+                                        : products.some(product => product.productName.toLowerCase().includes("fresh"))
+                                        ? `${products.find(product => product.productName.toLowerCase().includes("fresh"))?.productName || 'No Fresh Fish'} - (₦ ${new Intl.NumberFormat().format(
+                                            products.find(product => product.productName.toLowerCase().includes("fresh"))?.basePrice || 0
+                                        )})`
+                                        : 'No Fresh Fish Product'
+                                }
+                                className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
+                                readOnly
+                                placeholder="Wait for Fresh Fish"
+                            />
+                        </Col>
+
 
                     {/* Total Product Weight */}
                     <Col className="mb-4">
-                        <Form.Label className="fw-semibold">Total Product Weight {`(${unit})`}</Form.Label>
+                        <Form.Label className="fw-semibold">Total Product Weight {`(${products.find(product => product.productName.toLowerCase().includes("fresh"))?.unit})`}</Form.Label>
                         <Form.Control
                         placeholder="Enter product weight"
                         type="number"
                         name="productWeight"
-                        value={freshData.productWeight || ''}
+                        value={products.find(product => product.productName.toLowerCase().includes("fresh"))?.productWeight}
+                        required
+                        onChange={handleInputChange}
+                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        />
+                    </Col>
+                    
+                    {/* Quantity */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Quantity Of Fresh Fish</Form.Label>
+                        <Form.Control
+                        placeholder="Enter quantity"
+                        type="number"
+                        name="quantity"
+                        value={freshData.quantity || ''}                                            
                         required
                         onChange={handleInputChange}
                         className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
@@ -300,20 +315,7 @@ const FreshForm = ({ customers, stages, products}) => {
                         </Form.Group>
                     </Col>
 
-                    {/* Quantity */}
-                    <Col className="mb-4">
-                        <Form.Label className="fw-semibold">Quantity Of Fresh Fish</Form.Label>
-                        <Form.Control
-                        placeholder="Enter quantity"
-                        type="number"
-                        name="quantity"
-                        value={freshData.quantity || ''}                                            
-                        required
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
-                        />
-                    </Col>
-
+                    
                     {/* Discount */}
                     <Col className="mb-4">
                         <Form.Label className="fw-semibold">Discount</Form.Label>

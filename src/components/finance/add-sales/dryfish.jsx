@@ -18,7 +18,7 @@ const SalesForm = ({ customers, stages, products }) => {
     });
 
     const [receiptData, setReceiptData] = useState(null); // Store receipt details
-    const [showReceipt, setShowReceipt] = useState(false);
+    const [showReceipt, setShowReceipt] = useState(true);
     const [checkedProducts, setCheckedProducts] = useState({});
     const [currentStep, setCurrentStep] = useState(1);
     const [loader, setLoader] = useState(false);
@@ -140,8 +140,8 @@ const SalesForm = ({ customers, stages, products }) => {
         try {
             const response = await Api.post('/sales', dryData);
                // Update UI with receipt info
-               setReceiptData(response.data);
-            
+            const transactionId = response.data.data.transactionId;
+
             toast.update(loadingToast, {
                 render: "Sale added successfully!",
                 type: "success",
@@ -149,6 +149,9 @@ const SalesForm = ({ customers, stages, products }) => {
                 autoClose: 3000,
                 className: 'dark-toast'
             });
+
+            const receiptResponse = await Api.get(`/receipt/${transactionId}`);
+            setReceiptData(receiptResponse.data)
 
             setDryData({
                 products: [],
@@ -165,7 +168,9 @@ const SalesForm = ({ customers, stages, products }) => {
 
             // Show receipt after 3 seconds
             setTimeout(() => {            
-                setShowReceipt(true); // Display the receipt modal
+                if (receiptData !== null) {
+                    setShowReceipt(true); 
+                }
             }, 3000);
 
         } catch (error) {
@@ -180,6 +185,7 @@ const SalesForm = ({ customers, stages, products }) => {
             setLoader(false);
         }
     };
+
 
     const isNextButtonDisabled = () => {
         const hasCheckedProduct = Object.values(checkedProducts).some(checked => checked);
@@ -229,7 +235,7 @@ const SalesForm = ({ customers, stages, products }) => {
                                                     label={product.productName}
                                                     value={product.productName}
                                                     data-id={product.id}
-                                                    className=" text-uppercase fw-semibold"
+                                                    className=" text-uppercase mt-2 fw-semibold"
                                                     onChange={(e) => handleCheckChange(e, product.productName)}
                                                     checked={checkedProducts[product.productName] || false}
                                                 />
@@ -276,7 +282,8 @@ const SalesForm = ({ customers, stages, products }) => {
                         <div className='text-end'>
                             <Button 
                                 onClick={handleNextStep} 
-                                className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
+                                variant='dark'
+                                className={`border-0 btn btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
                                 disabled={isNextButtonDisabled()}
                             >
                                 Next
@@ -437,7 +444,7 @@ const SalesForm = ({ customers, stages, products }) => {
                     <div className="d-flex justify-content-between">
                         <Button
                             variant="secondary"
-                            className={`border-0 shadow py-2 px-5 fs-6 mb-5 fw-semibold`}
+                            className={`border-0 btn btn-secondary shadow py-2 px-5 fs-6 mb-5 fw-semibold`}
                             onClick={() => setCurrentStep(1)}
                         >
                             Back
@@ -454,7 +461,7 @@ const SalesForm = ({ customers, stages, products }) => {
                 </Form>
             )}
              {/* Receipt Modal */}
-                {showReceipt && <ReceiptModal receiptData={receiptData} onClose={() => setShowReceipt(false)} />}
+                <ReceiptModal receiptData={receiptData} onClose={() => setShowReceipt(false)} show={showReceipt}/>
         </div>
     );
 };
