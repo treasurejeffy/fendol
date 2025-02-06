@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { Form, Row, Col, Button, Dropdown } from 'react-bootstrap';
+import { Form, Row, Col, Button } from 'react-bootstrap';
 import Api from '../../shared/api/apiLink'; // Adjust based on your API import path
 import styles from '../finance.module.scss'; // Adjust the import as needed
 import ReceiptModal from './receipt';
 
-const FreshForm = ({ customers, stages, products}) => {
-    const [freshData, setFreshData] = useState({        
-        productName:"",
+const FreshForm = ({ customers, stages, products }) => {
+    const [freshData, setFreshData] = useState({
+        productName: "",
         productWeight: 0,
         quantity: 0,
         description: "",
         category: '',
         fullName: '',
         discount: 0,
+        amountPaid: null,
         batch_no: '',
         stageId_from: "",
-        paymentType:''
-    })
+        paymentType: '',
+        basePrice: 0, // Add basePrice to the state
+        totalPrice: 0 // Add totalPrice to the state
+    });
 
-    const [receiptData, setReceiptData] = useState(null); // Store receipt details
+    const [receiptData, setReceiptData] = useState({});
     const [showReceipt, setShowReceipt] = useState(false);
-
     const [loader, setLoader] = useState(false);
     const [product, setProduct] = useState([]);
     const [filteredCustomer, setFilteredCustomer] = useState([]);
@@ -36,69 +38,62 @@ const FreshForm = ({ customers, stages, products}) => {
     useEffect(() => {
         setCustomer(customers);
         setStage(stages);
-        setProduct(products)
-    }, []);
+        setProduct(products);
+    }, [customers, stages, products]);
+
+    // Recalculate totalPrice whenever quantity or basePrice changes
+    useEffect(() => {
+        const { quantity, basePrice, discount } = freshData;
+        const totalPrice = (basePrice || 0) * (quantity || 0) - (discount || 0);
+        setFreshData(prevData => ({ ...prevData, totalPrice: Math.max(totalPrice, 0) }));
+    }, [freshData.quantity, freshData.basePrice, freshData.discount]);
+
     // Product selection handler
     const handleProductSelect = async (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const selectedProductId = selectedOption?.getAttribute('data-id');
-        const productName = e.target.value;        
-    
+        const productName = e.target.value;
+
         setFreshData(prevData => ({ ...prevData, productName }));
-    
+
         if (selectedProductId) {
             try {
                 const { data } = await Api.get(`/product/${selectedProductId}`);
                 const productData = data.data;
-                setUnit(productData.unit)
-                setFreshData(prevData => {
-                    const quantity = prevData.productWeight || 1;  // Default to 1 if quantity is undefined
-                    const discount = prevData.discount || 0; // Default to 0 if discount is undefined
-                    const basePrice = productData.basePrice || 0;  // Default to 0 if basePrice is undefined
-                    const totalPrice = basePrice * quantity;  // Calculate total price before discount            
-    
-                    // Ensure totalPrice is not negative
-                    return {
-                        ...prevData,
-                        basePrice,
-                        totalPrice: Math.max(totalPrice, 0),
-                        productWeight: productData.productWeight,                        
-                    };
-                });
-    
+                setUnit(productData.unit);
+
+                setFreshData(prevData => ({
+                    ...prevData,
+                    basePrice: productData.basePrice || 0,
+                    productWeight: productData.productWeight,
+                }));
+
                 setProductDetails(productData); // Store the fetched product details
             } catch (error) {
                 toast.error('Error fetching product details.');
             }
         }
     };
-    
-    // Handle input change for dryData
+
+    // Handle input change for freshData
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        const numericValue = name === 'productWeight' || name === 'discount' ? parseFloat(value) || 0 : value;
+        const numericValue = name === 'productWeight' || name === 'discount' || name === 'quantity' ? parseFloat(value) || 0 : value;
+
         if (name === 'stageId_from') {
-            setFreshData({ ...freshData, stageId_from: value });
+            setFreshData(prevData => ({ ...prevData, stageId_from: value }));
             getQuantity(value);  // Pass stageId_from to getQuantity
         }
 
-        setFreshData(prevData => {
-            const quantity = name === 'productWeight' ? numericValue : prevData.productWeight || 1;
-            const discount = name === 'discount' ? numericValue : prevData.discount || 0;
-            const basePrice = prevData.basePrice || 0;
-            const totalPrice = (basePrice || 0) * quantity - discount;
-
-            return {
-                ...prevData,
-                [name]: numericValue,
-                totalPrice: Math.max(totalPrice, 0),
-            };
-        });
+        setFreshData(prevData => ({
+            ...prevData,
+            [name]: numericValue,
+        }));
     };
 
     // get batches available
     const getQuantity = async (stageId_from) => {
-        setSelectedQuantity('loading...')
+        setSelectedQuantity('loading...');
         if (stageId_from) {
             try {
                 const response = await Api.get(`/active-batch?stageId=${stageId_from}`);
@@ -115,51 +110,104 @@ const FreshForm = ({ customers, stages, products}) => {
 
     const handleSearchChange = (e) => {
         const { value } = e.target;
-    
+
         setFreshData(prevData => ({ ...prevData, fullName: value }));
-    
+
         const filtered = value
-            ? customer.filter(c => 
+            ? customer.filter(c =>
                 c.fullName?.toLowerCase().includes(value.toLowerCase()) && c.category === freshData.category
             )
             : customer.filter(c => c.category === freshData.category);
-    
+
         setFilteredCustomer(filtered.length ? filtered : []);
-    };    
+    };
 
     // Handle customer selection
     const handleSelectCustomer = (name) => {
         setFreshData(prevData => ({ ...prevData, fullName: name }));
         setFilteredCustomer([]); // Clear suggestions after selection
     };
-    
-    // Add Dry Fish sale
+
+    const calculateDiscountedPrice = () => {
+        let discountedPrice = freshData.totalPrice;
+        if (freshData.category === 'Marketer') {
+            discountedPrice -= (freshData.totalPrice * 0.1); // Apply 10% discount for Marketers
+        } else {
+            discountedPrice -= (freshData.discount || 0); // Apply fixed discount
+        }
+        return discountedPrice;
+    };
+
+    const calculateTotalBalance = () => {
+        const discountedPrice = calculateDiscountedPrice();
+        return discountedPrice - (freshData.amountPaid || 0);
+    };
+
     const handleAddSales = async (e) => {
         e.preventDefault();
-    
-        // Show confirmation dialog
-        const isConfirmed = window.confirm("Are you sure you want to add this sale?");
-        
-        if (!isConfirmed) {
-            return; // If the user cancels, exit the function
-        }
+        if (!window.confirm("Are you sure you want to add this sale?")) return;
     
         setLoader(true);
-        const loadingToast = toast.loading("Adding sale...", { className: 'dark-toast' });
+        
+        // Toast for sale process
+        const salesToast = toast.loading("Adding sale...", { className: 'dark-toast' });
     
         try {
-            const response = await Api.post('/sales-fresh-fish', freshData);
-            // Update UI with receipt info
-            setReceiptData(response.data);
-        
-            toast.update(loadingToast, {
+            // 1. Create sale first
+            const saleResponse = await Api.post('/sales-fresh-fish', freshData);
+    
+            if (saleResponse.status < 200 || saleResponse.status >= 300) {
+                throw new Error(saleResponse.data?.message || "Sale failed!");
+            }
+    
+            const transactionId = saleResponse.data?.transactionId;
+    
+            if (!transactionId) {
+                toast.update(salesToast, {
+                    render: "Transaction ID not found. Please try again.",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 3000,
+                    className: 'dark-toast'
+                });
+                setLoader(false);
+                return;
+            }
+    
+            // ✅ Sale success toast
+            toast.update(salesToast, {
                 render: "Sale added successfully!",
                 type: "success",
                 isLoading: false,
                 autoClose: 3000,
                 className: 'dark-toast'
             });
-            
+    
+            // 2. Toast for fetching receipt
+            const receiptToast = toast.loading("Fetching receipt...", { className: 'dark-toast' });
+    
+            // 3. Fetch receipt using transaction ID
+            const receiptResponse = await Api.get(`/receipt/${transactionId}`);
+    
+            if (receiptResponse.status < 200 || receiptResponse.status >= 300) {
+                throw new Error("Receipt could not be fetched.");
+            }
+    
+            // 4. Update state with receipt data
+            setReceiptData(receiptResponse.data);
+    
+            // ✅ Receipt success toast
+            toast.update(receiptToast, {
+                render: "Receipt fetched successfully!",
+                type: "success",
+                isLoading: false,
+                autoClose: 3000,
+                className: 'dark-toast'
+            });
+    
+            setShowReceipt(true); // Show receipt modal
+    
+            // 5. Reset form after showing receipt
             setFreshData({
                 productName: "",
                 productWeight: 0,
@@ -170,32 +218,34 @@ const FreshForm = ({ customers, stages, products}) => {
                 discount: 0,
                 stageId_from: "",
                 paymentType: '',
-                batch_no: ''
+                batch_no: '',
+                basePrice: 0,
+                totalPrice: 0
             });
-
-            // Show receipt after 3 seconds
-            setTimeout(() => {
-                setShowReceipt(true); // Display the receipt modal
-            }, 2000);
-            
+    
         } catch (error) {
-            toast.update(loadingToast, {
-                render: error.response ? error.response.data.message : 'Something went wrong',
+            console.error("Error in handleAddSales:", error);
+    
+            // Handle errors separately for sale and receipt
+            toast.update(salesToast, {
+                render: error.response?.data?.message || error.message || 'Sale failed!',
                 type: "error",
                 isLoading: false,
                 autoClose: 3000,
                 className: 'dark-toast'
             });
+    
+            toast.dismiss(); // Ensure no stale loading toasts remain
         } finally {
             setLoader(false);
         }
-    };
-    
+    };    
+
     return (
         <div>
             <Form onSubmit={handleAddSales}>
-                <Row xxl={2} xl={2} lg={2}>  
-                {/* Stage From */}
+                <Row xxl={2} xl={2} lg={2}>
+                    {/* Stage From */}
                     <Col className="mb-4">
                         <Form.Label className="fw-semibold">Pond From</Form.Label>
                         <Form.Select
@@ -206,7 +256,7 @@ const FreshForm = ({ customers, stages, products}) => {
                             className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                         >
                             <option value="" disabled>Select Pond</option>
-                            {stages                          
+                            {stages
                                 .map((stage, index) => (
                                     <option key={index} value={stage.id}>
                                         {stage.title || 'No Data Yet'} {freshData.stageId_from === stage.id ? `- (${stage.quantity || '0'})` : ''}
@@ -217,52 +267,51 @@ const FreshForm = ({ customers, stages, products}) => {
 
                     {/* Product Name */}
                     <Col className="mb-4">
-                            <Form.Label className="fw-semibold">Product Name</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="productName"
-                                required
-                                value={
-                                    products.length === 0
-                                        ? 'Loading...'
-                                        : products.some(product => product.productName.toLowerCase().includes("fresh"))
-                                        ? `${products.find(product => product.productName.toLowerCase().includes("fresh"))?.productName || 'No Fresh Fish'} - (₦ ${new Intl.NumberFormat().format(
-                                            products.find(product => product.productName.toLowerCase().includes("fresh"))?.basePrice || 0
-                                        )})`
-                                        : 'No Fresh Fish Product'
-                                }
-                                className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
-                                readOnly
-                                placeholder="Wait for Fresh Fish"
-                            />
-                        </Col>
-
+                        <Form.Label className="fw-semibold">Product Name</Form.Label>
+                        <Form.Select
+                            name="productName"
+                            required
+                            value={freshData.productName || ''}
+                            onChange={handleProductSelect}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                        >
+                            <option value="" disabled>Select Fresh Fish Products</option>
+                            {products
+                                .filter(product => product.productName?.toLowerCase().includes('fresh'))
+                                .map((product) => (
+                                    <option key={product.id} value={product.productName} data-id={product.id}>
+                                        {`${product.productName} - (₦${new Intl.NumberFormat().format(product.basePrice || 0)})`}
+                                    </option>
+                                ))
+                            }
+                        </Form.Select>
+                    </Col>
 
                     {/* Total Product Weight */}
                     <Col className="mb-4">
-                        <Form.Label className="fw-semibold">Total Product Weight {`(${products.find(product => product.productName.toLowerCase().includes("fresh"))?.unit})`}</Form.Label>
+                        <Form.Label className="fw-semibold">Total Product Weight {`(${unit})`}</Form.Label>
                         <Form.Control
-                        placeholder="Enter product weight"
-                        type="number"
-                        name="productWeight"
-                        value={products.find(product => product.productName.toLowerCase().includes("fresh"))?.productWeight}
-                        required
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                            placeholder="Enter product weight"
+                            type="number"
+                            name="productWeight"
+                            value={freshData.productWeight}
+                            required
+                            onChange={handleInputChange}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                         />
                     </Col>
-                    
+
                     {/* Quantity */}
                     <Col className="mb-4">
                         <Form.Label className="fw-semibold">Quantity Of Fresh Fish</Form.Label>
                         <Form.Control
-                        placeholder="Enter quantity"
-                        type="number"
-                        name="quantity"
-                        value={freshData.quantity || ''}                                            
-                        required
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                            placeholder="Enter quantity"
+                            type="number"
+                            name="quantity"
+                            value={freshData.quantity || ''}
+                            required
+                            onChange={handleInputChange}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                         />
                     </Col>
 
@@ -285,50 +334,49 @@ const FreshForm = ({ customers, stages, products}) => {
                     {/* Name of Customer */}
                     <Col className="mb-4">
                         <Form.Group controlId="searchCustomer">
-                        <Form.Label className="fw-semibold">Name</Form.Label>
-                        <div style={{ position: 'relative', width: '100%' }}>
-                            <Form.Control
-                                type="text"
-                                placeholder="Search Name..."
-                                name="fullName"
-                                value={freshData.fullName || ''}
-                                onChange={handleSearchChange}
-                                style={{ width: '100%' }}
-                                className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
-                            />
-                            {freshData.fullName && filteredCustomer.length > 0 && (
-                            <div className={`${styles.suggestions_box}`}>
-                                <ul>
-                                {filteredCustomer.map((customer, index) => (
-                                    <li
-                                    key={index}
-                                    onClick={() => handleSelectCustomer(customer.fullName)}
-                                    style={{ cursor: 'pointer' }}
-                                    >
-                                    {customer.fullName}
-                                    </li>
-                                ))}
-                                </ul>
+                            <Form.Label className="fw-semibold">Name</Form.Label>
+                            <div style={{ position: 'relative', width: '100%' }}>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Search Name..."
+                                    name="fullName"
+                                    value={freshData.fullName || ''}
+                                    onChange={handleSearchChange}
+                                    style={{ width: '100%' }}
+                                    className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
+                                />
+                                {freshData.fullName && filteredCustomer.length > 0 && (
+                                    <div className={`${styles.suggestions_box}`}>
+                                        <ul>
+                                            {filteredCustomer.map((customer, index) => (
+                                                <li
+                                                    key={index}
+                                                    onClick={() => handleSelectCustomer(customer.fullName)}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
+                                                    {customer.fullName}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
-                            )}
-                        </div>
                         </Form.Group>
                     </Col>
 
-                    
                     {/* Discount */}
                     <Col className="mb-4">
                         <Form.Label className="fw-semibold">Discount</Form.Label>
                         <div className={`${styles.inputContainer} position-relative`}>
-                        <Form.Control
-                            placeholder="Enter discount"
-                            type="text"
-                            name="discount"                                            
-                            value={freshData.discount ? (new Intl.NumberFormat().format(freshData.discount)) : '' }                                                            
-                            onChange={handleInputChange}
-                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs} pe-5`}
-                        />
-                        <span className={`${styles.nairaSign} position-absolute end-0 top-50 translate-middle-y pe-2`}>₦</span>
+                            <Form.Control
+                                placeholder="Enter discount"
+                                type="text"
+                                name="discount"
+                                value={freshData.category === 'Marketer' ? '10%' : freshData.discount || ''}
+                                onChange={(e) => setFreshData({ ...freshData, discount: e.target.value })}
+                                className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs} pe-5`}
+                                readOnly={freshData.category === 'Marketer'}
+                            />
                         </div>
                     </Col>
 
@@ -336,12 +384,12 @@ const FreshForm = ({ customers, stages, products}) => {
                     <Col className="mb-4">
                         <Form.Label className="fw-semibold">Description</Form.Label>
                         <Form.Control
-                        placeholder="Enter description"
-                        as="textarea"
-                        name="description"
-                        value={freshData.description || ''}
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                            placeholder="Enter description"
+                            as="textarea"
+                            name="description"
+                            value={freshData.description || ''}
+                            onChange={handleInputChange}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                         />
                     </Col>
 
@@ -349,29 +397,70 @@ const FreshForm = ({ customers, stages, products}) => {
                     <Col className='mb-4'>
                         <Form.Label className="fw-semibold">Payment Type</Form.Label>
                         <Form.Select
-                        name='paymentType'
-                        value={freshData.paymentType || ''}
-                        onChange={handleInputChange}
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                            name='paymentType'
+                            value={freshData.paymentType || ''}
+                            onChange={handleInputChange}
+                            className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
                         >
-                        <option value="" disabled>Select Payment Type</option>
-                        <option value="Cash">Cash</option>
-                        <option value="Credit">Credit</option>
-                        <option value="Transfer">Transfer</option>
-                        <option value="Pos">Pos</option>
+                            <option value="" disabled>Select Payment Type</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Credit">Credit</option>
+                            <option value="Transfer">Transfer</option>
+                            <option value="Pos">Pos</option>
                         </Form.Select>
-                    </Col>  
+                    </Col>
 
-                    {/* Total Price */}
+                    {/* Amount Paid Input (only if paymentType is Credit) */}                    
+                        <Col className="mb-4">
+                            <Form.Label className="fw-semibold">Amount Paid (₦)</Form.Label>
+                            <Form.Control
+                                placeholder="Enter amount paid"
+                                type="text"
+                                name="amountPaid"
+                                value={
+                                    freshData.amountPaid !== null && !isNaN(freshData.amountPaid)
+                                        ? new Intl.NumberFormat().format(freshData.amountPaid)
+                                        : ''
+                                }
+                                onChange={(e) => {
+                                    const rawValue = e.target.value.replace(/,/g, ''); // Remove commas for proper number parsing
+                                    const numericValue = parseFloat(rawValue); // Convert to number
+
+                                    // Update state only if the input is a valid number or an empty string
+                                    if (!isNaN(numericValue) || rawValue === '') {
+                                        setFreshData({
+                                            ...freshData,
+                                            amountPaid: rawValue === '' ? null : numericValue, // Set to null if empty
+                                        });
+                                    }
+                                }}
+                                className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
+                            />
+                        </Col>                
+
+                    {/* Total Price (Readonly) */}
                     <Col className="mb-4">
-                        <Form.Label className="fw-semibold">Total Price</Form.Label>
+                        <Form.Label className="fw-semibold">Total Price (₦)</Form.Label>
                         <Form.Control
-                        placeholder="Total price"
-                        type="text"
-                        name="totalPrice"
-                        value={freshData.totalPrice ? `₦${new Intl.NumberFormat().format(freshData.totalPrice)}` : ''}
-                        readOnly
-                        className={`py-2 bg-light-subtle shadow-none  border-1 ${styles.inputs}`}
+                            placeholder="Total price"
+                            type="text"
+                            name="totalPrice"
+                            value={freshData.totalPrice ? `₦${new Intl.NumberFormat().format(freshData.totalPrice)}` : ''}
+                            readOnly
+                            className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
+                        />
+                    </Col>
+
+                    {/* Discounted Price (Readonly) */}
+                    <Col className="mb-4">
+                        <Form.Label className="fw-semibold">Total Balance (₦)</Form.Label>
+                        <Form.Control
+                            placeholder="Total balance"
+                            type="text"
+                            name="totalBalance"
+                            value={new Intl.NumberFormat().format(calculateTotalBalance())}
+                            readOnly
+                            className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                         />
                     </Col>
                 </Row>
@@ -388,7 +477,7 @@ const FreshForm = ({ customers, stages, products}) => {
             </Form>
 
             {/* Receipt Modal */}
-            {showReceipt && <ReceiptModal receiptData={receiptData} onClose={() => setShowReceipt(false)} />}
+            <ReceiptModal receiptData={receiptData} onClose={() => setShowReceipt(false)} show={showReceipt}/>
         </div>
     );
 };

@@ -103,7 +103,7 @@ export default function ViewBrokenHistory() {
                       <p className="text-start text-muted fw-semibold" style={{fontSize:'14px'}}>Total Quantity</p>
                       <div className="d-flex pb-3">
                           <h1>{brokenQuantity}</h1>
-                          <p className="mt-3 fw-semibold" style={{fontSize:'12px'}}>Kg</p>
+                          <p className="mt-3 fw-semibold" style={{fontSize:'12px'}}>Pieces</p>
                       </div>
                     </div>
                 </div>
@@ -128,18 +128,16 @@ export default function ViewBrokenHistory() {
                 <table className={styles.styled_table}>
                   <thead className={`rounded-2 ${styles.theader}`}>
                     <tr>
-                      <th>DATE CREATED</th>
-                      <th>FISH TYPE</th> 
-                      <th>QUANTITY</th>                    
+                      <th>DATE CREATED</th> 
+                      <th className="text-end pe-4">QUANTITY</th>                    
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedData.length > 0 ? (
                       paginatedData.map((data, index) => (
                         <tr key={index}>
-                          <td>{formatDate(data.updatedAt)}</td>
-                          <td>{data.speciesName}</td>
-                          <td>{data.brokenFishQuantity}</td>                         
+                          <td>{formatDate(data.updatedAt)}</td>                          
+                          <td className="text-end pe-4">{data.brokenFishQuantity}</td>                         
                         </tr>
                       ))
                     ) : (

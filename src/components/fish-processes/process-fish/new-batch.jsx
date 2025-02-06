@@ -17,7 +17,7 @@ export default function NewBatchFish() {
     const [moveFishData, setMoveFishData] = useState({        
         stageId_to: '',
         batch_no: '',
-        actual_quantity: null,
+        actual_quantity: 0,
         remarks: '',
     });
     const navigate = useNavigate();
@@ -64,21 +64,15 @@ export default function NewBatchFish() {
     useEffect(() => {
         const fetchFishType = async () => {
             try {
-                const response = await Api.get('/get-all-active-harvest-batch');
-                if (Array.isArray(response.data.data)) {
-                    const fishData = response.data.data;
-                    setFishType(fishData);
-                    if (fishData.length > 0) {
-                        setMoveFishData(prev => ({
-                            ...prev,
-                            actual_quantity: fishData[0].accumulatedQuantity
-                        }));
-                    }
-                } else {
-                    throw new Error('Expected an array of species');
-                }
+                const response = await Api.get('/get-all-active-harvest-batch');                
+                if (response.data.data.quantity) {
+                    setMoveFishData(prev => ({
+                        ...prev,
+                        actual_quantity: response.data.data.quantity
+                    }));
+                }            
             } catch (err) {
-                console.error(err.response?.data?.message || 'Failed to fetch data. Please try again.');
+                console.error(err.response?.data?.message || 'Failed to fetch data. Please try again.' );
             }
         };
         fetchFishType();

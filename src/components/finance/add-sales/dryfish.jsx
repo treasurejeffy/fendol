@@ -14,11 +14,11 @@ const SalesForm = ({ customers, stages, products }) => {
         discount: 0,
         description: '',
         paymentType: '',
-        amountPaid: null
+        amountPaid: 0
     });
 
-    const [receiptData, setReceiptData] = useState(null); // Store receipt details
-    const [showReceipt, setShowReceipt] = useState(true);
+    const [receiptData, setReceiptData] = useState({}); // Store receipt details
+    const [showReceipt, setShowReceipt] = useState(false);
     const [checkedProducts, setCheckedProducts] = useState({});
     const [currentStep, setCurrentStep] = useState(1);
     const [loader, setLoader] = useState(false);
@@ -126,33 +126,69 @@ const SalesForm = ({ customers, stages, products }) => {
 
     const handleAddSales = async (e) => {
         e.preventDefault();
-
-        // Show confirmation dialog
-        const isConfirmed = window.confirm("Are you sure you want to add this sale?");
-        
-        if (!isConfirmed) {
-            return; // If the user cancels, exit the function
-        }
-
+        if (!window.confirm("Are you sure you want to add this sale?")) return;
+    
         setLoader(true);
-        const loadingToast = toast.loading("Adding sale...", { className: 'dark-toast' });
-
+        
+        // Toast for sale process
+        const salesToast = toast.loading("Adding sale...", { className: 'dark-toast' });
+    
         try {
-            const response = await Api.post('/sales', dryData);
-               // Update UI with receipt info
-            const transactionId = response.data.data.transactionId;
-
-            toast.update(loadingToast, {
+            // 1. Create sale first
+            const saleResponse = await Api.post('/sales', dryData);
+    
+            if (saleResponse.status < 200 || saleResponse.status >= 300) {
+                throw new Error(saleResponse.data?.message || "Sale failed!");
+            }
+    
+            const transactionId = saleResponse.data?.transactionId;
+    
+            if (!transactionId) {
+                toast.update(salesToast, {
+                    render: "Transaction ID not found. Please try again.",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 3000,
+                    className: 'dark-toast'
+                });
+                setLoader(false);
+                return;
+            }
+    
+            // ✅ Sale success toast
+            toast.update(salesToast, {
                 render: "Sale added successfully!",
                 type: "success",
                 isLoading: false,
                 autoClose: 3000,
                 className: 'dark-toast'
             });
-
+    
+            // 2. Toast for fetching receipt
+            const receiptToast = toast.loading("Fetching receipt...", { className: 'dark-toast' });
+    
+            // 3. Fetch receipt using transaction ID
             const receiptResponse = await Api.get(`/receipt/${transactionId}`);
-            setReceiptData(receiptResponse.data)
-
+    
+            if (receiptResponse.status < 200 || receiptResponse.status >= 300) {
+                throw new Error("Receipt could not be fetched.");
+            }
+    
+            // 4. Update state with receipt data
+            setReceiptData(receiptResponse.data);
+    
+            // ✅ Receipt success toast
+            toast.update(receiptToast, {
+                render: "Receipt fetched successfully!",
+                type: "success",
+                isLoading: false,
+                autoClose: 3000,
+                className: 'dark-toast'
+            });
+    
+            setShowReceipt(true); // Show receipt modal
+    
+            // 5. Reset form after showing receipt
             setDryData({
                 products: [],
                 category: '',
@@ -162,31 +198,29 @@ const SalesForm = ({ customers, stages, products }) => {
                 paymentType: '',
                 amountPaid: ''
             });
+    
             setCheckedProducts({});
             setCurrentStep(1);
             setFormSubmitted(false);
-
-            // Show receipt after 3 seconds
-            setTimeout(() => {            
-                if (receiptData !== null) {
-                    setShowReceipt(true); 
-                }
-            }, 3000);
-
+    
         } catch (error) {
-            toast.update(loadingToast, {
-                render: error.response ? error.response.data.message : 'Something went wrong',
+            console.error("Error in handleAddSales:", error);
+    
+            // Handle errors separately for sale and receipt
+            toast.update(salesToast, {
+                render: error.response?.data?.message || error.message || 'Sale failed!',
                 type: "error",
                 isLoading: false,
                 autoClose: 3000,
                 className: 'dark-toast'
             });
+    
+            toast.dismiss(); // Ensure no stale loading toasts remain
         } finally {
             setLoader(false);
         }
-    };
-
-
+    };    
+    
     const isNextButtonDisabled = () => {
         const hasCheckedProduct = Object.values(checkedProducts).some(checked => checked);
         if (!hasCheckedProduct) {
@@ -385,7 +419,14 @@ const SalesForm = ({ customers, stages, products }) => {
                             <Form.Select
                                 name="paymentType"
                                 value={dryData.paymentType || ''}
-                                onChange={(e) => setDryData({ ...dryData, paymentType: e.target.value })}
+                                onChange={(e) => {
+                                    const selectedPayment = e.target.value;
+                                    setDryData((prev) => ({
+                                        ...prev,
+                                        paymentType: selectedPayment,
+                                        amountPaid: selectedPayment !== "Credit" ?  calculateTotalBalance() : prev.amountPaid, // Ensure amountPaid matches totalBalance for non-credit
+                                    }));
+                                }}
                                 required
                                 className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                             >
@@ -397,8 +438,8 @@ const SalesForm = ({ customers, stages, products }) => {
                             </Form.Select>
                         </Col>
 
-                        {/* Amount Paid Input (only if paymentType is Credit) */}
-                        {dryData.paymentType === 'Credit' && (
+                        {/* Amount Paid Input (Only for Credit Payment) */}
+                        {dryData.paymentType === "Credit" && (
                             <Col className="mb-4">
                                 <Form.Label className="fw-semibold">Amount Paid (₦)</Form.Label>
                                 <Form.Control
@@ -428,7 +469,7 @@ const SalesForm = ({ customers, stages, products }) => {
                             />
                         </Col>
 
-                        {/* Discounted Price (Readonly) */}
+                        {/* Total Balance (Readonly) */}
                         <Col className="mb-4">
                             <Form.Label className="fw-semibold">Total Balance (₦)</Form.Label>
                             <Form.Control
@@ -440,6 +481,7 @@ const SalesForm = ({ customers, stages, products }) => {
                                 className={`py-2 bg-light-subtle shadow-none border-1 ${styles.inputs}`}
                             />
                         </Col>
+
                     </Row>
                     <div className="d-flex justify-content-between">
                         <Button

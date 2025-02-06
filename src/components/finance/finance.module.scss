@@ -192,9 +192,9 @@
 
 .receiptModal {
     background: white;
-    padding: 40px;
+    padding: 25px;
     border-radius: 8px;
-    width: 600px;
+    width: 650px;
     height: auto;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 
@@ -213,7 +213,13 @@
         border-collapse: collapse;
         margin-top: 10px;
 
-        th, td {
+        th{
+            background-color: #6C757D;
+            color: #f0f0f0;
+            padding: 8px;
+            text-align: left; 
+        }
+         td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
@@ -221,15 +227,31 @@
     }
 }
 
-
-
 @media print {
   .receiptButtons {
-      display: none !important;
+    display: none !important; // Hide buttons when printing
   }
 
-  .receiptModal{
-    display: none;
-  }
+    .printable, .printable * {
+        visibility: visible;
+    }
+    .printable {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+    
+    .receiptModal {
+    ul {
+      list-style: none; // Remove list styling (bullets/numbers)
+      padding-left: 0; // Remove default padding for lists
 
+      li {
+        span {
+          font-style: oblique; // Apply oblique font style to spans inside list items
+        }
+      }
+    }
+  }
 }

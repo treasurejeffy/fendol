@@ -7,56 +7,134 @@ const ReceiptModal = ({ receiptData, onClose, show }) => {
     const printRef = useRef();
 
     const handlePrint = () => {
-        const printContent = printRef.current.innerHTML;
-        const originalContent = document.body.innerHTML;
+        if (printRef.current) {
+            // Create a container for printing
+            const printContainer = document.createElement("div");
+            printContainer.id = "printable-content";
+            
+            // Apply styles to ensure it fills the page and is visible
+            printContainer.style.position = "fixed";
+            printContainer.style.top = "0";
+            printContainer.style.left = "0";
+            printContainer.style.width = "100%";
+            printContainer.style.minHeight = "100vh";
+            printContainer.style.backgroundColor = "white";
+            printContainer.style.zIndex = "9999"; // High z-index to bring it to the front
+            printContainer.style.padding = "20px";
+            printContainer.style.boxSizing = "border-box";
+            
+            // Copy the content from printRef into the container
+            printContainer.innerHTML = printRef.current.innerHTML;
+            
+            // Append to the document body
+            document.body.appendChild(printContainer);
+            
+            // Wait a moment to ensure the container is rendered, then print
+            setTimeout(() => {
+                window.print();
+                // Remove the container after printing
+                document.body.removeChild(printContainer);
+            }, 100);
+        }
+    };       
+    
+    if (!receiptData || !receiptData.receipt) {
+        return (
+            <Modal show={show} centered size="md">
+                <Modal.Body className="text-center">
+                    <p>No receipt data available.</p>
+                    <Button variant="danger" onClick={onClose}>Close</Button>
+                </Modal.Body>
+            </Modal>
+        );
+    }
 
-        document.body.innerHTML = printContent;
-        window.print();
-        document.body.innerHTML = originalContent;
-    };
-
+    const { receipt } = receiptData;
+    
     return (
         <Modal show={show} centered size="md">
             <Modal.Body className={styles.receiptModal}>
                 <div ref={printRef}>
-                    <img src={Logo} alt="logo" className="mb-3" />
+                    <img src={Logo} alt="logo"/>
                     <div className="d-flex justify-content-end">
                         <ul className="w-35 text-start text-muted">
-                            <li><span>FACTORY/OFFICE</span></li>
-                            <li>Kilometer 5 Osisioma</li>
-                            <li>Industry Layout,</li>
-                            <li>Aba, Abia State</li>
+                            <li><span>FACTORY/OFFICE:</span></li>
+                            <li>Kilometer 5 Osisioma <br/> Industry Layout, </li>
+                            <li>Aba, Abia State.</li>
                             <li>Tel: 08170002853</li>
-                            <li>Email:<br/> fendolgroup@yahoo.com</li>
+                            <li>Email:<br/> fendolgroup@yahoo.com</li>                        
                         </ul>
                     </div>
                     <div className="d-flex justify-content-center">
                         <p className="w-50 rounded-4 fw-semibold bg-light border border-secondary border-3 shadow text-center py-2 text-secondary">
-                            CASH/CREDIT SALES RECEIPT
+                            SALES RECEIPT
                         </p>
                     </div>
                     <div className="d-flex justify-content-between align-items-center gap-2 my-2">
-                        <div className="bg-secondary p-3 rounded-3">
+                        <div className="bg-secondary p-3 shadow rounded-3 border-2 border-secondary-subtle" style={{ width: "60%" }}>
                             <p className="text-light">
-                                <strong>Customer Name:</strong> <span class="text-decoration-underline">Obinna Justinet</span>
+                                <strong>{receiptData.receipt.customerCategory} Name:</strong> <span className=" px-3 text-decoration-underline">{receiptData.receipt.customerAddress}</span>
+                            </p>
+                            <p className="text-light">
+                                <strong>Address:</strong> <span className="px-3 text-decoration-underline">{receiptData.receipt.customerAddress}</span>
+                            </p>
+                            <p className="text-light">
+                                <strong>Served by:</strong> <span className=" px-3 text-decoration-underline">{receiptData.receipt.servedBy}</span>
                             </p>
                         </div>
                         <div>
-                            <span className="text-muted">0029</span>
-                            <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
-                            <p><strong>Time:</strong> {new Date().toLocaleTimeString()}</p>
+                            <span style={{ 
+                                display: 'inline-block', // Required for transform to work
+                                transform: 'rotate(8deg)',                                 
+                                margin: '20px 10px 30px',
+                                fontSize: '1.4rem',
+                                color: '#D2D2D2',
+                                fontStyle: 'italic',
+                                fontWeight: '600',
+                                transformOrigin: 'center' // Ensures the text rotates around its center
+                            }}>
+                                {receiptData.receipt.receiptNumber}
+                            </span>
+                            <p><strong>Date:</strong> <span className="text-decoration-underline px-3"> {receiptData.receipt.date}</span></p>
+                            <p><strong>Time:</strong> <span className="text-decoration-underline px-3">  {receiptData.receipt.time} </span> </p>
                         </div>
                     </div>                
 
-                    <div className="text-end">
-                        <p><strong>Grand Total:</strong> ₦{receiptData?.grandTotal}</p>
-                        <p><strong>Paid with:</strong> {receiptData?.paymentMethod}</p>
+                    <table className="table mt-4">
+                        <thead className="bg-secondary">
+                            <tr className='bg-secondary'>
+                                <th>PRODUCT</th>
+                                <th>QUANTITY</th>
+                                <th>TOTAL(₦)</th>
+                                <th>PRICE (₦)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {receiptData.receipt.items.map((product, index) => (
+                                <tr key={index}>
+                                    <td>{product.product}</td>
+                                    <td>{product.quantity}</td>
+                                    <td>{product.total?.toLocaleString()}</td>
+                                    <td>{product.unitPrice?.toLocaleString()}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    <div className="text-end text-muted">
+                        <p><strong>Grand Total:</strong> ₦{receiptData.receipt.totalAmount?.toLocaleString()}</p>
+                        <p><strong>Paid:</strong> ₦{receiptData.receipt.amountPaid?.toLocaleString()}</p>
+                        <p><strong>Amount Due:</strong> ₦{receiptData.receipt.remainingBalance?.toLocaleString()}</p>
+                        <p><strong>Payment Type:</strong> {receiptData.receipt.paymentMethod}</p>
+                        <p><strong>Your Total Savings:</strong> ₦{receiptData.receipt.discount?.toLocaleString()}</p>
                     </div>
+                    <hr className="my-4"/>
+                    <p className="text-center">Thanks for your Kind Patronage!</p>
                 </div>
 
-                <div className={`d-print-none ${styles.receiptButtons}`}>
-                    <Button variant="primary" onClick={handlePrint}>Print</Button>
-                    <Button variant="secondary" onClick={onClose}>Close</Button>
+                <div className={`d-print-none d-flex justify-content-between ${styles.receiptButtons}`}>
+                    <Button variant="danger" className=' px-4 py-2' onClick={onClose}>Close</Button>
+                    <Button variant="primary" className="px-4 py-2" onClick={handlePrint}>Print</Button>
                 </div>
             </Modal.Body>
         </Modal>

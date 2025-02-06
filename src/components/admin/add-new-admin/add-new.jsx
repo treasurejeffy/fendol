@@ -160,6 +160,7 @@ const AddNew = () => {
                                         <option value="" disabled>Select Role</option>                                
                                         <option value="admin">Admin</option>
                                         <option value="super_admin">Super Admin</option>
+                                        <option value="sales_manager">Sales Manager</option>
                                     </Form.Select>
                                 </Col>
                             </Row>

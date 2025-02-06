@@ -14,18 +14,20 @@ import { toast, ToastContainer } from 'react-toastify';
 const ViewAllStages = () => {
   const [stages, setStages] = useState([]);
   const [note, setNote] = useState([]);
+  const [sampling, setSampling] = useState([]); // Add sampling state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [loader, setLoader] = useState(true);
-  const [errors, setErrors] = useState('')
+  const [errors, setErrors] = useState('');
   const [modaltype, setModaltype] = useState('view all note');
   const [currentPage, setCurrentPage] = useState(0);
-  const [searchTerm, setSearchTerm] = useState(''); // Add state for search term
+  const [searchTerm, setSearchTerm] = useState('');
   const itemsPerPage = 10;
   const [showModal, setShowModal] = useState(false);
   const [showMdModal, setShowMdModal] = useState(false);
+  const [showSamplingModal, setShowSamplingModal] = useState(false); // Separate modal for sampling
   const [selectedStage, setSelectedStage] = useState(null);
-  const [selectedNote, setSelectedNote] = useState(null); // Store the clicked note
+  const [selectedNote, setSelectedNote] = useState(null);
 
   const handleNoteClick = (note) => {
     setSelectedNote(note);
@@ -136,11 +138,47 @@ const ViewAllStages = () => {
       await Api.post(`/note/${selectedStage.id}`, note);
       toast.update(noteToast, { render: 'Note added successfully!', type: 'success', isLoading: false, autoClose: 3000 });
       setShowMdModal(false);
-      fetchnote(selectedStage.id);
     } catch (err) {
       toast.update(noteToast, { render: 'Failed to add note. Please try again.', type: 'error', isLoading: false, autoClose: 3000 });
     }
+    finally {
+      fetchnote(selectedStage.id); // Always fetch samples after the request
+    }
   };
+
+  const fetchSampling = async (stage) => {
+    try {
+      const response = await Api.get(`/sample/${stage}`);  
+      if (Array.isArray(response.data.data)) {
+        setSampling(response.data.data);
+      } else {
+        throw new Error("Expected an array of sampling data");
+      }
+    } catch (err) {
+      console.error("Error fetching sampling data:", err);
+      setErrors(err.response?.data?.message || "Failed to fetch sampling. Please try again.");
+    } finally {
+      setLoader(false);
+    }
+  };
+
+  const handleAddSampling = () => {
+    setShowSamplingModal(true);
+  };
+
+  const handleAddSamplingSubmit = async (sampling) => {
+    const samplingToast = toast.loading('Adding sampling...');
+    try {
+      await Api.post(`/sample/${selectedStage.id}`, sampling);
+      toast.update(samplingToast, { render: 'Sampling added successfully!', type: 'success', isLoading: false, autoClose: 3000 });
+      setShowSamplingModal(false);
+    } catch (err) {
+      toast.update(samplingToast, { render: 'Failed to add sampling. Please try again.', type: 'error', isLoading: false, autoClose: 3000 });
+    }
+    finally {
+      fetchSampling(selectedStage.id); // Always fetch samples after the request
+    }
+  };  
 
   // delete pond function
   const DeletePond = async () => {
@@ -317,8 +355,43 @@ const ViewAllStages = () => {
 
           {/* View Note base on  for Modal Type */}
           <div className={` d-flex m-2  ${modaltype === 'edit pond' ? 'justify-content-end' : 'justify-content-start '}`}>
-            {modaltype === 'edit pond' ? (<span onClick={() => setModaltype('view all note')} style={{cursor:"pointer"}} className="text-muted text-decoration-underline  fw-semibold ">View Notes</span>) : (<h5 className="fw-semibold text-dark">Notes</h5>)
-            }
+          {modaltype === 'edit pond' ? (
+            <div className="d-flex gap-3">
+              <span 
+                onClick={() => setModaltype('view all note')} 
+                style={{ cursor: "pointer" }} 
+                className="text-muted text-decoration-underline fw-semibold"
+              >
+                View Notes
+              </span>
+              <span 
+                onClick={() => setModaltype('view all sampling')} 
+                style={{ cursor: "pointer", marginLeft: "10px" }} 
+                className="text-muted text-decoration-underline fw-semibold"
+              >
+                View Sampling
+              </span>
+            </div>
+          ) : (
+            <div className="d-flex gap-3">
+              <h5
+                className={`fw-semibold text-dark ${modaltype === 'view all note' ? 'border-bottom border-danger-subtle' : ''}`}
+                style={{ cursor: "pointer" }}
+                onClick={() => setModaltype('view all note')}
+              >
+                Notes
+              </h5>
+              <h5
+                className={`fw-semibold text-dark ${modaltype === 'view all sampling' ? 'border-bottom border-danger-subtle' : ''}`}
+                style={{ cursor: "pointer" }}
+                onClick={() => setModaltype('view all sampling')}
+              >
+                Sampling
+              </h5>
+            </div>
+
+          )}
+
           </div>
 
           {/* Conditional Rendering Based on Modal Type */}
@@ -429,6 +502,62 @@ const ViewAllStages = () => {
                 )}
               </>
             )}
+
+            {modaltype === 'view all sampling' && (
+              <>
+                {/* Loading Spinner */}
+                {loader && (
+                  <div className="text-center">
+                    <Spinner animation="border" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {errors && (
+                  <div className="d-flex justify-content-center">
+                    <Alert variant="danger" className="text-center w-50 py-5">
+                      <BsExclamationTriangleFill size={40} />{' '}
+                      <span className="fw-semibold">{errors}</span>
+                    </Alert>
+                  </div>
+                )}
+
+                {/* No Data Message */}
+                {!loader && !errors && sampling.length === 0 && (
+                  <div className="d-flex justify-content-center">
+                    <Alert variant="info" className="text-center w-50 py-5">
+                      No available data
+                    </Alert>
+                  </div>
+                )}
+
+                {/* Sampling Table */}
+                {!loader && !errors && sampling.length > 0 && (
+                  <table className={styles.styled_table}>
+                    <thead>
+                      <tr>
+                        <th>DATE</th>
+                        <th className="text-center">SAMPLING DATA</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sampling.map((sample) => {
+                        const formattedDate = formatDate(sample.createdAt);
+                        return (
+                          <tr key={sample.id}>
+                            <td>{formattedDate}</td>
+                            <td className="text-center">{sample.sample_labeling}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </>
+            )}
+
           </div>
         </Modal.Body>
 
@@ -441,15 +570,24 @@ const ViewAllStages = () => {
             >
               ADD NOTE
             </Button>
-          ) : (
-            <Button
-              variant="dark"
-              onClick={handleSave}
-              className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
-            >
-              Save Changes
-            </Button>
-          )}
+            ) : modaltype === 'view all sampling' ? (
+              <Button
+                variant="dark"
+                onClick={handleAddSampling}
+                className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
+              >
+                ADD SAMPLING
+              </Button>
+              ) : (
+              <Button
+                variant="dark"
+                onClick={handleSave}
+                className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}
+              >
+                Save Changes
+              </Button>
+            )}
+
         </Modal.Footer>
       </Modal>
 
@@ -491,6 +629,36 @@ const ViewAllStages = () => {
           </Form>
         </Modal.Body>
       </Modal>
+
+      {/* Add Sampling Modal */}
+      <Modal show={showSamplingModal} className="border-0" onHide={() => setShowSamplingModal(false)}>
+        <Modal.Header closeButton className="border-0">
+          <Modal.Title className="fw-semibold">Add Sampling</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="border-0">
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              const sampling = {
+                sample_labeling: formData.get('sample_labeling'),
+              };
+              handleAddSamplingSubmit(sampling);
+            }}
+          >
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-semibold">Sampling Comment</Form.Label>
+              <Form.Control as="textarea" name="sample_labeling" placeholder="Write sampling comment" rows={3} required />
+            </Form.Group>
+            <div className="text-end">
+              <Button type="submit" className={`border-0 btn-dark shadow py-2 px-5 fs-6 mb-5 fw-semibold ${styles.submit}`}>
+                ADD
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
 
     </section>
   );

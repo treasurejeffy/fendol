@@ -125,7 +125,6 @@ export default function SideBar() {
                                 </div>
                             </Collapse>
                         </Card>
-                     
                        )}
 
                         {/* Customer navigation */}
@@ -172,7 +171,7 @@ export default function SideBar() {
                         </Card>
 
                         {/* Pond navigation */}
-                        <Card className={styles.card}>
+                        {role !== 'sales_manager' &&  <Card className={styles.card}>
                             <Card.Header
                                 onClick={() => handleToggle('ponds')}
                                 aria-controls="ponds-collapse-text"
@@ -213,10 +212,10 @@ export default function SideBar() {
                                     </Card.Body>
                                 </div>
                             </Collapse>
-                        </Card>
+                        </Card>}
 
                          {/* Manage Fish navigation */}
-                         <Card className={styles.card}>
+                        {role !== 'sales_manager' && <Card className={styles.card}>
                             <Card.Header
                                 onClick={() => handleToggle('manage_fish')}
                                 aria-controls="manage_fish-collapse-text"
@@ -293,10 +292,10 @@ export default function SideBar() {
                                     </Card.Body>
                                 </div>
                             </Collapse>
-                        </Card>
+                        </Card>}
 
                         {/* Process navigation */}
-                        <Card className={styles.card}>
+                        {role !== 'sales_manager' && <Card className={styles.card}>
                             <Card.Header
                                 onClick={() => handleToggle('fish_processes')}
                                 aria-controls="fish_processes-collapse-text"
@@ -336,7 +335,7 @@ export default function SideBar() {
                                     </Card.Body>
                                 </div>
                             </Collapse>
-                        </Card>
+                        </Card>}
 
                         {/* Products navigation */}
                         <Card className={styles.card}>
@@ -430,7 +429,7 @@ export default function SideBar() {
                         </Card>
 
                         {/* Feed navigation */}
-                        <Card className={styles.card}>
+                        {role !== 'sales_manager' && <Card className={styles.card}>
                             <Card.Header 
                                 onClick={() => handleToggle('feed')} 
                                 aria-controls="feed-collapse-text" 
@@ -479,10 +478,10 @@ export default function SideBar() {
                                     </Card.Body>
                                 </div>
                             </Collapse>
-                        </Card>
+                        </Card>}
 
                         {/* store navigation */}
-                        <Card className={styles.card}>
+                        {role !== 'sales_manager' && <Card className={styles.card}>
                             <Card.Header 
                                 onClick={() => handleToggle('store')} 
                                 aria-controls="store-collapse-text" 
@@ -531,7 +530,7 @@ export default function SideBar() {
                                     </Card.Body>
                                 </div>
                             </Collapse>
-                        </Card>
+                        </Card>}
 
                         {/* finance navigation */}
                         <Card className={styles.card}>
@@ -562,7 +561,7 @@ export default function SideBar() {
                                                 <FaRegCircle size={16} className="me-1" /> Add Sales
                                             </div>
                                         </Nav.Item>
-                                        <Nav.Item className="mb-3" title="Add Expenses">
+                                        {role !== 'sales_manager' && <Nav.Item className="mb-3" title="Add Expenses">
                                             <div 
                                                 onClick={() => navigate('/finance/add-expenses')} 
                                                 className={`${location.pathname === "/finance/add-expenses" ? styles.activeLink : styles.nonactiveLink}`}
@@ -570,7 +569,7 @@ export default function SideBar() {
                                             >
                                                 <FaRegCircle size={16} className="me-1" /> Add Expenses
                                             </div>
-                                        </Nav.Item>
+                                        </Nav.Item>}
                                         {role === 'super_admin' && (<Nav.Item className="mb-3" title="Financial Ledger">
                                             <div 
                                                 onClick={() => navigate('/finance/ledger')} 
@@ -663,14 +662,14 @@ export default function SideBar() {
                             </Collapse>
                         </Card> */}
 
-                        <Nav.Item className={`mt-3 ${location.pathname === "/damage-loss" ? 'mx-2' : ''}`}>
-                        <Nav.Link
-                            onClick={() => navigate('/damage-loss')}
-                            className={`${location.pathname === "/damage-loss" ? styles.activeLink : styles.nonactiveLink}`}
-                        >
-                            <GiDamagedHouse size={25} className="me-1 text-light" /> <span className={styles.title}>Damage/Loss</span>
-                        </Nav.Link>                        
-                    </Nav.Item>
+                        {role !== 'sales_manager' && <Nav.Item className={`mt-3 ${location.pathname === "/damage-loss" ? 'mx-2' : ''}`}>
+                            <Nav.Link
+                                onClick={() => navigate('/damage-loss')}
+                                className={`${location.pathname === "/damage-loss" ? styles.activeLink : styles.nonactiveLink}`}
+                            >
+                                <GiDamagedHouse size={25} className="me-1 text-light" /> <span className={styles.title}>Damage/Loss</span>
+                            </Nav.Link>                        
+                        </Nav.Item>}
 
                         {/* Notification navigation */}
                         {/* <Card className={styles.card}>

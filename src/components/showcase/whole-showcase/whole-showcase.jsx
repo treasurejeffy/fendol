@@ -8,7 +8,7 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import { BsThreeDotsVertical} from "react-icons/bs"; // Dropdown icon
 import ReactPaginate from "react-paginate";
 import Api from "../../shared/api/apiLink";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function ViewWholeHistory() {
@@ -23,6 +23,7 @@ export default function ViewWholeHistory() {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState(""); // 'damage' or 'broken'
   const [brokenFishQuantity, setBrokenFishQuantity] = useState("");
+  const [damageFishQuantity, setDamageFishQuantity] = useState("");
   const [remarks, setRemarks] = useState("");
 
   const itemsPerPage = 10;
@@ -83,8 +84,10 @@ export default function ViewWholeHistory() {
 
   const handleSubmit = async () => {
     setLoading(true);
-    const loadingToast = toast.loading("Processing...");
-    if (!brokenFishQuantity || !remarks) {
+    const loadingToast = toast.loading("Moving...");
+  
+    const quantity = modalType === "damage" ? damageFishQuantity : brokenFishQuantity;
+    if (!quantity || !remarks) {
       toast.update(loadingToast, {
         render: 'Please fill in all fields.',
         type: "error",
@@ -92,33 +95,45 @@ export default function ViewWholeHistory() {
         autoClose: 3000,
         className: 'dark-toast'
       });
+      setLoading(false);
       return;
     }
+  
     try {
-      const endpoint =
-        modalType === "damage" ? "/move-damage" : "/move-broken";
-      const payload = { brokenFishQuantity, remarks };
-
-      const response = await Api.post(endpoint, payload);
+      const endpoint = modalType === "damage" ? "/move-to-damage" : "/move-to-broken";        
+      const payload =
+      modalType === "damage"
+        ? { damagedFishQuantity: Number(damageFishQuantity), remarks }
+        : { brokenFishQuantity: Number(brokenFishQuantity), remarks };
+  
+      await Api.post(endpoint, payload);
       toast.update(loadingToast, {
-        render: "OPERATION SUCCESSFULL!",
+        render: "OPERATION SUCCESSFUL!",
         type: "success",
         isLoading: false,
         autoClose: 3000,
         className: 'dark-toast'
       });
+      
+      setDamageFishQuantity('');
+      setBrokenFishQuantity('');
+      setRemarks('');
       fetchTableData(); // Refresh table data after successful submission
+      fetchQuantityData(); // Refresh quantity data after successful submission
       handleCloseModal();
     } catch (error) {
-        toast.update(loadingToast, {
-          render: error.response ? error.response.data.message : 'An error occurred while performing the action.',
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-          className: 'dark-toast'
-        });
+      toast.update(loadingToast, {
+        render: error.response.data.message || 'An error occurred while performing the action.',
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+        className: 'dark-toast'
+      });
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
@@ -190,7 +205,7 @@ export default function ViewWholeHistory() {
                       <div className="d-flex pb-3">
                         <h1>{brokenQuantity}</h1>
                         <p className="mt-3 fw-semibold" style={{ fontSize: "12px" }}>
-                          piece
+                          pieces
                         </p>
                       </div>
                     </div>
@@ -266,6 +281,7 @@ export default function ViewWholeHistory() {
         </section>
 
         <Modal show={showModal} onHide={handleCloseModal}>
+          <ToastContainer/>
           <Modal.Header closeButton  className='border-0'>
             <Modal.Title>
               {modalType === "damage" ? "Move to Damage" : "Move to Broken"}
@@ -278,8 +294,8 @@ export default function ViewWholeHistory() {
                 <Form.Label>Quantity</Form.Label>
                 <Form.Control
                   type="number"
-                  value={brokenFishQuantity}
-                  onChange={(e) => setBrokenFishQuantity(e.target.value)}
+                  value={modalType === "damage" ? damageFishQuantity : brokenFishQuantity}
+                  onChange={(e) => modalType === "damage" ? setDamageFishQuantity(e.target.value) : setBrokenFishQuantity(e.target.value)}
                   className="py-2 shadow-none border-secondary-subtle border-1"
                 />
               </Form.Group>
